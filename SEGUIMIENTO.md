@@ -9,23 +9,63 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**Fase 0 — Infraestructura.** Terminada. La app está en vivo:
+**Fase 1 — Admin.** Terminada. La app está en vivo con los datos reales:
 
 **https://warmup-ad2026.vercel.app**
 
-Faltan dos pasos que solo puede hacer Gustavo:
+Entra con la cuenta del equipo. Lo que se puede hacer hoy: ver el Tablero, el mapa de mesas
+por bloque, la lista de empresas con su ficha, y corregir reclutadores.
 
-1. **Crear la cuenta del equipo** en el panel de Supabase → Authentication → Users → Add user.
-   Correo y contraseña los elige él; no se escriben aquí ni en el vault.
-   Después hay que agregarla a la tabla `equipo` (ver
-   `supabase/migrations/06_lista_del_equipo.sql`). Sin esto nadie puede entrar a `/admin`.
+Dos cosas pendientes que no bloquean:
+
+1. **Etiquetar las carreras de las 54 empresas.** El Excel las trae como texto libre
+   ("Ingenierías: mecatrónica, mecánica, industrial"), y el filtro del día del evento
+   necesita etiquetas de la lista cerrada. Se hace desde la ficha de cada empresa.
+   Hoy hay 1 de 54 etiquetada, la de prueba.
 2. **Reconectar GitHub.** `gh auth status` dice que el token de la cuenta `Mrnrv32` está
-   vencido. El repo existe en local con dos commits; falta crearlo en GitHub y empujar.
-   Vercel ya despliega por CLI, así que esto no bloquea nada, solo el respaldo del código.
+   vencido. El repo existe en local con cuatro commits. Vercel despliega por CLI, así que
+   esto solo bloquea el respaldo del código.
 
-**Siguiente:** Fase 1 — importador del Excel, Tablero, Mapa de mesas, Empresas, Reclutadores.
+**Siguiente:** Fase 2 — Cupos y Pendientes. Los 27 pendientes ya están importados en la base;
+falta la pantalla. Si el tiempo aprieta, la Fase 2 se recorre y se salta a la 3.
 
 ## Fases cerradas
+
+### Fase 1 — Admin · 15-sep-2026
+
+- Importador del libro de control, leído en el navegador con SheetJS. Vista previa de altas,
+  cambios y bajas antes de aplicar. El libro nunca se escribe.
+- Tablero, mapa de mesas por bloque, empresas con ficha y etiquetado de carreras,
+  y tabla de reclutadores editable.
+- `src/lib/cifras.js` calcula con las mismas fórmulas del Tablero del Excel.
+- `scripts/verificar-importacion.mjs` corre el mismo código que el navegador y compara
+  contra las cifras del Excel.
+
+**Verificado con el libro real, corte del 15-sep:**
+
+| Cifra | App | Excel |
+|---|---|---|
+| Empresas | 54 | 54 |
+| Reclutadores Bloque 1 | 71 | 71 |
+| Reclutadores Bloque 2 | 48 | 48 |
+| Mesas apartadas | 71 | 71 |
+| Capacidad | 714 | 714 |
+| Nombres por confirmar | 10 | 10 |
+
+Además: 3 mesas libres —la 3, la 4 y la 74, igual que dice el panel del vault—, 7 reclutadores
+sin nombre y ninguno sin mesa.
+
+| Prueba | Resultado |
+|---|---|
+| Reimportar el mismo libro | 0 altas, 0 cambios, 54 sin cambio. No duplica |
+| Carreras etiquetadas tras reimportar | Sobreviven |
+| Fila TOTAL de la hoja Empresas | Se salta. Lee 54, no 55 |
+| Mesa 76 con el salón en 74 | Tablero y mapa la marcan en rojo, y la 75 también |
+| Botón "Ya la conseguí" | El total sube a 75 y el rojo de la 75 se apaga |
+| Mesa repetida en el mismo bloque | El editor avisa y no deja guardar |
+| Subir un archivo por el input del navegador | Lee y compara bien |
+| Bajas en la vista previa | Avisa las 54 y no borra nada |
+| Todas las pantallas a 375 px | Sin desbordes |
 
 ### Fase 0 — Infraestructura · 15-sep-2026
 
@@ -87,10 +127,31 @@ el día del evento. Las variables de entorno siguen mandando cuando existen.
 **Marcar Ocupado siempre reinicia el cronómetro.** Se tomó como "empezó una sesión nueva".
 Si resulta molesto el día del ensayo, se cambia a que no reinicie si ya estaba ocupada.
 
+**Los reclutadores se reemplazan enteros en cada importación; las empresas se actualizan.**
+En la tabla de reclutadores no vive nada capturado desde la app, así que borrar e insertar es
+más simple y no pierde nada. Las empresas sí guardan las carreras etiquetadas, por eso van
+por upsert conservando su id.
+
+**Los pendientes salen de la columna Notas de la hoja Empresas, no de la lista del Tablero.**
+Esa columna es la que el Tablero cuenta para "Empresas con algo pendiente" y da 27. La lista
+de viñetas del Tablero trae 21 y está escrita a mano.
+
+**Mesas apartadas se cuenta como mesas distintas usadas, no como MAX de los dos bloques.**
+El Excel usa `MAX(B1, B2)` y hoy las dos dan 71. Contar las distintas es más honesto si algún
+día los bloques usan numeraciones separadas.
+
+**SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
+pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
+
+**Estatus `cancelado` agregado al enum.** El Tablero del Excel ya lo descuenta
+(`Reclutadores!F:F,"<>Cancelado"`). Hoy no hay ninguno, pero la importación tenía que aguantarlo.
+
 ## Lo que está a medias
 
-Nada a medias. Las pantallas de admin, `/mesa` y `/host` son marcadores a propósito: dicen
-qué fase las construye.
+- **Las carreras de 53 de las 54 empresas están sin etiquetar.** Es captura manual desde la
+  ficha de cada empresa. Sin eso, el filtro por carrera de la Fase 4 no sirve.
+- `/mesa` y `/host` siguen siendo marcadores. Las construyen las fases 3 y 4.
+- Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
 ## Lo que se intentó y no funcionó
 
@@ -105,6 +166,13 @@ qué fase las construye.
   sin decir por qué. Habría reventado la pantalla del reclutador en la Fase 3. Ahora hay dos
   funciones —`edicionActiva()` con las columnas públicas y `edicionCompleta()` para el
   equipo— y `Cargando` tiene estado de error.
+- **Copiar el `.xlsx` a `public/` para probar la subida desde el navegador:** el entorno lo
+  bloqueó, y con razón — ese libro trae correos y celulares de 54 empresas y `public/` se
+  publica entero. Se resolvió de dos maneras: el importador se verificó desde Node con el
+  libro en su lugar, y el camino del navegador con un libro sintético de dos empresas
+  inventadas.
+- **`raise notice` para depurar SQL:** el MCP no devuelve los avisos ni los resultados
+  intermedios, solo el de la última sentencia.
 - **Primera prueba de escritura del intruso:** dio "pasó" por un falso positivo. El insert
   usaba un subselect sobre `ediciones`, que bajo RLS devolvía cero filas, así que insertaba
   cero y nunca disparaba el `with check`. Con un valor literal, rechaza bien.
@@ -123,5 +191,5 @@ confirmación de Management Solutions del 15.
 | Capacidad del evento | 714 atenciones |
 | Empresas con algo pendiente | 27 |
 
-Contra estas cifras se verifica la Fase 1. La base todavía está vacía de empresas y
-reclutadores: solo tiene el catálogo de carreras y las franjas de cupo.
+La base ya trae estas cifras cargadas y verificadas. Cuando entren registros nuevos, se
+captura en el Excel como siempre y se vuelve a importar.
