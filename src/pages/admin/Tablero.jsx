@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
-import { supabase, edicionCompleta } from '../../lib/supabase'
+import { Link } from 'react-router-dom'
+import { useDatos } from '../../lib/datos'
+import { calcularCifras, faltan } from '../../lib/cifras'
 import Cargando from '../../components/Cargando'
 
-function Cifra({ valor, etiqueta, nota }) {
+function Cifra({ valor, etiqueta, nota, tono }) {
+  const acento = {
+    rojo:  'border-rojo/60',
+    ambar: 'border-ambar/60',
+    teal:  'border-teal/60',
+  }[tono] ?? 'border-lavanda/15'
   return (
-    <div className="rounded-2xl border border-lavanda/15 bg-marino-alto/50 px-4 py-3.5">
+    <div className={`rounded-2xl border ${acento} bg-marino-alto/50 px-4 py-3.5`}>
       <p className="text-3xl font-extrabold cifra leading-none">{valor}</p>
       <p className="text-[13px] text-lavanda/80 mt-1.5 leading-tight">{etiqueta}</p>
       {nota && <p className="text-[11px] text-lavanda/45 mt-0.5 leading-tight">{nota}</p>}
@@ -13,29 +19,12 @@ function Cifra({ valor, etiqueta, nota }) {
 }
 
 export default function Tablero() {
-  const [edicion, setEdicion] = useState(null)
-  const [conteos, setConteos] = useState(null)
-  const [error, setError]     = useState(null)
+  const datos = useDatos()
+  if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const ed = await edicionCompleta()
-        if (!ed) { setError('No hay una edición activa en la base.'); return }
-        setEdicion(ed)
-        const [empresas, carreras] = await Promise.all([
-          supabase.from('empresas').select('id', { count: 'exact', head: true }).eq('edicion_id', ed.id),
-          supabase.from('carreras').select('siglas', { count: 'exact', head: true }),
-        ])
-        setConteos({ empresas: empresas.count ?? 0, carreras: carreras.count ?? 0 })
-      } catch (e) {
-        setError(e.message ?? e)
-      }
-    })()
-  }, [])
-
-  if (error)   return <Cargando error={error} />
-  if (!edicion) return <Cargando />
+  const { edicion, empresas, reclutadores } = datos
+  const c = calcularCifras({ edicion, empresas, reclutadores })
+  const vacio = empresas.length === 0
 
   const dias = Math.ceil(
     (new Date(edicion.fecha + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000
@@ -46,26 +35,58 @@ export default function Tablero() {
       <div>
         <h2 className="text-xl font-extrabold">Tablero</h2>
         <p className="text-sm text-lavanda/60 mt-0.5">
-          {edicion.nombre} · {new Date(edicion.fecha + 'T00:00:00').toLocaleDateString('es-MX',
-            { day: 'numeric', month: 'long', year: 'numeric' })}
+          {edicion.nombre} · {new Date(edicion.fecha + 'T00:00:00')
+            .toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
       </div>
+
+      {vacio && (
+        <div className="rounded-2xl border border-ambar/50 bg-ambar/10 px-5 py-4">
+          <p className="text-sm font-semibold">Todavía no hay datos</p>
+          <p className="text-sm text-lavanda/75 mt-1">
+            Sube el libro de control en <Link to="/admin/importar" className="text-cian underline">Importar Excel</Link>.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Cifra valor={dias > 0 ? dias : 0} etiqueta="Días para el evento" />
-        <Cifra valor={conteos?.empresas ?? '—'} etiqueta="Empresas registradas" />
-        <Cifra valor={edicion.total_mesas} etiqueta="Mesas en el salón"
-               nota="Sube al conseguir una excedente" />
-        <Cifra valor={conteos?.carreras ?? '—'} etiqueta="Carreras del catálogo" />
+        <Cifra valor={c.empresas} etiqueta="Empresas registradas" />
+        <Cifra valor={c.reclutadoresB1} etiqueta="Reclutadores Bloque 1" nota="10:00 a 13:00 h" />
+        <Cifra valor={c.reclutadoresB2} etiqueta="Reclutadores Bloque 2" nota="14:00 a 17:00 h" />
       </div>
 
-      <div className="rounded-2xl border border-dashed border-lavanda/25 bg-marino-alto/40 px-5 py-6">
-        <p className="text-xs uppercase tracking-widest text-ambar font-semibold">Fase 1</p>
-        <p className="text-sm text-lavanda/75 mt-2 leading-relaxed max-w-prose">
-          Aquí entran los reclutadores por bloque, las mesas apartadas contra el total, las mesas
-          faltantes y la capacidad del evento. Salen del Excel en cuanto corras la importación.
-        </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Cifra
+          valor={`${c.mesasApartadas} de ${c.totalMesas}`}
+          etiqueta="Mesas apartadas"
+          nota={c.mesasLibres > 0 ? `Quedan ${c.mesasLibres} libres` : 'Sin mesas libres'}
+        />
+        <Cifra
+          valor={c.mesasFaltantes}
+          etiqueta="Mesas por conseguir"
+          nota={c.mesasFaltantes > 0 ? `La más alta asignada es la ${c.mesaMasAlta}` : 'El salón alcanza'}
+          tono={c.mesasFaltantes > 0 ? 'rojo' : undefined}
+        />
+        <Cifra
+          valor={c.porConfirmar}
+          etiqueta="Nombres por confirmar"
+          tono={c.porConfirmar > 0 ? 'ambar' : undefined}
+        />
+        <Cifra valor={c.capacidad} etiqueta="Capacidad del evento" nota="atenciones" />
       </div>
+
+      {c.mesasFaltantes > 0 && (
+        <div className="rounded-2xl border border-rojo/50 bg-rojo/10 px-5 py-4">
+          <p className="text-sm font-semibold">
+            En el salón {faltan(c.mesasFaltantes)}
+          </p>
+          <p className="text-sm text-lavanda/75 mt-1">
+            Hay reclutadores asignados hasta la mesa {c.mesaMasAlta} y el salón tiene {c.totalMesas}.
+            {' '}<Link to="/admin/mesas" className="text-cian underline">Ver el mapa</Link>.
+          </p>
+        </div>
+      )}
     </section>
   )
 }

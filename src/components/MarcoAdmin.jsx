@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { ProveedorDatos } from '../lib/datos'
 
 const SECCIONES = [
   { a: '/admin',              t: 'Tablero',      fin: true },
@@ -54,7 +55,9 @@ export default function MarcoAdmin() {
       </header>
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-5">
-        <Outlet />
+        <ProveedorDatos>
+          <Outlet />
+        </ProveedorDatos>
       </main>
     </div>
   )

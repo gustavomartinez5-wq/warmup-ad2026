@@ -7,10 +7,12 @@
  * no se cae por una variable de entorno que faltó.
  *
  * Las variables de entorno mandan cuando existen, para poder apuntar a otra base
- * sin tocar el código.
+ * sin tocar el código. El `?.` permite además importar este módulo desde Node, donde
+ * `import.meta.env` no existe: así los scripts de verificación corren el mismo código
+ * que el navegador.
  */
 export const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL || 'https://vaowqzodsivdeqbqpcrn.supabase.co'
+  import.meta.env?.VITE_SUPABASE_URL || 'https://vaowqzodsivdeqbqpcrn.supabase.co'
 
 export const SUPABASE_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_g9M5sOz91Lp-K30Y7o3bfQ_ZdLtiiP8'
+  import.meta.env?.VITE_SUPABASE_ANON_KEY || 'sb_publishable_g9M5sOz91Lp-K30Y7o3bfQ_ZdLtiiP8'

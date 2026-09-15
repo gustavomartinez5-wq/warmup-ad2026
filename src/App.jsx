@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ProveedorSesion } from './lib/sesion'
 import Protegida from './components/Protegida'
@@ -13,7 +14,11 @@ import Empresas from './pages/admin/Empresas'
 import Reclutadores from './pages/admin/Reclutadores'
 import Cupos from './pages/admin/Cupos'
 import Pendientes from './pages/admin/Pendientes'
-import Importar from './pages/admin/Importar'
+import Cargando from './components/Cargando'
+
+// SheetJS pesa medio megabyte. Se carga solo al abrir la importación, para que las
+// pantallas del día del evento arranquen ligeras en un celular.
+const Importar = lazy(() => import('./pages/admin/Importar'))
 
 export default function App() {
   return (
@@ -33,7 +38,7 @@ export default function App() {
             <Route path="reclutadores" element={<Reclutadores />} />
             <Route path="cupos" element={<Cupos />} />
             <Route path="pendientes" element={<Pendientes />} />
-            <Route path="importar" element={<Importar />} />
+            <Route path="importar" element={<Suspense fallback={<Cargando />}><Importar /></Suspense>} />
           </Route>
 
           <Route path="*" element={<Navigate to="/admin" replace />} />
