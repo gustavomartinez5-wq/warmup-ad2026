@@ -13,6 +13,8 @@ export function ProveedorDatos({ children }) {
   const [empresas, setEmpresas] = useState([])
   const [reclutadores, setReclutadores] = useState([])
   const [carreras, setCarreras] = useState([])
+  const [cupos, setCupos] = useState([])
+  const [pendientes, setPendientes] = useState([])
 
   const recargar = useCallback(async () => {
     setEstado({ cargando: true, error: null })
@@ -21,15 +23,18 @@ export function ProveedorDatos({ children }) {
       if (!ed) throw new Error('No hay una edición activa en la base.')
       setEdicion(ed)
 
-      const [e, r, c] = await Promise.all([
+      const [e, r, c, cu, pe] = await Promise.all([
         supabase.from('empresas')
           .select('*, empresa_carreras(siglas)')
           .eq('edicion_id', ed.id).order('nombre'),
         supabase.from('reclutadores')
           .select('*').eq('edicion_id', ed.id).order('mesa_numero', { nullsFirst: false }),
         supabase.from('carreras').select('*').order('siglas'),
+        supabase.from('cupos').select('*').eq('edicion_id', ed.id).order('orden'),
+        supabase.from('pendientes')
+          .select('*, empresas(nombre)').eq('edicion_id', ed.id).order('creado_en'),
       ])
-      for (const res of [e, r, c]) if (res.error) throw res.error
+      for (const res of [e, r, c, cu, pe]) if (res.error) throw res.error
 
       setEmpresas((e.data ?? []).map(x => ({
         ...x,
@@ -37,6 +42,8 @@ export function ProveedorDatos({ children }) {
       })))
       setReclutadores(r.data ?? [])
       setCarreras(c.data ?? [])
+      setCupos(cu.data ?? [])
+      setPendientes(pe.data ?? [])
       setEstado({ cargando: false, error: null })
     } catch (err) {
       setEstado({ cargando: false, error: err.message ?? String(err) })
@@ -46,7 +53,7 @@ export function ProveedorDatos({ children }) {
   useEffect(() => { recargar() }, [recargar])
 
   return (
-    <Ctx.Provider value={{ ...estado, edicion, empresas, reclutadores, carreras, recargar }}>
+    <Ctx.Provider value={{ ...estado, edicion, empresas, reclutadores, carreras, cupos, pendientes, recargar }}>
       {children}
     </Ctx.Provider>
   )

@@ -9,7 +9,7 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**Fase 4 — Vista de host.** Terminada. La app está completa salvo Cupos y Pendientes.
+**La app está completa.** Quedan las seis pantallas de admin, la del reclutador y la de host.
 
 | Pantalla | Link | Quién entra |
 |---|---|---|
@@ -18,19 +18,42 @@ dónde quedamos.
 | Reclutador | https://warmup-ad2026.vercel.app/mesa | nadie, es el QR |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr | cuenta del equipo |
 
-**Siguiente:** Fase 5, el ensayo. Antes conviene cerrar dos cosas:
+**Siguiente:** Fase 5, el ensayo. Se corre con Gustavo, dos teléfonos y una laptop: un host
+mandando estudiantes imaginarios y dos reclutadores cambiando estados.
 
-1. ~~Etiquetar las carreras~~ — hecho el 15-sep. Las 54 empresas quedaron etiquetadas,
-   1,101 etiquetas. El mapeo vive en `supabase/carreras-por-empresa.sql` y la tabla para
-   revisarlo en `supabase/carreras-asignadas.md`. **Falta que Gustavo lo revise:** es criterio,
+Antes del 28 conviene:
+
+1. **Revisar el etiquetado de carreras.** Está en `supabase/carreras-asignadas.md`. Es criterio,
    no dato duro.
-2. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido. El
-   repo vive en local con seis commits. Vercel despliega por CLI, así que solo falta el respaldo.
-
-La Fase 2 —Cupos y Pendientes— se recorrió a propósito: no hace falta para operar el evento.
-Los 27 pendientes ya están importados en la base, esperando pantalla.
+2. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido. El repo
+   vive en local con nueve commits. Vercel despliega por CLI, así que solo falta el respaldo.
+3. **Limpiar los estados de mesa** que queden de las pruebas, la mañana del evento.
 
 ## Fases cerradas
+
+### Fase 2 — Cupos y pendientes · 15-sep-2026
+
+- `/admin/cupos`: las seis franjas como tarjetas, con reclutadores, capacidad, cupo CV y
+  cupo entrevista calculados, los dos campos de registro editables y el semáforo. Arriba, los
+  supuestos —atenciones por hora y % para CV— también editables: cambiarlos recalcula todo.
+- `/admin/pendientes`: los 27 del Excel, con pestañas de abiertos y resueltos y buscador.
+  Resolver no borra: marca. Una reimportación respeta lo resuelto.
+- El Tablero suma dos cifras: pendientes abiertos y empresas sin carreras etiquetadas.
+
+**Verificado contra la hoja Cupos del Excel:**
+
+| Prueba | Resultado |
+|---|---|
+| Capacidad total | 714, igual que el Excel |
+| Franja de Bloque 1 | 71 reclutadores, 142 capacidad, 85 CV, 57 entrevista |
+| Registrar 130 de 142 | Semáforo «Por cerrar», 12 disponibles |
+| Registrar 140 de 142 | Semáforo «Lleno», 2 disponibles |
+| Volver a 0 | «Abierto», 142 disponibles |
+| Supuestos a 3 por hora y 50% | Capacidad 1071, cupos 107 y 106 |
+| Supuestos de vuelta a 2 y 60% | 714, 85 y 57 |
+| Pendientes cargados | 27 abiertos, igual que el Tablero del Excel |
+| Resolver uno y reimportar el Excel | Sigue resuelto, y las 1,101 etiquetas intactas |
+| Las dos pantallas a 375 px | Sin desbordes, sin errores de consola |
 
 ### Etiquetado de carreras · 15-sep-2026
 
@@ -225,6 +248,15 @@ día los bloques usan numeraciones separadas.
 **SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
 pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
 
+**Los supuestos de cupo son editables desde la app.** El Excel los tiene como celdas sueltas
+en la hoja Cupos; aquí viven en `ediciones` y cambiarlos recalcula las seis franjas. El
+semáforo usa umbrales que el Excel no traía: menos de 70% Abierto, de 70 a 95% Por cerrar,
+95% o más Lleno.
+
+**Resolver un pendiente no lo borra.** La reimportación vuelve a leer las notas del Excel,
+así que borrarlos los traería de vuelta al día siguiente. Marcarlos resueltos es lo que
+sobrevive.
+
 **El buscador de `/host` entiende carreras, no solo empresas.** Escribir «IRS» saca las 16
 empresas que la buscan. Las siglas se comparan por principio —«IM» encuentra IM, IMA, IMD e
 IMT— y el nombre completo por cualquier parte, sin acentos: «robotica» llega a IRS y a ISD.
@@ -268,7 +300,8 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 - **El etiquetado de carreras es criterio mío, sin revisar por Gustavo.** Está en
   `supabase/carreras-asignadas.md` para que lo lea. Lo más discutible: cuando una empresa
   dice «ingenierías en general» recibe las 22, biomédica incluida.
-- Cupos y Pendientes siguen siendo marcadores. Los datos de pendientes ya están importados.
+- Nada a medias en el código. Lo único abierto es criterio: el etiquetado de carreras
+  necesita que Gustavo lo lea.
 - Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
 ## Lo que se intentó y no funcionó

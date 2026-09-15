@@ -22,9 +22,12 @@ export default function Tablero() {
   const datos = useDatos()
   if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
-  const { edicion, empresas, reclutadores } = datos
+  const { edicion, empresas, reclutadores, pendientes } = datos
   const c = calcularCifras({ edicion, empresas, reclutadores })
   const vacio = empresas.length === 0
+
+  const abiertos = pendientes.filter(p => !p.resuelto).length
+  const sinCarreras = empresas.filter(e => (e.carreras ?? []).length === 0).length
 
   const dias = Math.ceil(
     (new Date(edicion.fecha + 'T00:00:00') - new Date(new Date().toDateString())) / 86400000
@@ -74,6 +77,21 @@ export default function Tablero() {
           tono={c.porConfirmar > 0 ? 'ambar' : undefined}
         />
         <Cifra valor={c.capacidad} etiqueta="Capacidad del evento" nota="atenciones" />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Cifra
+          valor={abiertos}
+          etiqueta="Pendientes abiertos"
+          nota={abiertos > 0 ? 'con empresas' : 'todo cerrado'}
+          tono={abiertos > 0 ? 'ambar' : 'teal'}
+        />
+        <Cifra
+          valor={sinCarreras}
+          etiqueta="Empresas sin carreras"
+          nota={sinCarreras > 0 ? 'el filtro no las encuentra' : 'todas etiquetadas'}
+          tono={sinCarreras > 0 ? 'ambar' : 'teal'}
+        />
       </div>
 
       {c.mesasFaltantes > 0 && (
