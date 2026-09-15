@@ -18,6 +18,10 @@ dónde quedamos.
 | Reclutador | https://warmup-ad2026.vercel.app/mesa | nadie, es el QR |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr | cuenta del equipo |
 
+**Ojo con la próxima importación:** el 15-sep se movió Celestica a mano en la app, no en el
+Excel. Si se reimporta el libro sin corregirlo antes, el cambio se deshace. Ver «Cambios hechos
+a mano», abajo.
+
 **Lo que falta antes del 28:**
 
 1. **Ensayo con personas**, para ver si alguien se atora sin que le expliquen. La máquina ya
@@ -318,6 +322,34 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 **Estatus `cancelado` agregado al enum.** El Tablero del Excel ya lo descuenta
 (`Reclutadores!F:F,"<>Cancelado"`). Hoy no hay ninguno, pero la importación tenía que aguantarlo.
+
+## Cambios hechos a mano, fuera del Excel
+
+### Celestica pasa completa a Bloque 2 · 15-sep-2026
+
+Gustavo avisó que Celestica ya no viene en Bloque 1. Claudia Villarreal estaba en la mesa 22
+de Bloque 1 y Mario Gerardo Mata en la 22 de Bloque 2; ahora van los dos en Bloque 2.
+
+Como la 21 y la 23 estaban ocupadas, se **recorrió** el tramo para que queden juntos:
+
+- **Bloque 2, mesas 23 a 47: cada una sube un número**, y pasan a ser 24 a 48. La 48 estaba
+  libre, así que el recorrido para ahí y nadie más se mueve.
+- Claudia queda en la **mesa 23 de Bloque 2**, junto a Mario en la 22.
+- La **mesa 22 de Bloque 1 queda libre.**
+
+| Antes | Después |
+|---|---|
+| Bloque 1: 71 reclutadores | 70 |
+| Bloque 2: 48 reclutadores | 49 |
+| Libres en Bloque 1: 3, 4, 74 | 3, 4, **22**, 74 |
+| Capacidad: 714 | 714, no cambia |
+
+Verificado: 0 mesas repetidas dentro de un bloque, Celestica no aparece en Bloque 1 y sale dos
+veces seguidas en Bloque 2.
+
+**Esto vive solo en la base.** Para que sobreviva a una reimportación hay que hacer lo mismo en
+la hoja `Reclutadores` del Excel: mover la fila de Claudia a Bloque 2 con mesa 23, y sumarle 1
+a la columna Mesa de las filas de Bloque 2 que hoy digan de 23 a 47.
 
 ## El tope del plan gratuito de Supabase
 
