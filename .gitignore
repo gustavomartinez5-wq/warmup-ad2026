@@ -1,9 +1,12 @@
 node_modules
 dist
-.env
-.env.local
 .vercel
 .DS_Store
+
+# Secretos. .env.example sí entra: no trae valores.
+.env
+.env.*
+!.env.example
 
 # El libro de control nunca entra al repo: trae correos y celulares de gente externa.
 *.xlsx

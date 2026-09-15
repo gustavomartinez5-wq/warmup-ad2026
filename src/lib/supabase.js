@@ -1,14 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
+import { SUPABASE_URL, SUPABASE_KEY } from './config'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-if (!url || !key) {
-  // Falla temprano y claro: sin esto ninguna pantalla sirve.
-  console.error('Faltan VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY. Ver .env.example')
-}
-
-export const supabase = createClient(url, key)
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 /**
  * La edición activa, con las columnas que cualquiera puede leer.
