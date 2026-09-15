@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Paleta CVDP. Sale de 07 - Recursos/Design-System/design-system-presentaciones-cvdp.md.
+   Teal, ámbar y rojo son semánticos (DEC-019): aquí el color ES el estado de la mesa. */
+@theme {
+  --color-marino:       #0A1D38;
+  --color-marino-hondo: #051228;
+  --color-marino-alto:  #13294F;
+  --color-tec:          #0039A6;
+  --color-tec-claro:    #1E56C8;
+  --color-cian:         #00F0F0;
+  --color-teal:         #0A8C82;
+  --color-teal-hondo:   #07736B;
+  --color-ambar:        #F5A81E;
+  --color-ambar-hondo:  #8A5605;
+  --color-rojo:         #C0392B;
+  --color-lavanda:      #99ACFF;
+  --color-lavanda-suave:#CDD6FF;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 50% 0%, var(--color-marino) 0%, var(--color-marino-hondo) 100%);
+  background-attachment: fixed;
+  color: #fff;
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Números de cronómetro y conteos: sin saltos de ancho al cambiar de dígito. */
+.cifra { font-variant-numeric: tabular-nums; }
+
+@keyframes latido { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+.late { animation: latido 1s ease-in-out infinite; }
