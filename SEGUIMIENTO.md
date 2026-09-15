@@ -66,6 +66,8 @@ sin nombre y ninguno sin mesa.
 | Subir un archivo por el input del navegador | Lee y compara bien |
 | Bajas en la vista previa | Avisa las 54 y no borra nada |
 | Todas las pantallas a 375 px | Sin desbordes |
+| Mapa por columna a 375 px | 3 columnas que arrancan en 1, 26 y 51 |
+| Mapa por columna a 1280 px | 11 columnas de 7 que arrancan en 1, 8, 15, 22… |
 
 ### Fase 0 — Infraestructura · 15-sep-2026
 
@@ -142,6 +144,12 @@ día los bloques usan numeraciones separadas.
 
 **SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
 pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
+
+**El mapa de mesas se llena por columna, no por renglón.** Gustavo lo pidió con un dibujo:
+1, 2, 3 bajando por la primera columna y el 8 arriba de la segunda. Vive en
+`src/components/RejillaMesas.jsx`: fija los renglones según el ancho real del contenedor y
+deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3 columnas de
+25; en laptop, 11 de 7. **La vista de host de la Fase 4 tiene que usar el mismo componente.**
 
 **Estatus `cancelado` agregado al enum.** El Tablero del Excel ya lo descuenta
 (`Reclutadores!F:F,"<>Cancelado"`). Hoy no hay ninguno, pero la importación tenía que aguantarlo.

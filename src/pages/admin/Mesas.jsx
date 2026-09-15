@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useDatos } from '../../lib/datos'
 import { mapaDeMesas, ESTADO_MESA, BLOQUES, calcularCifras, faltan } from '../../lib/cifras'
 import Cargando from '../../components/Cargando'
+import RejillaMesas from '../../components/RejillaMesas'
 
 function Leyenda({ mapa }) {
   const cuenta = e => mapa.filter(m => m.estado === e).length
@@ -139,7 +140,7 @@ export default function Mesas() {
       {mapa.length === 0 ? (
         <p className="text-sm text-lavanda/50 py-8 text-center">Sin mesas todavía.</p>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-1.5">
+        <RejillaMesas total={mapa.length}>
           {mapa.map(m => {
             const { clase } = ESTADO_MESA[m.estado]
             return (
@@ -155,7 +156,7 @@ export default function Mesas() {
               </button>
             )
           })}
-        </div>
+        </RejillaMesas>
       )}
     </section>
   )
