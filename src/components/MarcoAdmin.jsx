@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ProveedorDatos } from '../lib/datos'
 
@@ -29,12 +29,17 @@ export default function MarcoAdmin() {
             <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP</p>
             <h1 className="text-base font-extrabold leading-tight truncate">Warm Up AD2026</h1>
           </div>
-          <button
-            onClick={salir}
-            className="text-xs text-lavanda/60 hover:text-white transition-colors shrink-0 pt-1"
-          >
-            Salir
-          </button>
+          <div className="flex items-center gap-3 shrink-0 pt-1">
+            <Link
+              to="/host"
+              className="text-xs font-semibold text-cian hover:text-white transition-colors"
+            >
+              Vista de host
+            </Link>
+            <button onClick={salir} className="text-xs text-lavanda/60 hover:text-white transition-colors">
+              Salir
+            </button>
+          </div>
         </div>
 
         <nav className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto pb-px [scrollbar-width:none]">

@@ -9,28 +9,50 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**Fase 3 — Pantalla del reclutador.** Terminada. En vivo:
+**Fase 4 — Vista de host.** Terminada. La app está completa salvo Cupos y Pendientes.
 
-- **https://warmup-ad2026.vercel.app/mesa** — sin contraseña, es la del QR
-- **https://warmup-ad2026.vercel.app/admin/qr** — el QR imprimible
+| Pantalla | Link | Quién entra |
+|---|---|---|
+| Administración | https://warmup-ad2026.vercel.app/admin | cuenta del equipo |
+| Vista de host | https://warmup-ad2026.vercel.app/host | cuenta del equipo |
+| Reclutador | https://warmup-ad2026.vercel.app/mesa | nadie, es el QR |
+| QR imprimible | https://warmup-ad2026.vercel.app/admin/qr | cuenta del equipo |
 
-**Siguiente:** Fase 4 — vista de host. Decidido con Gustavo el 15-sep:
+**Siguiente:** Fase 5, el ensayo. Antes conviene cerrar dos cosas:
 
-1. **Rejilla y lista, con interruptor.** La rejilla usa `RejillaMesas` para que el salón se
-   lea igual que en admin. La lista va ordenada por estado, con las disponibles hasta arriba,
-   que es lo que se busca cuando traes un estudiante al lado.
-2. **Los mismos umbrales del reclutador**: ámbar a los 18, rojo a los 20. Si el reclutador ve
-   rojo, el equipo ve rojo.
-3. **Una mesa ocupada muestra empresa, estado y desde cuándo.** A quién se atendió no se
-   guarda: el reclutador no registra nada.
+1. **Etiquetar las carreras de 53 de las 54 empresas.** El filtro por carrera de `/host` ya
+   funciona, pero hoy solo encuentra a British American Tobacco porque es la única etiquetada.
+   Se hace desde la ficha de cada empresa en `/admin/empresas`.
+2. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido. El
+   repo vive en local con seis commits. Vercel despliega por CLI, así que solo falta el respaldo.
 
-Falta todavía, y no bloquea:
-
-- **Etiquetar las carreras de 53 de las 54 empresas**, desde la ficha de cada una. Sin eso el
-  filtro por carrera de la Fase 4 no filtra nada.
-- **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido.
+La Fase 2 —Cupos y Pendientes— se recorrió a propósito: no hace falta para operar el evento.
+Los 27 pendientes ya están importados en la base, esperando pantalla.
 
 ## Fases cerradas
+
+### Fase 4 — Vista de host · 15-sep-2026
+
+- `/host` con dos vistas y un interruptor: rejilla —el salón, con `RejillaMesas`— y lista
+  ordenada por estado con las disponibles arriba.
+- Buscador por empresa o número, y filtros por carrera y por giro.
+- Cuatro botones de estado, «No llegó» incluido, para los cambios de último minuto.
+- Pastillas de conteo arriba, con una de «pasadas de 20» que solo aparece cuando hay alguna.
+- `src/lib/estadoVivo.js` decide el color: la mesa ocupada escala de azul a ámbar a rojo con
+  el tiempo, y break va en ámbar punteado para no confundirse con una sesión pasada.
+
+**Verificado con los datos reales:**
+
+| Prueba | Resultado |
+|---|---|
+| Reclutador marca Ocupado en `/mesa` | `/host` lo pinta azul con el reloj, sin recargar |
+| Host marca Break | El teléfono del reclutador lo muestra, sin recargar |
+| Host marca «No llegó» | La mesa se apaga y la pastilla sube a 1 |
+| Filtro por carrera LAF | Devuelve solo las dos mesas de British American Tobacco |
+| Filtro por giro Financiero | Devuelve solo BBVA México |
+| Vista de lista | Disponibles arriba, luego break, luego ocupadas |
+| Rejilla a 375 px y a 1280 px | 3 y 12 columnas, sin desbordes |
+| Conteos de las pastillas | Cuadran con lo que se ve |
 
 ### Fase 3 — Pantalla del reclutador · 15-sep-2026
 
@@ -170,6 +192,13 @@ día los bloques usan numeraciones separadas.
 **SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
 pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
 
+**La mesa ocupada cambia de color con el tiempo, no solo el número.** Azul mientras va bien,
+ámbar a los 18 y rojo pasados los 20. El salón se lee de reojo y las que llevan mucho saltan
+solas, que es para lo que existe esa pantalla.
+
+**Break va en ámbar punteado y sin cronómetro.** Ámbar también marca los 18 minutos, así que
+sin esa diferencia una mesa en break y una que ya se pasó se veían igual.
+
 **El reclutador tiene tres botones, no cuatro.** El plan decía cuatro, con «No llegó».
 Ese estado no tiene sentido en su propio teléfono: si lo está tocando, llegó. Es una
 observación del equipo sobre una mesa vacía, así que el botón vive en `/host`. El estado
@@ -199,7 +228,7 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 - **Las carreras de 53 de las 54 empresas están sin etiquetar.** Es captura manual desde la
   ficha de cada empresa. Sin eso, el filtro por carrera de la Fase 4 no sirve.
-- `/host` sigue siendo marcador. Lo construye la Fase 4.
+- Cupos y Pendientes siguen siendo marcadores. Los datos de pendientes ya están importados.
 - Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
 ## Lo que se intentó y no funcionó
@@ -220,6 +249,9 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
   publica entero. Se resolvió de dos maneras: el importador se verificó desde Node con el
   libro en su lugar, y el camino del navegador con un libro sintético de dos empresas
   inventadas.
+- **Los tres controles de filtro en un solo renglón:** a 375 px el buscador quedaba en
+  cuarenta píxeles, ilegible. Se vio al renderizar, no en el código. Ahora el buscador va
+  completo arriba y los dos selectores debajo, a la mitad cada uno.
 - **Probar el QR con la cuenta de prueba:** no hizo falta. Esa pantalla no lee nada de la
   base, así que se verificó quitando la guardia en local y restaurándola.
 - **Dos pestañas del mismo navegador para simular dos teléfonos:** comparten `localStorage`,
