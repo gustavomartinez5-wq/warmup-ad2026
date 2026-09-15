@@ -9,27 +9,52 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**Fase 1 — Admin.** Terminada. La app está en vivo con los datos reales:
+**Fase 3 — Pantalla del reclutador.** Terminada. En vivo:
 
-**https://warmup-ad2026.vercel.app**
+- **https://warmup-ad2026.vercel.app/mesa** — sin contraseña, es la del QR
+- **https://warmup-ad2026.vercel.app/admin/qr** — el QR imprimible
 
-Entra con la cuenta del equipo. Lo que se puede hacer hoy: ver el Tablero, el mapa de mesas
-por bloque, la lista de empresas con su ficha, y corregir reclutadores.
+**Siguiente:** Fase 4 — vista de host. Decidido con Gustavo el 15-sep:
 
-Dos cosas pendientes que no bloquean:
+1. **Rejilla y lista, con interruptor.** La rejilla usa `RejillaMesas` para que el salón se
+   lea igual que en admin. La lista va ordenada por estado, con las disponibles hasta arriba,
+   que es lo que se busca cuando traes un estudiante al lado.
+2. **Los mismos umbrales del reclutador**: ámbar a los 18, rojo a los 20. Si el reclutador ve
+   rojo, el equipo ve rojo.
+3. **Una mesa ocupada muestra empresa, estado y desde cuándo.** A quién se atendió no se
+   guarda: el reclutador no registra nada.
 
-1. **Etiquetar las carreras de las 54 empresas.** El Excel las trae como texto libre
-   ("Ingenierías: mecatrónica, mecánica, industrial"), y el filtro del día del evento
-   necesita etiquetas de la lista cerrada. Se hace desde la ficha de cada empresa.
-   Hoy hay 1 de 54 etiquetada, la de prueba.
-2. **Reconectar GitHub.** `gh auth status` dice que el token de la cuenta `Mrnrv32` está
-   vencido. El repo existe en local con cuatro commits. Vercel despliega por CLI, así que
-   esto solo bloquea el respaldo del código.
+Falta todavía, y no bloquea:
 
-**Siguiente:** Fase 2 — Cupos y Pendientes. Los 27 pendientes ya están importados en la base;
-falta la pantalla. Si el tiempo aprieta, la Fase 2 se recorre y se salta a la 3.
+- **Etiquetar las carreras de 53 de las 54 empresas**, desde la ficha de cada una. Sin eso el
+  filtro por carrera de la Fase 4 no filtra nada.
+- **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido.
 
 ## Fases cerradas
+
+### Fase 3 — Pantalla del reclutador · 15-sep-2026
+
+- `/mesa`: elige número de mesa y se queda en ella aunque recargue. La mesa elegida vive en
+  el `localStorage` del teléfono, no en la base.
+- Cronómetro calculado desde `ocupado_desde`, nunca desde un contador en memoria.
+- `/admin/qr`: un QR para todas las mesas, imprimible y descargable como PNG.
+  Los estilos de impresión dejan solo la hoja blanca.
+- `src/lib/reloj.js` tiene los umbrales, y los va a usar igual la vista de host.
+
+**Verificado con los datos reales:**
+
+| Prueba | Resultado |
+|---|---|
+| Entrar a `/mesa` sin sesión | Carga la lista del bloque del reloj |
+| Elegir mesa y recargar | Vuelve a su mesa, el tiempo sigue corriendo |
+| 18 min 30 s | Ámbar, sin parpadear |
+| 20 min 22 s | Rojo parpadeante y «00:22 de más» |
+| 23 min | Rojo fijo y «03:12 de más» |
+| Disponible | Para el reloj y lo deja en 00:00 |
+| Cambio hecho desde la base | Llega por realtime, sin recargar |
+| Dos pestañas con mesas distintas | Cada una con su estado, sin pisarse |
+| `/mesa` a 375 px | Sin desbordes, sin errores de consola |
+| `/mesa` en el sitio publicado | Carga la lista con la clave pública |
 
 ### Fase 1 — Admin · 15-sep-2026
 
@@ -145,6 +170,22 @@ día los bloques usan numeraciones separadas.
 **SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
 pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
 
+**El reclutador tiene tres botones, no cuatro.** El plan decía cuatro, con «No llegó».
+Ese estado no tiene sentido en su propio teléfono: si lo está tocando, llegó. Es una
+observación del equipo sobre una mesa vacía, así que el botón vive en `/host`. El estado
+`no_llego` existe igual en la base.
+
+**La mesa elegida se guarda en el teléfono, no en la base.** Así dos personas pueden usar la
+misma mesa desde distintos aparatos sin pelearse, y perderla no rompe nada: se vuelve a elegir.
+
+**El bloque sale del reloj, con el corte a la 13:30, y el interruptor es por aparato.**
+Un interruptor global habría necesitado columna nueva y podía dejar a todo el salón en el
+bloque equivocado por un descuido. Si el evento se recorre mucho, la Fase 4 puede agregar uno
+del lado del equipo.
+
+**Parpadea solo el minuto 20.** De 21 en adelante el rojo se queda fijo: lo que importa
+después es cuánto lleva de más, y un número parpadeando media hora deja de verse.
+
 **El mapa de mesas se llena por columna, no por renglón.** Gustavo lo pidió con un dibujo:
 1, 2, 3 bajando por la primera columna y el 8 arriba de la segunda. Vive en
 `src/components/RejillaMesas.jsx`: fija los renglones según el ancho real del contenedor y
@@ -158,7 +199,7 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 - **Las carreras de 53 de las 54 empresas están sin etiquetar.** Es captura manual desde la
   ficha de cada empresa. Sin eso, el filtro por carrera de la Fase 4 no sirve.
-- `/mesa` y `/host` siguen siendo marcadores. Las construyen las fases 3 y 4.
+- `/host` sigue siendo marcador. Lo construye la Fase 4.
 - Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
 ## Lo que se intentó y no funcionó
@@ -179,6 +220,11 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
   publica entero. Se resolvió de dos maneras: el importador se verificó desde Node con el
   libro en su lugar, y el camino del navegador con un libro sintético de dos empresas
   inventadas.
+- **Probar el QR con la cuenta de prueba:** no hizo falta. Esa pantalla no lee nada de la
+  base, así que se verificó quitando la guardia en local y restaurándola.
+- **Dos pestañas del mismo navegador para simular dos teléfonos:** comparten `localStorage`,
+  así que la segunda hereda la mesa de la primera. Se resuelve tocando «Esta no es mi mesa».
+  En teléfonos distintos no pasa.
 - **`raise notice` para depurar SQL:** el MCP no devuelve los avisos ni los resultados
   intermedios, solo el de la última sentencia.
 - **Primera prueba de escritura del intruso:** dio "pasó" por un falso positivo. El insert

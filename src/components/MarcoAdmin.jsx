@@ -10,6 +10,7 @@ const SECCIONES = [
   { a: '/admin/cupos',        t: 'Cupos' },
   { a: '/admin/pendientes',   t: 'Pendientes' },
   { a: '/admin/importar',     t: 'Importar Excel' },
+  { a: '/admin/qr',           t: 'QR' },
 ]
 
 export default function MarcoAdmin() {

@@ -20,6 +20,9 @@ import Cargando from './components/Cargando'
 // pantallas del día del evento arranquen ligeras en un celular.
 const Importar = lazy(() => import('./pages/admin/Importar'))
 
+// La librería de QR tampoco tiene por qué viajar en el paquete principal.
+const Qr = lazy(() => import('./pages/admin/Qr'))
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -39,6 +42,7 @@ export default function App() {
             <Route path="cupos" element={<Cupos />} />
             <Route path="pendientes" element={<Pendientes />} />
             <Route path="importar" element={<Suspense fallback={<Cargando />}><Importar /></Suspense>} />
+            <Route path="qr" element={<Suspense fallback={<Cargando />}><Qr /></Suspense>} />
           </Route>
 
           <Route path="*" element={<Navigate to="/admin" replace />} />

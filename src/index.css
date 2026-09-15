@@ -37,3 +37,17 @@ body {
 
 @keyframes latido { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 .late { animation: latido 1s ease-in-out infinite; }
+
+/* Al imprimir el QR queda solo la hoja blanca: sin marco, sin menú, sin botones. */
+@media print {
+  body { background: #fff !important; }
+  header, .no-imprimir { display: none !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  .hoja {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    margin: 0 auto;
+    padding: 0 !important;
+  }
+}

@@ -1,16 +1,286 @@
-import EnObra from '../components/EnObra'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase'
+import { mesasDelBloque, cambiarEstado, recordarMesa, mesaRecordada, olvidarMesa }
+  from '../lib/mesaPublica'
+import { bloquePorReloj, segundosDesde, comoReloj, tonoDelTiempo, deMas } from '../lib/reloj'
+import { etiquetaBloque } from '../lib/cifras'
+import Cargando from '../components/Cargando'
 
-/** La pantalla del reclutador. Sin login: se entra por el QR. */
-export default function Mesa() {
+/**
+ * La pantalla del reclutador. Se entra por el QR, sin contraseña.
+ * Primero elige su número de mesa; después se queda en su mesa aunque recargue.
+ */
+
+// El reclutador no marca «No llegó»: si está tocando el teléfono, llegó.
+// Ese estado lo pone el equipo desde /host cuando ve una mesa vacía.
+const BOTONES = [
+  { clave: 'disponible', texto: 'Disponible', fondo: 'bg-teal  hover:bg-teal-hondo' },
+  { clave: 'ocupado',    texto: 'Ocupado',    fondo: 'bg-tec   hover:bg-tec-claro' },
+  { clave: 'break',      texto: 'Break',      fondo: 'bg-ambar hover:bg-ambar/80' },
+]
+
+function Encabezado({ children }) {
   return (
-    <div className="min-h-dvh px-5 py-8 max-w-md mx-auto">
+    <div className="px-5 pt-6 pb-4">
       <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP</p>
-      <h1 className="text-2xl font-extrabold leading-tight mt-1 mb-5">Warm Up AD2026</h1>
-      <EnObra
-        titulo="Tu mesa"
-        fase="3"
-        que="Eliges tu número de mesa y llegas a tu pantalla: empresa, instrucciones y los cuatro botones de estado, con el cronómetro."
-      />
+      <h1 className="text-xl font-extrabold leading-tight mt-0.5">Warm Up AD2026</h1>
+      {children}
     </div>
   )
+}
+
+/* ── Elegir mesa ──────────────────────────────────────────────────────────── */
+
+function Elegir({ bloque, onBloque, onElegir }) {
+  const [mesas, setMesas] = useState(null)
+  const [error, setError] = useState(null)
+  const [busca, setBusca] = useState('')
+
+  useEffect(() => {
+    let vivo = true
+    setMesas(null); setError(null)
+    mesasDelBloque(bloque)
+      .then(d => vivo && setMesas(d))
+      .catch(e => vivo && setError(e.message ?? String(e)))
+    return () => { vivo = false }
+  }, [bloque])
+
+  const q = busca.trim().toLowerCase()
+  const lista = (mesas ?? []).filter(m =>
+    !q || String(m.numero).includes(q) || (m.empresa ?? '').toLowerCase().includes(q))
+
+  return (
+    <div className="min-h-dvh max-w-md mx-auto flex flex-col">
+      <Encabezado>
+        <p className="text-sm text-lavanda/70 mt-1.5">Busca tu número de mesa y tócalo.</p>
+      </Encabezado>
+
+      <div className="px-5 pb-3">
+        <input
+          value={busca} onChange={e => setBusca(e.target.value)}
+          inputMode="search" placeholder="Número de mesa o empresa…"
+          className="w-full rounded-xl bg-marino-alto/70 border border-lavanda/20 px-3.5 py-3 text-[15px]
+                     placeholder-lavanda/30 outline-none focus:border-cian focus:ring-2 focus:ring-cian/30"
+        />
+        <button
+          onClick={() => onBloque(bloque === 'b1' ? 'b2' : 'b1')}
+          className="text-xs text-lavanda/50 hover:text-cian mt-2.5 underline underline-offset-2"
+        >
+          Estás viendo {etiquetaBloque(bloque)}. Ver {etiquetaBloque(bloque === 'b1' ? 'b2' : 'b1')}
+        </button>
+      </div>
+
+      {error   && <Cargando error={error} />}
+      {!mesas && !error && <Cargando />}
+
+      {mesas && (
+        <div className="flex-1 overflow-y-auto px-5 pb-8">
+          {lista.length === 0 ? (
+            <p className="text-sm text-lavanda/50 py-8 text-center">
+              {mesas.length === 0
+                ? `Todavía no hay mesas asignadas en ${etiquetaBloque(bloque)}.`
+                : 'Ninguna mesa coincide.'}
+            </p>
+          ) : (
+            <ul className="space-y-1.5">
+              {lista.map(m => (
+                <li key={m.numero}>
+                  <button
+                    onClick={() => onElegir(m.numero)}
+                    className="w-full flex items-center gap-3 text-left rounded-xl border border-lavanda/20
+                               bg-marino-alto/50 hover:border-cian/60 active:scale-[0.99]
+                               px-4 py-3.5 transition-all"
+                  >
+                    <span className="cifra text-lg font-extrabold text-lavanda/60 w-10 shrink-0 text-right">
+                      {m.numero}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[15px] font-semibold truncate">{m.empresa}</span>
+                      {m.giro && <span className="block text-xs text-lavanda/50 truncate">{m.giro}</span>}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Mi mesa ──────────────────────────────────────────────────────────────── */
+
+function MiMesa({ numero, bloque, onCambiarMesa }) {
+  const [mesa, setMesa]       = useState(null)
+  const [error, setError]     = useState(null)
+  const [mandando, setMandando] = useState(null)
+  const [ahora, setAhora]     = useState(Date.now())
+  const desmontado = useRef(false)
+
+  const traer = useCallback(async () => {
+    try {
+      const todas = await mesasDelBloque(bloque)
+      const mia = todas.find(m => m.numero === numero)
+      if (desmontado.current) return
+      if (!mia) { setError(`La mesa ${numero} no está asignada en ${etiquetaBloque(bloque)}.`); return }
+      setMesa(mia); setError(null)
+    } catch (e) {
+      if (!desmontado.current) setError(e.message ?? String(e))
+    }
+  }, [numero, bloque])
+
+  useEffect(() => {
+    desmontado.current = false
+    traer()
+    // Si el equipo cambia el estado desde /host, esta pantalla se entera sola.
+    const canal = supabase.channel(`mesa-${bloque}-${numero}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'mesas_estado', filter: `numero=eq.${numero}` },
+        carga => {
+          if (carga.new?.bloque !== bloque) return
+          setMesa(prev => prev && { ...prev, estado: carga.new.estado, ocupado_desde: carga.new.ocupado_desde })
+        })
+      .subscribe()
+    return () => { desmontado.current = true; supabase.removeChannel(canal) }
+  }, [traer, numero, bloque])
+
+  // Un solo reloj para toda la pantalla.
+  useEffect(() => {
+    const id = setInterval(() => setAhora(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  async function marcar(estado) {
+    setMandando(estado)
+    try {
+      const fila = await cambiarEstado(numero, bloque, estado)
+      setMesa(prev => prev && { ...prev, estado: fila.estado, ocupado_desde: fila.ocupado_desde })
+      setError(null)
+    } catch (e) {
+      setError(e.message ?? String(e))
+    }
+    setMandando(null)
+  }
+
+  if (error && !mesa) {
+    return (
+      <div className="min-h-dvh max-w-md mx-auto flex flex-col">
+        <Encabezado />
+        <div className="px-5">
+          <Cargando error={error} />
+          <button onClick={onCambiarMesa}
+            className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3 font-bold text-sm transition-colors">
+            Elegir otra mesa
+          </button>
+        </div>
+      </div>
+    )
+  }
+  if (!mesa) return <Cargando />
+
+  // El cronómetro se calcula desde ocupado_desde, no desde un contador en memoria:
+  // si el teléfono se recarga o se bloquea, el tiempo sigue siendo el correcto.
+  const corriendo = mesa.estado === 'ocupado' && mesa.ocupado_desde
+  const segundos  = corriendo ? segundosDesde(mesa.ocupado_desde, ahora) : 0
+  const tono      = tonoDelTiempo(segundos)
+  const exceso    = deMas(segundos)
+
+  return (
+    <div className="min-h-dvh max-w-md mx-auto flex flex-col">
+      <div className="px-5 pt-6 pb-4 border-b border-lavanda/15">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">
+          CVDP · {etiquetaBloque(bloque)}
+        </p>
+        <div className="flex items-start gap-3 mt-1.5">
+          <span className="w-11 h-11 rounded-xl bg-marino-alto border border-lavanda/20
+                           grid place-items-center text-base font-extrabold cifra shrink-0">
+            {numero}
+          </span>
+          <div className="min-w-0">
+            <h1 className="text-lg font-extrabold leading-tight">{mesa.empresa}</h1>
+            {mesa.giro && <p className="text-xs text-lavanda/55 mt-0.5">{mesa.giro}</p>}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center px-5 py-6 gap-7">
+        <div className="text-center">
+          <p className="text-[11px] uppercase tracking-widest text-lavanda/40">
+            {corriendo ? 'Sesión en curso' : 'Sin sesión'}
+          </p>
+          <p className={`text-[64px] leading-none font-extrabold cifra mt-1.5 transition-colors
+                         ${corriendo ? tono.clase : 'text-lavanda/20'} ${tono.parpadea ? 'late' : ''}`}>
+            {comoReloj(segundos)}
+          </p>
+          {exceso && corriendo && (
+            <p className="text-sm font-bold text-rojo mt-1.5">{exceso}</p>
+          )}
+        </div>
+
+        <div className="space-y-2.5">
+          {BOTONES.map(b => {
+            const puesto = mesa.estado === b.clave
+            return (
+              <button
+                key={b.clave} onClick={() => marcar(b.clave)} disabled={mandando !== null}
+                className={`w-full py-4 rounded-2xl font-extrabold text-base transition-all
+                            disabled:opacity-50 ${
+                  puesto
+                    ? `${b.fondo} text-white ring-4 ring-white/25`
+                    : 'bg-marino-alto text-lavanda/60 hover:text-white border border-lavanda/20'
+                }`}
+              >
+                {mandando === b.clave ? 'Guardando…' : b.texto}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="rounded-xl border border-lavanda/15 bg-marino-alto/40 px-4 py-3">
+          <ul className="text-xs text-lavanda/70 space-y-1 leading-relaxed">
+            <li>Toca Ocupado cuando empiece la sesión. El tiempo arranca solo.</li>
+            <li>Toca Disponible al terminar, para que te manden a la siguiente persona.</li>
+            <li>Toca Break si te levantas un momento.</li>
+          </ul>
+        </div>
+
+        {error && (
+          <p className="text-xs text-rojo bg-rojo/10 border border-rojo/30 rounded-lg px-3 py-2">
+            {error}
+          </p>
+        )}
+      </div>
+
+      <div className="px-5 pb-6">
+        <button onClick={onCambiarMesa}
+          className="text-xs text-lavanda/40 hover:text-lavanda underline underline-offset-2">
+          Esta no es mi mesa
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ── La ruta ──────────────────────────────────────────────────────────────── */
+
+export default function Mesa() {
+  const guardada = mesaRecordada()
+  const [bloque, setBloque] = useState(guardada?.bloque ?? bloquePorReloj())
+  const [numero, setNumero] = useState(guardada?.numero ?? null)
+
+  function elegir(n) {
+    setNumero(n)
+    recordarMesa(n, bloque)
+  }
+
+  function cambiarMesa() {
+    setNumero(null)
+    olvidarMesa()
+    setBloque(bloquePorReloj())
+  }
+
+  return numero === null
+    ? <Elegir bloque={bloque} onBloque={setBloque} onElegir={elegir} />
+    : <MiMesa numero={numero} bloque={bloque} onCambiarMesa={cambiarMesa} />
 }
