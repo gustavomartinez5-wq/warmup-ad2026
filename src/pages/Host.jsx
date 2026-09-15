@@ -5,6 +5,8 @@ import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
 import { bloquePorReloj, comoReloj } from '../lib/reloj'
 import { BLOQUES, etiquetaBloque } from '../lib/cifras'
 import { ESTADOS, textoEstado, pintar, ordenarParaLista, contarPorEstado } from '../lib/estadoVivo'
+import { catalogoDeCarreras } from '../lib/carreras'
+import { plano, contiene } from '../lib/texto'
 import RejillaMesas from '../components/RejillaMesas'
 import Cargando from '../components/Cargando'
 
@@ -127,6 +129,7 @@ export default function Host() {
   const [giro, setGiro]       = useState('')
   const [abierta, setAbierta] = useState(null)
   const [marcando, setMarcando] = useState(null)
+  const [catalogo, setCatalogo] = useState([])
   const desmontado = useRef(false)
 
   const traer = useCallback(async () => {
@@ -160,6 +163,9 @@ export default function Host() {
     return () => clearInterval(id)
   }, [])
 
+  // El catálogo sirve para que el buscador entienda «mecatrónica» y no solo «IMT».
+  useEffect(() => { catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo([])) }, [])
+
   const carreras = useMemo(
     () => [...new Set((mesas ?? []).flatMap(m => m.carreras ?? []))].sort(),
     [mesas])
@@ -167,11 +173,38 @@ export default function Host() {
     () => [...new Set((mesas ?? []).map(m => m.giro).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')),
     [mesas])
 
-  const q = busca.trim().toLowerCase()
-  const filtradas = (mesas ?? []).filter(m =>
-    (!q || (m.empresa ?? '').toLowerCase().includes(q) || String(m.numero).includes(q)) &&
-    (!carrera || (m.carreras ?? []).includes(carrera)) &&
-    (!giro || m.giro === giro))
+  const q = plano(busca)
+
+  /**
+   * Las siglas que coinciden con lo escrito. La sigla se busca por principio
+   * —«IRS» encuentra IRS, «IM» encuentra IM, IMA, IMD e IMT— y el nombre por
+   * cualquier parte, para que «robotica» también llegue a IRS.
+   */
+  const siglasQueCoinciden = useMemo(() => {
+    if (!q) return []
+    return catalogo
+      .filter(c => plano(c.siglas).startsWith(q) || contiene(c.nombre, q))
+      .map(c => c.siglas)
+  }, [q, catalogo])
+
+  const filtradas = (mesas ?? []).filter(m => {
+    const porTexto = !q
+      || contiene(m.empresa, q)
+      || contiene(m.giro, q)
+      || String(m.numero).includes(q)
+      || (m.carreras ?? []).some(c => siglasQueCoinciden.includes(c))
+    return porTexto
+      && (!carrera || (m.carreras ?? []).includes(carrera))
+      && (!giro || m.giro === giro)
+  })
+
+  // Qué carreras se reconocieron, para que quede claro por qué salió esa lista.
+  const carrerasReconocidas = useMemo(() => {
+    const enUso = new Set((mesas ?? []).flatMap(m => m.carreras ?? []))
+    return catalogo
+      .filter(c => siglasQueCoinciden.includes(c.siglas) && enUso.has(c.siglas))
+      .slice(0, 3)
+  }, [siglasQueCoinciden, catalogo, mesas])
 
   const cuenta = contarPorEstado(mesas ?? [])
   const hayFiltro = Boolean(q || carrera || giro)
@@ -253,7 +286,7 @@ export default function Host() {
         <div className="space-y-2">
           <input
             value={busca} onChange={e => setBusca(e.target.value)}
-            inputMode="search" placeholder="Empresa o mesa…"
+            inputMode="search" placeholder="Empresa, carrera, giro o mesa…"
             className="w-full rounded-lg bg-marino-alto border border-lavanda/20 px-3 py-2 text-[13px]
                        placeholder-lavanda/30 outline-none focus:border-cian"
           />
@@ -268,6 +301,13 @@ export default function Host() {
             </select>
           </div>
         </div>
+
+        {carrerasReconocidas.length > 0 && (
+          <p className="text-[11px] text-cian leading-snug">
+            {carrerasReconocidas.map(c => `${c.siglas} · ${c.nombre}`).join(' / ')}
+            {' — '}{filtradas.length} {filtradas.length === 1 ? 'mesa' : 'mesas'}
+          </p>
+        )}
 
         {carreras.length === 0 && mesas?.length > 0 && (
           <p className="text-[11px] text-ambar/90 leading-snug">

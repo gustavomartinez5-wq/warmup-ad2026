@@ -81,6 +81,11 @@ producción musical ni nutrición por su nombre.
 | Vista de lista | Disponibles arriba, luego break, luego ocupadas |
 | Rejilla a 375 px y a 1280 px | 3 y 12 columnas, sin desbordes |
 | Conteos de las pastillas | Cuadran con lo que se ve |
+| Buscar «IRS» | 16 empresas, 31 mesas, con la carrera nombrada debajo |
+| Buscar «robotica» sin acento | Encuentra IRS e ISD |
+| Buscar «mecatronica» | Encuentra IMT y BME |
+| Buscar «consultoria» | Filtra por giro |
+| Buscar «PwC» | Una empresa |
 
 ### Fase 3 — Pantalla del reclutador · 15-sep-2026
 
@@ -219,6 +224,12 @@ día los bloques usan numeraciones separadas.
 
 **SheetJS se carga aparte.** Pesa 375 kB. Cargarlo solo al abrir la importación deja la
 pantalla del reclutador y la del host en la mitad del peso, que es lo que importa el 28.
+
+**El buscador de `/host` entiende carreras, no solo empresas.** Escribir «IRS» saca las 16
+empresas que la buscan. Las siglas se comparan por principio —«IM» encuentra IM, IMA, IMD e
+IMT— y el nombre completo por cualquier parte, sin acentos: «robotica» llega a IRS y a ISD.
+Debajo del buscador sale qué carrera reconoció, para que quede claro por qué salió esa lista.
+Los dos selectores siguen ahí para cuando se quiere hojear en vez de buscar.
 
 **La mesa ocupada cambia de color con el tiempo, no solo el número.** Azul mientras va bien,
 ámbar a los 18 y rojo pasados los 20. El salón se lee de reojo y las que llevan mucho saltan
