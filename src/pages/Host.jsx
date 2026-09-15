@@ -17,6 +17,12 @@ import Cargando from '../components/Cargando'
  *   Rejilla — el salón como está acomodado, para ubicar la mesa 43 de un vistazo.
  *   Lista   — ordenada por estado, disponibles arriba, para cuando traes a un
  *             estudiante al lado y necesitas a dónde mandarlo ya.
+ *
+ * Aquí las mesas pasadas de 20 minutos NO parpadean: en la simulación, con medio
+ * salón pasado de tiempo, la pantalla entera latía y dejaba de resaltar nada. El
+ * rojo fijo y la pastilla de «pasadas de 20» dicen lo mismo sin estrobo. El
+ * parpadeo se queda donde hay un solo reloj: la pantalla del reclutador y la
+ * hoja de detalle de una mesa.
  */
 
 function Pastilla({ valor, texto, tono }) {
@@ -243,7 +249,19 @@ export default function Host() {
             <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP · Host</p>
             <h1 className="text-lg font-extrabold leading-tight">Warm Up AD2026</h1>
           </div>
-          <Link to="/admin" className="text-xs text-lavanda/55 hover:text-white pt-1 shrink-0">Admin</Link>
+          <div className="flex items-center gap-3 pt-1 shrink-0">
+            {/* Red por si el tiempo real se retrasa: el plan gratuito de Supabase
+                topa en 100 mensajes por segundo y una ráfaga puede pasarse. Las
+                escrituras nunca se pierden —van por REST—, así que recargar
+                siempre trae la verdad. */}
+            <button
+              onClick={traer}
+              className="text-xs text-lavanda/55 hover:text-white transition-colors"
+            >
+              Recargar
+            </button>
+            <Link to="/admin" className="text-xs text-lavanda/55 hover:text-white">Admin</Link>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -335,7 +353,7 @@ export default function Host() {
                 <button
                   key={m.numero} onClick={() => setAbierta(m.numero)}
                   className={`rounded-lg border px-2 py-2 text-left min-h-[62px] flex flex-col justify-between
-                              transition-transform active:scale-95 ${p.celda} ${p.parpadea ? 'late' : ''}`}
+                              transition-transform active:scale-95 ${p.celda}`}
                 >
                   <span className="flex items-baseline justify-between gap-1">
                     <span className="text-[11px] font-bold cifra opacity-75">{m.numero}</span>
@@ -363,8 +381,7 @@ export default function Host() {
                     className="w-full flex items-center gap-3 text-left rounded-xl border border-lavanda/15
                                bg-marino-alto/40 hover:border-lavanda/35 px-3 py-2.5 transition-colors"
                   >
-                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${p.celda.split(' ')[0]}
-                                      ${p.parpadea ? 'late' : ''}`} />
+                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${p.celda.split(' ')[0]}`} />
                     <span className="cifra text-sm font-bold text-lavanda/50 w-8 shrink-0 text-right">
                       {m.numero}
                     </span>

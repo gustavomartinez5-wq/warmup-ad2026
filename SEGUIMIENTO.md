@@ -9,7 +9,7 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**La app está completa.** Quedan las seis pantallas de admin, la del reclutador y la de host.
+**La app está completa y corrida en simulación.** Falta el ensayo con personas de verdad.
 
 | Pantalla | Link | Quién entra |
 |---|---|---|
@@ -18,18 +18,42 @@ dónde quedamos.
 | Reclutador | https://warmup-ad2026.vercel.app/mesa | nadie, es el QR |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr | cuenta del equipo |
 
-**Siguiente:** Fase 5, el ensayo. Se corre con Gustavo, dos teléfonos y una laptop: un host
-mandando estudiantes imaginarios y dos reclutadores cambiando estados.
+**Lo que falta antes del 28:**
 
-Antes del 28 conviene:
-
-1. **Revisar el etiquetado de carreras.** Está en `supabase/carreras-asignadas.md`. Es criterio,
-   no dato duro.
-2. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido. El repo
-   vive en local con nueve commits. Vercel despliega por CLI, así que solo falta el respaldo.
-3. **Limpiar los estados de mesa** que queden de las pruebas, la mañana del evento.
+1. **Ensayo con personas**, para ver si alguien se atora sin que le expliquen. La máquina ya
+   pasó; falta la gente.
+2. **Revisar el etiquetado de carreras** en `supabase/carreras-asignadas.md`. Es criterio.
+3. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido.
+4. **Decidir si se sube a Supabase Pro.** Ver el hallazgo del tope de mensajes, abajo.
 
 ## Fases cerradas
+
+### Simulación del evento · 15-sep-2026
+
+Se corrió el Bloque 1 completo —71 mesas— con la vista de host abierta y un reclutador real
+en la mesa 7, moviendo estados por el mismo camino que usa el teléfono. El guion vive en
+`scripts/simular-evento.mjs` y se puede repetir: `poblar`, `correr`, `rafaga`, `limpiar`.
+
+| Prueba | Resultado |
+|---|---|
+| Poblar 71 mesas con una foto realista | 43 ocupadas, 8 break, 5 no llegaron, 15 disponibles |
+| Colores contra las pastillas | Cuadran exacto en las cinco tomas |
+| Dos minutos de movimiento | 574 cambios, 0 fallas, mediana 92 ms, peor 299 ms |
+| Ráfaga de las 71 a la vez | 683 ms en total, 0 fallas, peor 679 ms |
+| La pantalla siguió el ritmo | Sí, sin recargar y sin desfasarse |
+| Teléfono del reclutador | Se sincronizó solo con lo que hizo el guion |
+| Salón entero en ámbar y luego en rojo | Legible, sin desbordes |
+| Buscar «IRS» con 5 mesas libres | 50 mesas de esa carrera, las 4 libres hasta arriba |
+| Errores de consola | Ninguno de la app |
+
+**Lo que la simulación destapó y ya se corrigió:**
+
+- **El parpadeo de la rejilla se quitó.** Con 71 mesas pasadas de 20 minutos, las 71
+  parpadeaban juntas y la pantalla entera latía: dejaba de resaltar nada, que es justo lo
+  contrario de para lo que existe. Ahora en la rejilla y en la lista el rojo es fijo, y la
+  pastilla «pasadas de 20» lleva la cuenta. El parpadeo se quedó donde hay un solo reloj: la
+  pantalla del reclutador y la hoja de detalle.
+- **Se agregó «Recargar» a la vista de host**, por lo del tope de mensajes.
 
 ### Fase 2 — Cupos y pendientes · 15-sep-2026
 
@@ -294,6 +318,25 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 **Estatus `cancelado` agregado al enum.** El Tablero del Excel ya lo descuenta
 (`Reclutadores!F:F,"<>Cancelado"`). Hoy no hay ninguno, pero la importación tenía que aguantarlo.
+
+## El tope del plan gratuito de Supabase
+
+Las cifras del plan Free, confirmadas en la documentación el 15-sep-2026:
+
+| Límite | Free | Dónde quedamos |
+|---|---|---|
+| Conexiones simultáneas | 200 | ~80 el día del evento. Holgado |
+| Mensajes de tiempo real por segundo | 100 | Una ráfaga lo pasa |
+
+Cada cambio de estado se reparte a cada pantalla suscrita: un host mirando y el reclutador de
+esa mesa. Con 71 reclutadores tocando el botón en el mismo segundo y varios hosts abiertos, la
+ráfaga se pasa de 100 mensajes.
+
+**Las escrituras nunca están en riesgo:** van por REST, no por tiempo real. Lo peor que pasa
+es que la pantalla de host se atrase unos segundos. Por eso tiene botón de Recargar.
+
+En régimen normal —dos a cinco cambios por segundo— no se acerca al tope. La decisión de subir
+a Pro (500 mensajes por segundo) es de Gustavo; en la simulación no hizo falta.
 
 ## Lo que está a medias
 
