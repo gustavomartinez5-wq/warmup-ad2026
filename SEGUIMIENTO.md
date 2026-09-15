@@ -20,9 +20,10 @@ dónde quedamos.
 
 **Siguiente:** Fase 5, el ensayo. Antes conviene cerrar dos cosas:
 
-1. **Etiquetar las carreras de 53 de las 54 empresas.** El filtro por carrera de `/host` ya
-   funciona, pero hoy solo encuentra a British American Tobacco porque es la única etiquetada.
-   Se hace desde la ficha de cada empresa en `/admin/empresas`.
+1. ~~Etiquetar las carreras~~ — hecho el 15-sep. Las 54 empresas quedaron etiquetadas,
+   1,101 etiquetas. El mapeo vive en `supabase/carreras-por-empresa.sql` y la tabla para
+   revisarlo en `supabase/carreras-asignadas.md`. **Falta que Gustavo lo revise:** es criterio,
+   no dato duro.
 2. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido. El
    repo vive en local con seis commits. Vercel despliega por CLI, así que solo falta el respaldo.
 
@@ -30,6 +31,33 @@ La Fase 2 —Cupos y Pendientes— se recorrió a propósito: no hace falta para
 Los 27 pendientes ya están importados en la base, esperando pantalla.
 
 ## Fases cerradas
+
+### Etiquetado de carreras · 15-sep-2026
+
+Las 54 empresas quedaron etiquetadas contra la lista cerrada de 47 carreras, leyendo lo que
+cada una escribió en el Forms. El criterio es amplio a propósito, como lo pidió Gustavo: una
+empresa que pide «Ing. de Calidad» recibe IIS, IQ e INA; una que pide «negocios y análisis de
+datos» recibe BGB, LIT, LAE, LAF, LEC e IDM.
+
+- El mapeo está en `supabase/carreras-por-empresa.sql`, con grupos reutilizables
+  (`ing`, `manuf`, `tec`, `neg`, `todas`) para que se lea y se corrija fácil.
+- La tabla de revisión, con lo que dijo cada empresa al lado de lo que recibió, está en
+  `supabase/carreras-asignadas.md`.
+- **IIS/BIE, IMT/BME y LIN/BGB son la misma carrera en planes distintos.** Se etiquetan las
+  dos para que el filtro encuentre a la empresa sin importar cuál traiga la matrícula.
+
+| Prueba | Resultado |
+|---|---|
+| Empresas sin etiquetar | 0 de 54 |
+| Nombres que no cruzaron entre el mapa y la base | 0 |
+| Carreras sin ninguna empresa | 0. La que menos tiene son 4 |
+| Filtro ARQ en `/host` | Devuelve solo las de arquitectura |
+| Filtro IDM en Bloque 2 | 16 empresas |
+| Etiquetas totales | 1,101 |
+
+Las más pedidas: IIS y BIE con 42 empresas, LAE con 40, ISD con 39. Las menos: LBC, LNB y LTM
+con 4, y solo porque cuatro empresas dijeron «todas las carreras». Ninguna empresa pidió
+producción musical ni nutrición por su nombre.
 
 ### Fase 4 — Vista de host · 15-sep-2026
 
@@ -226,8 +254,9 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 ## Lo que está a medias
 
-- **Las carreras de 53 de las 54 empresas están sin etiquetar.** Es captura manual desde la
-  ficha de cada empresa. Sin eso, el filtro por carrera de la Fase 4 no sirve.
+- **El etiquetado de carreras es criterio mío, sin revisar por Gustavo.** Está en
+  `supabase/carreras-asignadas.md` para que lo lea. Lo más discutible: cuando una empresa
+  dice «ingenierías en general» recibe las 22, biomédica incluida.
 - Cupos y Pendientes siguen siendo marcadores. Los datos de pendientes ya están importados.
 - Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
