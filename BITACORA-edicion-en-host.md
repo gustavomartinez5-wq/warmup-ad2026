@@ -9,8 +9,9 @@ El plan completo está en la conversación; aquí va nada más dónde quedamos.
 
 **Fase en curso:** 4
 **Lo siguiente:** el canal `mapa-${bloque}` para que los otros hosts se refresquen solos.
-**Algo a medias en la base:** nada. 54 empresas, 70 y 49 reclutadores, 1,101 etiquetas,
-7 nombres por definir.
+**Algo a medias en la base:** nada. Desde el 17-sep, con la hoja del equipo: 55 empresas del
+libro más ELLAZ, 75 y 51 reclutadores, 1,104 etiquetas. Las cifras de las fases de abajo son
+las de antes.
 
 **Pendiente de Gustavo:** falta unir la última puntada —darle a Guardar con una sesión del
 equipo de verdad—. Ver «Lo que no se pudo verificar» al final.

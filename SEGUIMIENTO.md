@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **16 de septiembre de 2026**.
+Última actualización: **17 de septiembre de 2026**.
 
 ---
 
@@ -27,12 +27,49 @@ dónde quedamos.
 
 1. **Subir 7 commits.** `git push` falla con 403: git en esta máquina autentica como
    `tsunamipro-dev`, sin escritura en el repo. Lo corre Gustavo desde su terminal.
-2. **Replicar el cambio de Celestica en el Excel**, o la próxima importación lo deshace.
-   Ver «Cambios hechos a mano».
+2. **Mesa 75 de Bloque 1.** El salón tiene 74 y Bloque 1 ocupa 75: hay que conseguir una mesa
+   más o resolver Areya (ver «Hoja del equipo del 17-sep»).
 3. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
 4. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### Hoja del equipo del 17-sep · 17-sep-2026
+
+Gustavo pasó la hoja compartida del equipo (`Warm Up _Tecnológico de Monterrey…28 de
+septiembre (1).xlsx`). No trae mesas: las asignó Claude, junto a su empresa cuando había lugar.
+Se aplicó al libro de control con Excel COM (respaldo en `~/Downloads/… (respaldo antes de hoja
+del equipo 17-sep).xlsx`) y la base se llevó a lo que lee el importador de ese libro.
+
+| Cambio | Mesa |
+|---|---|
+| Index suma 3 personas en B1 (llega a 8) | 3, 4, 22 |
+| Cydsa suma una segunda persona en B1 (ya estaba en el libro, no en la base) | 24 |
+| GE Vernova suma una tercera persona en B1 | 74 |
+| KATCON: la hoja repite un nombre y cuenta 3. Tercera «Por definir» | **75, excedente** |
+| BBVA pasa a ambos bloques, por confirmar | B2-49 |
+| BECK, empresa nueva: Arquitectura y construcción, carreras IC y ARQ | B2-50 |
+| Sale EY de B1-24: estaba solo en la base; la hoja la pone solo en B2 | — |
+| Areya: la hoja la pone en B2 y el Forms en B1. **Sigue en B1, por confirmar (ámbar)** | 33–35 |
+| El recorrido de Celestica quedó también en el libro | — |
+
+Cinco notas de empresa al día; los pendientes pasan de 27 a 28.
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 55 empresas · 75 en B1 · 51 en B2 · 756 de capacidad · 15 por confirmar |
+| Lector de la app sobre el libro | 55 y 126, sin avisos |
+| Libro contra base, fila por fila (md5) | Idénticos. 126 reclutadores, 55 empresas |
+| Mesas repetidas | 0 |
+| `hornear-mapa.mjs --verificar` | Al día: 75 y 51 |
+| `/mesa` en producción a 390 px | B1 con 75, B2 con 51, sin scroll lateral ni errores |
+| `npm run build` | Limpio |
+
+**No se pudo ver `/host` ni `/admin/impreso`:** piden sesión y se denegó quitar la guardia en
+local. `/mesa` usa los mismos datos.
+
+**En la base hay una empresa «ELLAZ»** (Moda, una carrera, sin reclutadores), creada desde la app
+el 17-sep a las 00:10. No está en el libro; el importador la avisaría como baja. No se tocó.
 
 ### Plan B: la app sirve aunque la base no conteste · 16-sep-2026
 
@@ -488,6 +525,8 @@ deja que las columnas salgan solas con `grid-auto-flow: column`. En celular da 3
 
 ### Celestica pasa completa a Bloque 2 · 15-sep-2026
 
+**Replicado en el libro el 17-sep-2026.** Ya no se pierde al reimportar.
+
 Gustavo avisó que Celestica ya no viene en Bloque 1. Claudia Villarreal estaba en la mesa 22
 de Bloque 1 y Mario Gerardo Mata en la 22 de Bloque 2; ahora van los dos en Bloque 2.
 
@@ -575,17 +614,16 @@ a Pro (500 mensajes por segundo) es de Gustavo; en la simulación no hizo falta.
 
 ## Números del último corte
 
-Del Excel de control, corte del Forms del 14-sep-2026 17:25 h con 61 registros, más la
-confirmación de Management Solutions del 15.
+Del Excel de control, con la hoja del equipo del 17-sep-2026 (Forms con 62 registros).
 
 | Indicador | Valor |
 |---|---|
-| Empresas registradas | 54 |
-| Reclutadores Bloque 1 (10:00–13:00) | 71 |
-| Reclutadores Bloque 2 (14:00–17:00) | 48 |
-| Mesas apartadas | 71 de 74 |
-| Capacidad del evento | 714 atenciones |
-| Empresas con algo pendiente | 27 |
+| Empresas registradas | 55 |
+| Reclutadores Bloque 1 (10:00–13:00) | 75 |
+| Reclutadores Bloque 2 (14:00–17:00) | 51 |
+| Mesas apartadas | 75 de 74 — falta una |
+| Capacidad del evento | 756 atenciones |
+| Empresas con algo pendiente | 28 |
 
 La base ya trae estas cifras cargadas y verificadas. Cuando entren registros nuevos, se
 captura en el Excel como siempre y se vuelve a importar.

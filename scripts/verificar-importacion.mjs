@@ -19,14 +19,14 @@ import { compararImportacion, aplicarImportacion } from '../src/lib/importar.js'
 import { calcularCifras } from '../src/lib/cifras.js'
 import { supabase, edicionCompleta } from '../src/lib/supabase.js'
 
-// Lo que dice el Tablero del Excel al corte del 15-sep-2026.
+// Lo que dice el Tablero del Excel al corte del 17-sep-2026.
 const ESPERADO = {
-  empresas:       54,
-  reclutadoresB1: 71,
-  reclutadoresB2: 48,
-  mesasApartadas: 71,
-  capacidad:      714,
-  porConfirmar:   10,
+  empresas:       55,
+  reclutadoresB1: 75,
+  reclutadoresB2: 51,
+  mesasApartadas: 75,
+  capacidad:      756,
+  porConfirmar:   15,
 }
 
 const rutaArg = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : null

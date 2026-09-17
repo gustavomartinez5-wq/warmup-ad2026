@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-17T04:53:53.918Z",
+  "generado_en": "2026-09-17T15:07:25.093Z",
   "bloques": {
     "b1": [
       {
@@ -56,6 +56,114 @@
           "LIN",
           "LIT",
           "LRI"
+        ]
+      },
+      {
+        "numero": 3,
+        "empresa": "Index Nuevo León",
+        "giro": "Manufactura",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 4,
+        "empresa": "Index Nuevo León",
+        "giro": "Manufactura",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
         ]
       },
       {
@@ -516,6 +624,60 @@
           "LEM",
           "LIN",
           "LIT"
+        ]
+      },
+      {
+        "numero": 22,
+        "empresa": "Index Nuevo León",
+        "giro": "Manufactura",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
         ]
       },
       {
@@ -1928,6 +2090,41 @@
           "IRS",
           "ISD"
         ]
+      },
+      {
+        "numero": 74,
+        "empresa": "GE Vernova",
+        "giro": "Manufactura",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "IRS",
+          "ISD"
+        ]
+      },
+      {
+        "numero": 75,
+        "empresa": "KATCON",
+        "giro": "Automotriz",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "IRS",
+          "ISD",
+          "ITC",
+          "LDI"
+        ]
       }
     ],
     "b2": [
@@ -3146,6 +3343,28 @@
           "LTM",
           "LTP",
           "LUB"
+        ]
+      },
+      {
+        "numero": 49,
+        "empresa": "BBVA México",
+        "giro": "Financiero",
+        "carreras": [
+          "LAE",
+          "LAF",
+          "LCPF",
+          "LDE",
+          "LEC",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 50,
+        "empresa": "BECK",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC"
         ]
       },
       {
