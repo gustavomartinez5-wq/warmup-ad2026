@@ -9,6 +9,7 @@ import { catalogoDeCarreras } from '../lib/carreras'
 import { plano, contiene } from '../lib/texto'
 import RejillaMesas from '../components/RejillaMesas'
 import Cargando from '../components/Cargando'
+import Enlace from '../components/Enlace'
 
 /**
  * La vista del equipo el día del evento. Para los tres hosts y los becarios,
@@ -136,6 +137,8 @@ export default function Host() {
   const [abierta, setAbierta] = useState(null)
   const [marcando, setMarcando] = useState(null)
   const [catalogo, setCatalogo] = useState([])
+  const [enlace, setEnlace] = useState('conectando')
+  const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const desmontado = useRef(false)
 
   const traer = useCallback(async () => {
@@ -160,9 +163,15 @@ export default function Host() {
           ? { ...m, estado: fila.estado, ocupado_desde: fila.ocupado_desde }
           : m))
       })
-      .subscribe()
+      // Sin esto, una caída del websocket deja la pantalla vieja y muda.
+      .subscribe(estado => {
+        if (estado === 'SUBSCRIBED') setEnlace('vivo')
+        else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT' || estado === 'CLOSED') {
+          setEnlace('caido')
+        }
+      })
     return () => { desmontado.current = true; supabase.removeChannel(canal) }
-  }, [traer, bloque])
+  }, [traer, bloque, intento])
 
   useEffect(() => {
     const id = setInterval(() => setAhora(Date.now()), 1000)
@@ -215,6 +224,12 @@ export default function Host() {
   const cuenta = contarPorEstado(mesas ?? [])
   const hayFiltro = Boolean(q || carrera || giro)
 
+  // Cambiar `intento` vuelve a correr el efecto: cierra el canal muerto y abre uno nuevo.
+  function reconectar() {
+    setEnlace('conectando')
+    setIntento(n => n + 1)
+  }
+
   async function marcar(numero, estado) {
     setMarcando(estado)
     try {
@@ -254,6 +269,7 @@ export default function Host() {
                 topa en 100 mensajes por segundo y una ráfaga puede pasarse. Las
                 escrituras nunca se pierden —van por REST—, así que recargar
                 siempre trae la verdad. */}
+            <Enlace estado={enlace} alReconectar={reconectar} />
             <button
               onClick={traer}
               className="text-xs text-lavanda/55 hover:text-white transition-colors"

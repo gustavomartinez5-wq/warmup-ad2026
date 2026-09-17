@@ -6,6 +6,7 @@ import { bloquePorReloj, segundosDesde, comoReloj, tonoDelTiempo, deMas } from '
 import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque } from '../lib/cifras'
 import Cargando from '../components/Cargando'
+import Enlace from '../components/Enlace'
 
 /**
  * La pantalla del reclutador. Se entra por el QR, sin contraseña.
@@ -128,6 +129,8 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
   const [error, setError]     = useState(null)
   const [mandando, setMandando] = useState(null)
   const [ahora, setAhora]     = useState(Date.now())
+  const [enlace, setEnlace]   = useState('conectando')
+  const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const desmontado = useRef(false)
 
   const traer = useCallback(async () => {
@@ -153,9 +156,14 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
           if (carga.new?.bloque !== bloque) return
           setMesa(prev => prev && { ...prev, estado: carga.new.estado, ocupado_desde: carga.new.ocupado_desde })
         })
-      .subscribe()
+      .subscribe(estado => {
+        if (estado === 'SUBSCRIBED') setEnlace('vivo')
+        else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT' || estado === 'CLOSED') {
+          setEnlace('caido')
+        }
+      })
     return () => { desmontado.current = true; supabase.removeChannel(canal) }
-  }, [traer, numero, bloque])
+  }, [traer, numero, bloque, intento])
 
   // Un solo reloj para toda la pantalla.
   useEffect(() => {
@@ -201,9 +209,12 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
   return (
     <div className="min-h-dvh max-w-md mx-auto flex flex-col">
       <div className="px-5 pt-6 pb-4 border-b border-lavanda/15">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">
-          CVDP · {etiquetaBloque(bloque)}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">
+            CVDP · {etiquetaBloque(bloque)}
+          </p>
+          <Enlace estado={enlace} alReconectar={() => { setEnlace('conectando'); setIntento(n => n + 1) }} />
+        </div>
         <div className="flex items-start gap-3 mt-1.5">
           <span className="w-11 h-11 rounded-xl bg-marino-alto border border-lavanda/20
                            grid place-items-center text-base font-extrabold cifra shrink-0">

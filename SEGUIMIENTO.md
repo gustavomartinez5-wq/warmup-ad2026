@@ -57,6 +57,22 @@ Conectar 72 teléfonos tomó 1.1 segundos, mediana de 346 ms. La apertura del sa
 producción se comparó contra la base al parar. 21 disponibles, 34 ocupadas, 15 en break en las
 dos, y mesa por mesa idénticas, sin una sola recarga.
 
+#### El semáforo de conexión · 16-sep-2026
+
+Gustavo preguntó qué pasa si alguien machaca recargar creyendo que la app se congeló.
+Medido: **una recarga de `/mesa` cuesta 1 petición** a Supabase (112 ms) y 1 KB de Vercel,
+porque el resto sale de caché. Por ahí no hay riesgo.
+
+El riesgo estaba en otro lado. Las dos pantallas se suscribían con `.subscribe()` **sin
+callback**: si el websocket se caía —mal wifi, o el tope de 200 conexiones— la pantalla se
+veía idéntica y solo dejaba de actualizarse. Un host con números viejos manda estudiantes a
+mesas ocupadas, y nadie se entera. Y una pantalla que parece congelada es justo lo que hace
+que la gente machaque recargar.
+
+Ahora las dos traen `src/components/Enlace.jsx`: un punto y una palabra —Conectando, En vivo,
+Sin conexión— y cuando se cae, un botón de reconectar que re-monta el canal sin recargar la
+página.
+
 #### Lo que encontró el agente reclutador
 
 Se lanzó un agente con el papel y la liga, sin manual. Encontró lo que ningún script encuentra:
