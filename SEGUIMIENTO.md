@@ -9,28 +9,58 @@ dónde quedamos.
 
 ## Dónde vamos
 
-**La app está completa y corrida en simulación.** Falta el ensayo con personas de verdad.
+**La app está completa, probada bajo carga y lista.** Faltan cosas de calendario, no de código.
 
-| Pantalla | Link | Quién entra |
-|---|---|---|
-| Administración | https://warmup-ad2026.vercel.app/admin | cuenta del equipo |
-| Vista de host | https://warmup-ad2026.vercel.app/host | cuenta del equipo |
-| Reclutador | https://warmup-ad2026.vercel.app/mesa | nadie, es el QR |
-| QR imprimible | https://warmup-ad2026.vercel.app/admin/qr | cuenta del equipo |
+| Pantalla | Link |
+|---|---|
+| Administración | https://warmup-ad2026.vercel.app/admin |
+| Vista de host | https://warmup-ad2026.vercel.app/host |
+| Reclutador, por el QR | https://warmup-ad2026.vercel.app/mesa |
+| QR imprimible | https://warmup-ad2026.vercel.app/admin/qr |
+| Latido de la base | https://warmup-ad2026.vercel.app/api/latido |
 
-**Ojo con la próxima importación:** el 15-sep se movió Celestica a mano en la app, no en el
-Excel. Si se reimporta el libro sin corregirlo antes, el cambio se deshace. Ver «Cambios hechos
-a mano», abajo.
+**Lo que falta, en orden:**
 
-**Lo que falta antes del 28:**
-
-1. **Ensayo con personas**, para ver si alguien se atora sin que le expliquen. La máquina ya
-   pasó; falta la gente.
-2. **Revisar el etiquetado de carreras** en `supabase/carreras-asignadas.md`. Es criterio.
-3. **Reconectar GitHub.** `gh auth status` dice que el token de `Mrnrv32` está vencido.
-4. **Decidir si se sube a Supabase Pro.** Ver el hallazgo del tope de mensajes, abajo.
+1. **Subir 7 commits.** `git push` falla con 403: git en esta máquina autentica como
+   `tsunamipro-dev`, sin escritura en el repo. Lo corre Gustavo desde su terminal.
+2. **Replicar el cambio de Celestica en el Excel**, o la próxima importación lo deshace.
+   Ver «Cambios hechos a mano».
+3. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
+4. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### El plan gratuito aguanta, y el latido · 16-sep-2026
+
+Gustavo dio los números reales del evento: 10:00 a 17:00, 70–75 reclutadores, unos 400
+estudiantes. La cuenta, con los estudiantes contando como cero porque no tocan la app:
+
+| | |
+|---|---|
+| Escrituras en todo el día | ~1,650, una cada 13 segundos |
+| Mensajes de tiempo real | ~6,600 en todo el día |
+| Contra el tope de 100 por segundo | usamos 0.31 — **327 veces de margen** |
+| Contra los 2 millones al mes | usamos 0.33% de la cuota |
+| Contra las 200 conexiones | usamos ~81 |
+
+El peor momento realista —cambio de turno, todos terminando en dos minutos— son 2 mensajes por
+segundo. El 16-sep se midió el sistema a 540 sin perder uno. **No hace falta Supabase Pro.**
+
+**El riesgo real resultó ser otro, y es de calendario.** Supabase pausa los proyectos gratuitos
+que pasan 7 días con poca actividad. Del corte del registro al 28 puede haber una semana muerta,
+y un proyecto pausado la mañana del evento no levanta sin restaurarlo a mano.
+
+Se resolvió con `api/latido.js` y una entrada de cron en `vercel.json`: una vez al día hace tres
+consultas de lectura contra la base. Verificado en producción — responde con la edición, la
+fecha, las 47 carreras y las 70 mesas del Bloque 1, y el rewrite de la SPA sigue intacto porque
+la regla ahora excluye `/api/`.
+
+También quedó `PREFLIGHT.md`: la lista de 15 minutos para la mañana del 28. El paso que no se
+puede saltar es el 5, probar `/mesa` y `/host` **en la red de Centrales Norte**, no en la
+oficina: es lo único que no se puede verificar desde el escritorio.
+
+**Se canceló la prueba de lectura bajo escritura.** Se había diseñado cuando el tope de mensajes
+parecía un riesgo; con 327 veces de margen respondía una pregunta que ya no existe.
 
 ### Ensayo de carga y primer agente · 16-sep-2026
 
