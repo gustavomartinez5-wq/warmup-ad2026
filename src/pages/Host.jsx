@@ -11,6 +11,8 @@ import { plano, contiene } from '../lib/texto'
 import RejillaMesas from '../components/RejillaMesas'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
+import EditarMesa from '../components/EditarMesa'
+import { datosDelSalon } from '../lib/mesaEquipo'
 
 /**
  * La vista del equipo el día del evento. Para los tres hosts y los becarios,
@@ -44,7 +46,7 @@ function Pastilla({ valor, texto, tono }) {
 
 /* ── Hoja de detalle ──────────────────────────────────────────────────────── */
 
-function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando }) {
+function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }) {
   const p = pintar(mesa, ahora)
   return (
     <div
@@ -118,6 +120,18 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando }) {
               ))}
             </div>
           </div>
+
+          {/* Solo con la base viva: sin ella no se puede escribir, y ofrecerlo
+              sería mentir. */}
+          {onEditar && (
+            <button
+              onClick={onEditar}
+              className="w-full rounded-xl border border-lavanda/25 text-lavanda/75 hover:text-white
+                         hover:border-lavanda/50 py-3 text-sm font-bold transition-colors"
+            >
+              Editar esta mesa
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -139,6 +153,9 @@ export default function Host() {
   const [abierta, setAbierta] = useState(null)
   const [marcando, setMarcando] = useState(null)
   const [catalogo, setCatalogo] = useState([])
+  const [editando, setEditando] = useState(null)   // número de mesa que se está editando
+  const [salon, setSalon]       = useState(null)   // empresas y filas; solo para el equipo
+  const [trayendoSalon, setTrayendoSalon] = useState(false)
   const [enlace, setEnlace] = useState('conectando')
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const desmontado = useRef(false)
@@ -243,6 +260,23 @@ export default function Host() {
     setIntento(n => n + 1)
   }
 
+  /**
+   * Las empresas y las filas de reclutadores no se piden al abrir `/host`: son
+   * dos consultas que solo hacen falta si alguien va a editar. Se traen la
+   * primera vez y se quedan.
+   */
+  const traerSalon = useCallback(async () => {
+    setTrayendoSalon(true)
+    try { setSalon(await datosDelSalon()) }
+    catch (e) { setError(e.message ?? String(e)); setSalon(null) }
+    setTrayendoSalon(false)
+  }, [])
+
+  function abrirEdicion(numero) {
+    setEditando(numero)
+    if (!salon) traerSalon()
+  }
+
   async function marcar(numero, estado) {
     setMarcando(estado)
     try {
@@ -257,6 +291,7 @@ export default function Host() {
 
   const mesaAbierta = filtradas.find(m => m.numero === abierta)
     ?? (mesas ?? []).find(m => m.numero === abierta)
+  const mesaEnEdicion = (mesas ?? []).find(m => m.numero === editando)
 
   const campoFiltro = 'min-w-0 rounded-lg bg-marino-alto border border-lavanda/20 px-2.5 py-2 ' +
                       'text-[13px] outline-none focus:border-cian text-lavanda'
@@ -267,6 +302,16 @@ export default function Host() {
         <Detalle
           mesa={mesaAbierta} bloque={bloque} ahora={ahora} marcando={marcando}
           onCerrar={() => setAbierta(null)} onMarcar={marcar}
+          onEditar={fuente === 'viva' ? () => abrirEdicion(mesaAbierta.numero) : null}
+        />
+      )}
+
+      {mesaEnEdicion && (
+        <EditarMesa
+          mesa={mesaEnEdicion} bloque={bloque} salon={salon} carreras={catalogo}
+          cargando={trayendoSalon}
+          onCerrar={() => setEditando(null)}
+          onGuardado={async () => { await Promise.all([traer(), traerSalon()]); setAbierta(null) }}
         />
       )}
 
