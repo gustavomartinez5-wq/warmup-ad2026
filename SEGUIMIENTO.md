@@ -536,11 +536,9 @@ a Pro (500 mensajes por segundo) es de Gustavo; en la simulación no hizo falta.
 
 ## Lo que está a medias
 
-- **El etiquetado de carreras es criterio mío, sin revisar por Gustavo.** Está en
-  `supabase/carreras-asignadas.md` para que lo lea. Lo más discutible: cuando una empresa
-  dice «ingenierías en general» recibe las 22, biomédica incluida.
-- Nada a medias en el código. Lo único abierto es criterio: el etiquetado de carreras
-  necesita que Gustavo lo lea.
+- **El etiquetado de carreras quedó revisado y aprobado por Gustavo el 16-sep-2026.**
+  La tabla sigue en `supabase/carreras-asignadas.md` por si hay que ajustar alguna.
+- Nada a medias en el código.
 - Cupos y Pendientes son marcadores. Los datos de pendientes ya están importados.
 
 ## Lo que se intentó y no funcionó
