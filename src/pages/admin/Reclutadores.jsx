@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useDatos } from '../../lib/datos'
 import { BLOQUES, etiquetaBloque, esPorDefinir } from '../../lib/cifras'
+import { cambiarEmpresaDeMesa, moverMesa, datosDelSalon } from '../../lib/mesaEquipo'
 import Cargando from '../../components/Cargando'
+import EditarMesa from '../../components/EditarMesa'
 
 const ESTATUS = [
   { clave: 'confirmado',    texto: 'Confirmado' },
@@ -34,20 +36,35 @@ function Editar({ fila, empresas, reclutadores, onCerrar, onGuardado }) {
     r => r.id !== fila.id && r.bloque === form.bloque && r.mesa_numero === mesa
   )
 
+  /**
+   * El nombre y el estatus son de la persona y se escriben directo. La empresa y
+   * la mesa van por las funciones de la base: son las que validan el choque en
+   * una transacción y dejan rastro en la bitácora. Si se escribieran aquí
+   * también, habría dos lugares donde se mueve una mesa y uno de los dos se
+   * quedaría atrás.
+   */
   async function guardar() {
     if (choca) return
     setGuardando(true); setError(null)
-    const { error } = await supabase.from('reclutadores').update({
-      nombre:      form.nombre.trim() || 'Por definir',
-      empresa_id:  form.empresa_id,
-      bloque:      form.bloque,
-      estatus:     form.estatus,
-      mesa_numero: mesa,
-    }).eq('id', fila.id)
-    if (error) { setError(error.message); setGuardando(false); return }
-    await onGuardado()
-    setGuardando(false)
-    onCerrar()
+    try {
+      const { error: err } = await supabase.from('reclutadores').update({
+        nombre:  form.nombre.trim() || 'Por definir',
+        estatus: form.estatus,
+      }).eq('id', fila.id)
+      if (err) throw new Error(err.message)
+
+      if (form.empresa_id !== fila.empresa_id) {
+        await cambiarEmpresaDeMesa(fila.id, form.empresa_id)
+      }
+      if (mesa !== null && (mesa !== fila.mesa_numero || form.bloque !== fila.bloque)) {
+        await moverMesa(fila.id, form.bloque, mesa)
+      }
+      await onGuardado()
+      onCerrar()
+    } catch (e) {
+      setError(e.message ?? String(e))
+      setGuardando(false)
+    }
   }
 
   const campo = 'w-full rounded-xl bg-marino/70 border border-lavanda/20 px-3 py-2.5 text-sm ' +
@@ -115,7 +132,14 @@ function Editar({ fila, empresas, reclutadores, onCerrar, onGuardado }) {
 
           {choca && (
             <p className="text-xs text-rojo bg-rojo/10 border border-rojo/30 rounded-lg px-3 py-2">
-              La mesa {mesa} ya está ocupada en {etiquetaBloque(form.bloque)}.
+              La mesa {mesa} ya está ocupada en {etiquetaBloque(form.bloque)}. Para cambiarlas de
+              lugar, usa «Editar la mesa» desde la lista: ahí se intercambian o se recorre el tramo.
+            </p>
+          )}
+          {form.empresa_id !== fila.empresa_id && (
+            <p className="text-xs text-ambar bg-ambar/10 border border-ambar/40 rounded-lg px-3 py-2">
+              Al cambiar de empresa, el nombre pasa a «Por definir»: el que está puesto es de una
+              persona de la empresa anterior.
             </p>
           )}
           {error && (
@@ -144,6 +168,22 @@ export default function Reclutadores() {
   const [busca, setBusca] = useState('')
   const [filtro, setFiltro] = useState('todos')
   const [editando, setEditando] = useState(null)
+  const [editandoMesa, setEditandoMesa] = useState(null)
+  const [salon, setSalon] = useState(null)
+  const [trayendoSalon, setTrayendoSalon] = useState(false)
+
+  // Las empresas y las filas con la forma que pide el editor del salón. Se
+  // traen la primera vez que alguien abre una mesa, no al abrir la pantalla.
+  const traerSalon = useCallback(async () => {
+    setTrayendoSalon(true)
+    try { setSalon(await datosDelSalon()) } catch { setSalon(null) }
+    setTrayendoSalon(false)
+  }, [])
+
+  function abrirMesa(fila) {
+    setEditandoMesa(fila)
+    if (!salon) traerSalon()
+  }
 
   if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
@@ -191,6 +231,16 @@ export default function Reclutadores() {
         />
       )}
 
+      {/* El mismo editor que usa `/host`: mover, intercambiar, recorrer y liberar. */}
+      {editandoMesa && (
+        <EditarMesa
+          mesa={{ numero: editandoMesa.mesa_numero }} bloque={editandoMesa.bloque}
+          salon={salon} carreras={datos.carreras} cargando={trayendoSalon}
+          onCerrar={() => setEditandoMesa(null)}
+          onGuardado={async () => { await Promise.all([recargar(), traerSalon()]) }}
+        />
+      )}
+
       <div>
         <h2 className="text-xl font-extrabold">Reclutadores</h2>
         <p className="text-sm text-lavanda/60 mt-0.5">
@@ -227,10 +277,10 @@ export default function Reclutadores() {
       ) : (
         <ul className="space-y-1">
           {lista.map(r => (
-            <li key={r.id}>
+            <li key={r.id} className="flex items-stretch gap-1">
               <button
                 onClick={() => setEditando(r.id)}
-                className="w-full text-left rounded-xl border border-lavanda/15 bg-marino-alto/40
+                className="flex-1 min-w-0 text-left rounded-xl border border-lavanda/15 bg-marino-alto/40
                            hover:border-lavanda/35 px-3.5 py-2.5 transition-colors flex items-center gap-3"
               >
                 <span className="cifra text-sm font-bold text-lavanda/50 w-9 shrink-0 text-right">
@@ -248,6 +298,17 @@ export default function Reclutadores() {
                   {ESTATUS.find(s => s.clave === r.estatus)?.texto}
                 </span>
               </button>
+              {r.mesa_numero !== null && (
+                <button
+                  onClick={() => abrirMesa(r)}
+                  title="Mover, intercambiar, recorrer o liberar la mesa"
+                  className="shrink-0 rounded-xl border border-lavanda/15 text-lavanda/55
+                             hover:text-white hover:border-lavanda/35 px-3 text-[11px] font-semibold
+                             transition-colors"
+                >
+                  Mesa
+                </button>
+              )}
             </li>
           ))}
         </ul>

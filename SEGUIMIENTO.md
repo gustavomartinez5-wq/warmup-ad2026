@@ -3,7 +3,8 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **17 de septiembre de 2026**.
+Última actualización: **17 de septiembre de 2026**, con los expertos de portafolio y el
+control completo del salón.
 
 ---
 
@@ -18,6 +19,7 @@ dónde quedamos.
 | Reclutador, por el QR | https://warmup-ad2026.vercel.app/mesa |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr |
 | Hoja de papel | https://warmup-ad2026.vercel.app/admin/impreso |
+| Cambios del día | https://warmup-ad2026.vercel.app/admin/cambios |
 | Latido de la base | https://warmup-ad2026.vercel.app/api/latido |
 
 **Lo que falta, en orden:**
@@ -25,14 +27,104 @@ dónde quedamos.
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
-1. **Subir 7 commits.** `git push` falla con 403: git en esta máquina autentica como
-   `tsunamipro-dev`, sin escritura en el repo. Lo corre Gustavo desde su terminal.
-2. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
+1. **Commitear y subir lo del 17-sep por la tarde, más los 7 commits de antes.** `git push`
+   falla con 403: git en esta máquina autentica como `tsunamipro-dev`, sin escritura en el
+   repo. Lo corre Gustavo desde su terminal. **Hasta que no se despliegue, producción sigue
+   con el salón de 74 mesas y sin los expertos**; la base ya está al día.
+
+2. **Las dos pruebas que piden sesión del equipo.** Son dos minutos y las tiene que hacer
+   Gustavo, porque las contraseñas no pasan por el chat: abrir `/host` con la cuenta del
+   equipo, tocar una mesa y darle a Guardar; y con dos `/host` abiertos a la vez, ver que el
+   cambio aparece en el otro sin recargar.
+3. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
    P&G, Vitro, Redwood), Index como Regal Rexnord, y si Clarios trae a alguien en Bloque 1.
-3. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
-4. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
+4. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
+5. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### Expertos de portafolio, 75 mesas y control completo del salón · 17-sep-2026
+
+Llegaron tres cosas juntas: los cinco expertos de portafolio creativo de EAAD, el salón
+confirmado en 75 mesas, y la necesidad de reacomodar el salón el día del evento sin entrar
+por SQL.
+
+**Los cinco expertos.** Entran como una empresa cada uno, nombrada por el perfil que revisa,
+porque las carreras van pegadas a la empresa: con una sola empresa de cinco mesas, el
+estudiante de urbanismo habría salido mandado a la mesa de animación. Giro nuevo para las
+cinco, `Revisión de portafolio`, que es lo que saca la zona completa de un toque.
+
+| Empresa | Bloque · Mesa | Carreras |
+|---|---|---|
+| Portafolio · Diseño | B1 · 74 | LDI |
+| Portafolio · Urbanismo | B1 · 75 | LUB |
+| Portafolio · Diseño y Animación | B2 · 73 | LDI, LAD |
+| Portafolio · Todos los perfiles | B2 · 74 | ARQ, LDI, LAD, LUB |
+| Portafolio · Animación | B2 · 75 | LAD |
+
+Las últimas tres mesas quedan como zona de portafolio en los dos bloques. En Bloque 2 ya
+estaban libres; en Bloque 1 las tenía GE Vernova con tres personas, y se movieron completas
+—72, 73 y 74 pasan a 33, 34 y 35, las que dejó libres Areya— para no partir a la empresa.
+Quedan libres la 72 y la 73 en Bloque 1.
+
+Dos pendientes nuevos, los dos anotados en la nota de su empresa: Saúl Cabriales contestó
+horario de 10:00 a 12:00 y se va una hora antes de que cierre Bloque 1, y Cecilia González
+dijo «todos los perfiles», que se tomó como las cuatro carreras de EAAD.
+
+**El control del salón.** `EditarMesa` es ahora el único editor y lo usan las dos puertas:
+`/host` en el celular y `/admin/reclutadores` en el escritorio. Siete acciones, nombradas como
+se dicen en el salón: cambiar quién se sienta, mover, intercambiar, recorrer desde aquí,
+liberar, agregar mesa y cambiar de bloque. Cuando el número que se pide está tomado, la hoja
+no se queda en «no puedes»: ofrece intercambiar o recorrer, y guarda antes lo que ya se cambió
+arriba para que elegir una salida no lo tire.
+
+Los movimientos viven en Postgres (`08_editar_el_salon.sql`), no en el navegador:
+`reclutadores_mesa_unica` es un índice único parcial y no se puede diferir, así que dos
+`update` seguidos truenan o —peor— dejan el salón a medias si se cae la red entre uno y otro.
+La migración arregla además que **`'cancelado'` no estaba en el enum `estatus_t`**: se había
+agregado a mano a la base viva y nunca se commiteó.
+
+También quedó `/admin/cambios`, la bitácora del día. Existe por una razón concreta: el 28 manda
+la app, pero una reimportación del libro borra y reinserta `reclutadores`, así que sin esta
+lista todo lo que el equipo arregla en el salón se pierde al día siguiente sin que nadie se dé
+cuenta.
+
+**Que los otros hosts se enteren.** Canal de difusión `salon-<bloque>`: quien guarda avisa y
+las otras pantallas vuelven a pedir `mesas_publicas`. Es difusión y no `postgres_changes` sobre
+`reclutadores` a propósito —esa tabla trae nombres de personas de fuera del Tec—, y el texto
+que se lee vive en la pantalla y no en el mensaje: la clave pública está a la vista y
+cualquiera podría mandar un aviso con lo que quisiera escrito.
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 60 empresas · 73 en B1 · 57 en B2 · 780 de capacidad |
+| Lector de la app sobre el libro | 60 y 130, sin avisos |
+| Libro contra base, fila por fila (md5) | Idénticos: 130 reclutadores, 60 empresas |
+| Mesas repetidas · mesa más alta | 0 · 75 en los dos bloques |
+| Empresas sin carreras etiquetadas | 0 de 60. Etiquetas: 1,112 |
+| Pendientes abiertos | 27 |
+| `hornear-mapa.mjs --verificar` | Al día: 73 y 57 |
+| `/mesa` en los dos bloques a 390 px | Buscar «portafolio» da 2 mesas en B1 y 3 en B2, en vivo |
+| `/host`, filtro de giro «Revisión de portafolio» | Las 3 mesas de B2, en teal |
+| `/admin/impreso` | «Revisión de portafolio (EAAD): 74, 75», y LDI llega a la 74 y LUB a la 75 |
+| Editor a 390 px, modo alta | Arranca en «Otra empresa…» con la 72 sugerida y el botón apagado |
+| Editor a 390 px, número tomado | «La mesa 7 la tiene Cemex» + intercambiar + «65 mesas suben una» |
+| Intercambiar dos mesas (contra la base, deshecho) | Cemex a la 1 y Management Solutions a la 7 |
+| Recorrer un tramo (contra la base, deshecho) | Steelcase 70 y 71 pasan a 71 y 72; KATCON no se mueve |
+| Recorrer sin hueco hasta el final | Avisa y no toca nada |
+| Mover a una mesa tomada | Avisa y no toca nada |
+| Liberar y reasignar | La mesa queda libre y **no hereda el estado viejo** |
+| Cambiar la empresa de una mesa | Entra la nueva y el nombre pasa a «Por definir» |
+| Bitácora | Una línea por acción, y las trece formas se leen en español |
+| Dos pantallas abiertas | La que no hizo el cambio muestra el aviso y refresca sin recargar |
+| `/mesa` al llegar el aviso | Vuelve a pedir `mesas_publicas`, una vez |
+| Permisos de las nueve funciones | `authenticated` sí, `anon` no |
+| `npm run build` | Limpio |
+
+Las escrituras se probaron como una cuenta del equipo dentro de una transacción que se deshace
+al final: la base quedó igual que estaba. **Falta la puntada que une pantalla y escritura**
+—guardar desde `/host` con la cuenta de verdad— y ver dos `/host` a la vez. Son los dos puntos
+de arriba.
 
 ### Revisión con el equipo: registro contra hoja · 17-sep-2026
 
@@ -641,16 +733,17 @@ a Pro (500 mensajes por segundo) es de Gustavo; en la simulación no hizo falta.
 
 ## Números del último corte
 
-Del Excel de control, con la revisión del equipo del 17-sep-2026 (Forms con 62 registros).
+Del Excel de control, con la revisión del equipo del 17-sep-2026 (Forms con 62 registros) y
+los cinco expertos de portafolio de EAAD.
 
 | Indicador | Valor |
 |---|---|
-| Empresas registradas | 55 |
-| Reclutadores Bloque 1 (10:00–13:00) | 71 |
-| Reclutadores Bloque 2 (14:00–17:00) | 54 |
-| Mesas apartadas | 71 de 74 |
-| Capacidad del evento | 750 atenciones |
-| Empresas con algo pendiente | 28 (3 ya resueltos) |
+| Empresas registradas | 60 (55 + 5 de portafolio) |
+| Reclutadores Bloque 1 (10:00–13:00) | 73 |
+| Reclutadores Bloque 2 (14:00–17:00) | 57 |
+| Mesas apartadas | 74 de 75 |
+| Capacidad del evento | 780 atenciones |
+| Empresas con algo pendiente | 30 (3 ya resueltos) |
 
 La base ya trae estas cifras cargadas y verificadas. Cuando entren registros nuevos, se
 captura en el Excel como siempre y se vuelve a importar.

@@ -16,6 +16,13 @@ export const BLOQUES = [
 
 export const etiquetaBloque = b => (b === 'b1' ? 'Bloque 1' : 'Bloque 2')
 
+/**
+ * El giro con el que entran los expertos de portafolio de EAAD. No reclutan:
+ * revisan portafolio creativo. Se reconocen por el giro y no por el número de
+ * mesa, para que la etiqueta siga siendo cierta si esas mesas se mueven.
+ */
+export const GIRO_PORTAFOLIO = 'Revisión de portafolio'
+
 /** Un reclutador cancelado no ocupa lugar ni cuenta para la capacidad. */
 const vivos = reclutadores => reclutadores.filter(r => r.estatus !== 'cancelado')
 

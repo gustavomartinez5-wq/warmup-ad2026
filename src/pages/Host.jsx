@@ -158,7 +158,10 @@ export default function Host() {
   const [trayendoSalon, setTrayendoSalon] = useState(false)
   const [enlace, setEnlace] = useState('conectando')
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
+  const [aviso, setAviso]   = useState(null)  // «otro host movió una mesa»
   const desmontado = useRef(false)
+  const canalSalon = useRef(null)
+  const salonPedido = useRef(false)
 
   /**
    * Nunca deja la pantalla en blanco. Si la base contesta, sus estados pisan al
@@ -176,6 +179,19 @@ export default function Host() {
       if (!desmontado.current) setFuente(f => (f === 'viva' || f === 'vieja') ? 'vieja' : 'fija')
     }
   }, [bloque])
+
+  /**
+   * Las empresas y las filas de reclutadores no se piden al abrir `/host`: son
+   * dos consultas que solo hacen falta si alguien va a editar. Se traen la
+   * primera vez y se quedan.
+   */
+  const traerSalon = useCallback(async () => {
+    salonPedido.current = true
+    setTrayendoSalon(true)
+    try { setSalon(await datosDelSalon()) }
+    catch (e) { setError(e.message ?? String(e)); setSalon(null) }
+    setTrayendoSalon(false)
+  }, [])
 
   // Al cambiar de bloque, el salón del bloque nuevo aparece completo de inmediato.
   // No va en el efecto del canal a propósito: reconectar no debe tirar lo vivo.
@@ -202,6 +218,42 @@ export default function Host() {
       })
     return () => { desmontado.current = true; supabase.removeChannel(canal) }
   }, [traer, bloque, intento])
+
+  /**
+   * El salón cambia de forma durante el evento: llega una empresa sin avisar, se
+   * libera una mesa, se recorre un tramo. Con tres hosts en el piso, el que no
+   * hizo el cambio seguía viendo el salón viejo hasta que tocara Recargar, y
+   * mandaba estudiantes a una mesa que ya no era de esa empresa.
+   *
+   * Es un canal de difusión y no `postgres_changes` sobre `reclutadores` a
+   * propósito: esa tabla trae nombres de personas de fuera del Tec y agregarla a
+   * la publicación de tiempo real los mandaría por el cable. El aviso no lleva
+   * datos: solo dice que el salón cambió y cada pantalla vuelve a preguntar.
+   */
+  useEffect(() => {
+    const canal = supabase.channel(`salon-${bloque}`)
+      // El texto no viene del mensaje: la clave pública está a la vista y
+      // cualquiera podría mandar un aviso con lo que quisiera escrito. El
+      // mensaje solo sirve de campana; lo que se lee está aquí.
+      .on('broadcast', { event: 'cambio' }, () => {
+        if (desmontado.current) return
+        setAviso('El salón cambió: alguien del equipo movió una mesa.')
+        traer()
+        // Si esta pantalla ya trajo las empresas y las filas, se refrescan: si
+        // alguien tiene el editor abierto, tiene que ver los números de ahora.
+        if (salonPedido.current) traerSalon()
+      })
+      .subscribe()
+    canalSalon.current = canal
+    return () => { canalSalon.current = null; supabase.removeChannel(canal) }
+  }, [traer, traerSalon, bloque])
+
+  // El aviso se va solo: es una noticia, no un error que haya que atender.
+  useEffect(() => {
+    if (!aviso) return
+    const id = setTimeout(() => setAviso(null), 12000)
+    return () => clearTimeout(id)
+  }, [aviso])
 
   useEffect(() => {
     const id = setInterval(() => setAhora(Date.now()), 1000)
@@ -260,18 +312,6 @@ export default function Host() {
     setIntento(n => n + 1)
   }
 
-  /**
-   * Las empresas y las filas de reclutadores no se piden al abrir `/host`: son
-   * dos consultas que solo hacen falta si alguien va a editar. Se traen la
-   * primera vez y se quedan.
-   */
-  const traerSalon = useCallback(async () => {
-    setTrayendoSalon(true)
-    try { setSalon(await datosDelSalon()) }
-    catch (e) { setError(e.message ?? String(e)); setSalon(null) }
-    setTrayendoSalon(false)
-  }, [])
-
   function abrirEdicion(numero) {
     setEditando(numero)
     if (!salon) traerSalon()
@@ -312,7 +352,12 @@ export default function Host() {
           mesa={mesaEnEdicion ?? null} bloque={bloque} salon={salon} carreras={catalogo}
           cargando={trayendoSalon}
           onCerrar={() => setEditando(null)}
-          onGuardado={async () => { await Promise.all([traer(), traerSalon()]); setAbierta(null) }}
+          onGuardado={async () => {
+            await Promise.all([traer(), traerSalon()])
+            setAbierta(null)
+            // Los otros hosts se enteran sin recargar.
+            canalSalon.current?.send({ type: 'broadcast', event: 'cambio', payload: {} })
+          }}
         />
       )}
 
@@ -395,6 +440,16 @@ export default function Host() {
             {' '}
             <button onClick={traer} className="underline underline-offset-2 font-semibold">
               Reintentar
+            </button>
+          </p>
+        )}
+
+        {aviso && (
+          <p className="text-[11px] leading-snug rounded-lg border border-cian/50 bg-cian/10
+                        text-cian px-2.5 py-2">
+            {aviso}{' '}
+            <button onClick={() => setAviso(null)} className="underline underline-offset-2 font-semibold">
+              Entendido
             </button>
           </p>
         )}

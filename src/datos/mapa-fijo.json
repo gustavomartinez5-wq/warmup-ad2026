@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-17T16:00:26.646Z",
+  "generado_en": "2026-09-17T20:45:49.959Z",
   "bloques": {
     "b1": [
       {
@@ -950,6 +950,57 @@
           "LEM",
           "LIN",
           "LIT"
+        ]
+      },
+      {
+        "numero": 33,
+        "empresa": "GE Vernova",
+        "giro": "Manufactura",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "IRS",
+          "ISD"
+        ]
+      },
+      {
+        "numero": 34,
+        "empresa": "GE Vernova",
+        "giro": "Manufactura",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "IRS",
+          "ISD"
+        ]
+      },
+      {
+        "numero": 35,
+        "empresa": "GE Vernova",
+        "giro": "Manufactura",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "IRS",
+          "ISD"
         ]
       },
       {
@@ -2025,54 +2076,19 @@
         ]
       },
       {
-        "numero": 72,
-        "empresa": "GE Vernova",
-        "giro": "Manufactura",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IE",
-          "IFI",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "IRS",
-          "ISD"
-        ]
-      },
-      {
-        "numero": 73,
-        "empresa": "GE Vernova",
-        "giro": "Manufactura",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IE",
-          "IFI",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "IRS",
-          "ISD"
-        ]
-      },
-      {
         "numero": 74,
-        "empresa": "GE Vernova",
-        "giro": "Manufactura",
+        "empresa": "Portafolio · Diseño",
+        "giro": "Revisión de portafolio",
         "carreras": [
-          "BIE",
-          "BME",
-          "IE",
-          "IFI",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "IRS",
-          "ISD"
+          "LDI"
+        ]
+      },
+      {
+        "numero": 75,
+        "empresa": "Portafolio · Urbanismo",
+        "giro": "Revisión de portafolio",
+        "carreras": [
+          "LUB"
         ]
       }
     ],
@@ -3424,6 +3440,34 @@
           "LEI",
           "LRI",
           "LTP"
+        ]
+      },
+      {
+        "numero": 73,
+        "empresa": "Portafolio · Diseño y Animación",
+        "giro": "Revisión de portafolio",
+        "carreras": [
+          "LAD",
+          "LDI"
+        ]
+      },
+      {
+        "numero": 74,
+        "empresa": "Portafolio · Todos los perfiles",
+        "giro": "Revisión de portafolio",
+        "carreras": [
+          "ARQ",
+          "LAD",
+          "LDI",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 75,
+        "empresa": "Portafolio · Animación",
+        "giro": "Revisión de portafolio",
+        "carreras": [
+          "LAD"
         ]
       }
     ]

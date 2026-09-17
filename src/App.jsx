@@ -14,6 +14,7 @@ import Empresas from './pages/admin/Empresas'
 import Reclutadores from './pages/admin/Reclutadores'
 import Cupos from './pages/admin/Cupos'
 import Pendientes from './pages/admin/Pendientes'
+import Cambios from './pages/admin/Cambios'
 import Cargando from './components/Cargando'
 
 // SheetJS pesa medio megabyte. Se carga solo al abrir la importación, para que las
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="reclutadores" element={<Reclutadores />} />
             <Route path="cupos" element={<Cupos />} />
             <Route path="pendientes" element={<Pendientes />} />
+            <Route path="cambios" element={<Cambios />} />
             <Route path="importar" element={<Suspense fallback={<Cargando />}><Importar /></Suspense>} />
             <Route path="qr" element={<Suspense fallback={<Cargando />}><Qr /></Suspense>} />
             <Route path="impreso" element={<Impreso />} />

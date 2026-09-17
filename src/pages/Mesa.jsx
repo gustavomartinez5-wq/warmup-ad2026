@@ -184,6 +184,20 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
     return () => { desmontado.current = true; supabase.removeChannel(canal) }
   }, [traer, numero, bloque, intento])
 
+  /**
+   * Cuando el equipo reacomoda el salón, la empresa de esta mesa puede cambiar.
+   * Sin esto, el teléfono se quedaba con el nombre de la empresa anterior toda
+   * la jornada, porque el canal de arriba solo escucha estados.
+   *
+   * Es el mismo canal de difusión que usa `/host`. El aviso no lleva datos.
+   */
+  useEffect(() => {
+    const canal = supabase.channel(`salon-${bloque}`)
+      .on('broadcast', { event: 'cambio' }, () => { if (!desmontado.current) traer() })
+      .subscribe()
+    return () => { supabase.removeChannel(canal) }
+  }, [traer, bloque])
+
   // Un solo reloj para toda la pantalla.
   useEffect(() => {
     const id = setInterval(() => setAhora(Date.now()), 1000)

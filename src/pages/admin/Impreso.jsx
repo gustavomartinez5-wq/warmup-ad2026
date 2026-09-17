@@ -1,5 +1,5 @@
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../../lib/mapaFijo'
-import { BLOQUES, etiquetaBloque } from '../../lib/cifras'
+import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../../lib/cifras'
 
 /**
  * El salón en papel. Es el último respaldo: si se cae Supabase, Vercel, el wifi
@@ -26,6 +26,13 @@ function Hoja({ bloque, ultima }) {
   }
   const carreras = [...porCarrera.entries()].sort((a, b) => a[0].localeCompare(b[0]))
 
+  // La zona de portafolio no es reclutamiento: un host con la hoja en la mano
+  // tiene que saberlo sin preguntar. Sale del giro y no de números fijos, para
+  // que siga diciendo la verdad si esas mesas se mueven.
+  const portafolio = mesas
+    .filter(m => m.giro === GIRO_PORTAFOLIO)
+    .map(m => m.numero)
+
   return (
     <div
       className="hoja bg-white text-marino rounded-2xl px-8 py-7 max-w-4xl mx-auto"
@@ -42,6 +49,13 @@ function Hoja({ bloque, ultima }) {
           {mesas.length} mesas · datos del {fechaDelMapa()}
         </p>
       </div>
+
+      {portafolio.length > 0 && (
+        <p className="text-[11px] text-marino/75 mt-2">
+          <span className="font-bold">Revisión de portafolio (EAAD):</span>{' '}
+          <span className="cifra">{portafolio.join(', ')}</span>. No son mesas de reclutamiento.
+        </p>
+      )}
 
       <h3 className="text-[11px] uppercase tracking-[0.14em] font-bold text-marino/60 mt-4 mb-1.5">
         Quién está en cada mesa

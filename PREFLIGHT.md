@@ -38,7 +38,7 @@ Primero, que el mapa de respaldo no se haya quedado atrás:
 node scripts/hornear-mapa.mjs --verificar
 ```
 
-Tiene que decir «Al día: 70 mesas en Bloque 1, 49 en Bloque 2, 47 carreras». Si dice que ya no
+Tiene que decir «Al día: 73 mesas en Bloque 1, 57 en Bloque 2, 47 carreras». Si dice que ya no
 coincide, te enseña qué mesa cambió: corre el script sin `--verificar`, vuelve a desplegar y
 reimprime las hojas.
 
@@ -47,14 +47,15 @@ Abre https://warmup-ad2026.vercel.app/admin y mira el Tablero:
 
 | Debe decir | |
 |---|---|
-| Empresas registradas | 54 |
-| Reclutadores Bloque 1 | 70 |
-| Reclutadores Bloque 2 | 49 |
+| Empresas registradas | 60 |
+| Reclutadores Bloque 1 | 73 |
+| Reclutadores Bloque 2 | 57 |
 | Mesas por conseguir | 0 |
 | Empresas sin carreras | 0 |
 
 Si algo no cuadra, alguien reimportó el Excel encima. Revisa en Reclutadores que Celestica
-siga con sus dos mesas en Bloque 2 —la 22 y la 23— y nada en Bloque 1.
+siga con sus dos mesas en Bloque 2 —la 22 y la 23— y nada en Bloque 1, y que las mesas 73, 74
+y 75 sean las de portafolio.
 
 ## 4 · Los tres hosts pueden entrar · 2 min
 
@@ -85,7 +86,7 @@ Para poder decir con seguridad qué pasa si falla. Abre:
 https://warmup-ad2026.vercel.app/host?sinbase=1
 ```
 
-Eso finge que la base no contesta. Tienes que ver las 70 mesas con su empresa, el buscador
+Eso finge que la base no contesta. Tienes que ver las 73 mesas con su empresa, el buscador
 funcionando —escribe IRS— y todo en gris, con el aviso ámbar arriba. Ninguna mesa se ve verde:
 cuando no se sabe si está libre, no se dice que lo está.
 

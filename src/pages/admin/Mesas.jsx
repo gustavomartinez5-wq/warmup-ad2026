@@ -19,6 +19,81 @@ function Leyenda({ mapa }) {
   )
 }
 
+/**
+ * El tamaño del salón. Antes solo subía de uno en uno, desde el detalle de una
+ * mesa excedente. El día que el salón confirmó 75 mesas de golpe hubo que
+ * entrar por SQL, y eso no lo puede hacer el equipo.
+ */
+function TamanoDelSalon({ edicion, masAlta, onGuardado }) {
+  const [abierto, setAbierto] = useState(false)
+  const [valor, setValor]     = useState(String(edicion.total_mesas))
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError]     = useState(null)
+
+  const n = /^\d+$/.test(valor.trim()) ? parseInt(valor.trim(), 10) : null
+  const listo = n !== null && n >= masAlta && n !== edicion.total_mesas && !guardando
+
+  async function guardar() {
+    setGuardando(true); setError(null)
+    const { error: err } = await supabase
+      .from('ediciones').update({ total_mesas: n }).eq('id', edicion.id)
+    if (err) { setError(err.message); setGuardando(false); return }
+    // La bitácora es un registro, no una condición: si falla, el cambio ya pasó.
+    try {
+      await supabase.rpc('anotar_cambio', {
+        p_edicion: edicion.id, p_accion: 'tamaño del salón',
+        p_detalle: { antes: edicion.total_mesas, ahora: n },
+      })
+    } catch { /* no bloquea */ }
+    await onGuardado()
+    setGuardando(false); setAbierto(false)
+  }
+
+  if (!abierto) {
+    return (
+      <button
+        onClick={() => { setValor(String(edicion.total_mesas)); setAbierto(true) }}
+        className="text-xs text-lavanda/55 hover:text-white underline underline-offset-2"
+      >
+        Cambiar el tamaño del salón
+      </button>
+    )
+  }
+
+  return (
+    <div className="rounded-xl border border-lavanda/20 bg-marino-alto/50 px-4 py-3 space-y-2 max-w-sm">
+      <p className="text-xs text-lavanda/55">Cuántas mesas tiene el salón</p>
+      <div className="flex gap-2">
+        <input
+          value={valor} onChange={e => setValor(e.target.value)} inputMode="numeric"
+          className="cifra w-24 rounded-lg bg-marino border border-lavanda/20 px-3 py-2 text-sm
+                     outline-none focus:border-cian"
+        />
+        <button
+          onClick={guardar} disabled={!listo}
+          className="rounded-lg bg-tec hover:bg-tec-claro disabled:opacity-40 px-4 py-2
+                     text-[13px] font-bold transition-colors"
+        >
+          {guardando ? 'Guardando…' : 'Guardar'}
+        </button>
+        <button
+          onClick={() => setAbierto(false)}
+          className="text-[13px] text-lavanda/55 hover:text-white px-2"
+        >
+          Cancelar
+        </button>
+      </div>
+      {n !== null && n < masAlta && (
+        <p className="text-[11px] text-ambar">
+          La mesa asignada más alta es la <span className="cifra">{masAlta}</span>. Bajar de ahí
+          dejaría empresas en mesas que el salón no tiene: primero hay que moverlas.
+        </p>
+      )}
+      {error && <p className="text-[11px] text-rojo">{error}</p>}
+    </div>
+  )
+}
+
 function Detalle({ mesa, bloque, onCerrar, onConseguida, guardando }) {
   const r = mesa.reclutador
   return (
@@ -117,6 +192,11 @@ export default function Mesas() {
             <span className="text-rojo font-semibold"> · {faltan(c.mesasFaltantes)} por conseguir</span>
           )}
         </p>
+        <div className="mt-2">
+          <TamanoDelSalon
+            edicion={edicion} masAlta={c.mesaMasAlta} onGuardado={recargar}
+          />
+        </div>
       </div>
 
       <div className="flex gap-1 border-b border-lavanda/15">
