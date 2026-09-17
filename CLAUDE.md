@@ -23,6 +23,10 @@ Las reglas de cómo se escribe y cómo se trabaja viven en el `CLAUDE.md` del va
 - **Ninguna pantalla se da por hecha sin verla renderizada a 390 px.** Los desbordes no
   existen en el código, solo al pintarse.
 - **El Excel manda hasta el día del evento; el 28 manda la app.**
+- **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
+  `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
+  cuando la base no contesta y lo que sale en la hoja impresa; si se queda atrás, el día del
+  evento manda gente a mesas equivocadas. `--verificar` avisa, y está en el preflight.
 
 ## Stack
 
@@ -34,15 +38,19 @@ renderizar en servidor y es una cosa menos que pueda fallar el día del evento.
 src/
 ├── App.jsx              rutas
 ├── index.css            paleta CVDP como tokens de Tailwind
+├── datos/
+│   └── mapa-fijo.json   el salón horneado, generado por scripts/hornear-mapa.mjs
 ├── lib/
 │   ├── supabase.js      cliente + edicionActiva()
+│   ├── mapaFijo.js      lo que se ve cuando la base no contesta
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra
 └── pages/
     ├── Entrar.jsx       login del equipo
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Host.jsx         vista del equipo el día del evento
-    └── admin/           Tablero, Mesas, Empresas, Reclutadores, Cupos, Pendientes, Importar
+    └── admin/           Tablero, Mesas, Empresas, Reclutadores, Cupos, Pendientes,
+                          Importar, Qr, Impreso
 ```
 
 ## Rutas

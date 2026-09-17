@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado, recordarMesa, mesaRecordada, olvidarMesa }
   from '../lib/mesaPublica'
 import { bloquePorReloj, segundosDesde, comoReloj, tonoDelTiempo, deMas } from '../lib/reloj'
 import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque } from '../lib/cifras'
+import { mesasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
 
@@ -34,16 +35,18 @@ function Encabezado({ children }) {
 /* ── Elegir mesa ──────────────────────────────────────────────────────────── */
 
 function Elegir({ bloque, onBloque, onElegir }) {
-  const [mesas, setMesas] = useState(null)
-  const [error, setError] = useState(null)
+  // Arranca con el mapa horneado: la lista se ve completa desde el primer
+  // instante, y si la base no contesta al menos se puede encontrar la mesa.
+  const [mesas, setMesas] = useState(() => mesasFijas(bloque))
+  const [fria, setFria]   = useState(true)
   const [busca, setBusca] = useState('')
 
   useEffect(() => {
     let vivo = true
-    setMesas(null); setError(null)
+    setMesas(mesasFijas(bloque)); setFria(true)
     mesasDelBloque(bloque)
-      .then(d => vivo && setMesas(d))
-      .catch(e => vivo && setError(e.message ?? String(e)))
+      .then(d => { if (vivo) { setMesas(d); setFria(false) } })
+      .catch(() => { /* se queda el mapa fijo, que ya está en pantalla */ })
     return () => { vivo = false }
   }, [bloque])
 
@@ -74,8 +77,13 @@ function Elegir({ bloque, onBloque, onElegir }) {
         </button>
       </div>
 
-      {error   && <Cargando error={error} />}
-      {!mesas && !error && <Cargando />}
+      {fria && (
+        <p className="mx-5 mb-3 text-xs leading-snug rounded-lg border border-ambar/50
+                      bg-ambar/10 text-ambar px-3 py-2">
+          La base no está contestando. Las mesas son las del {fechaDelMapa()}: puedes encontrar
+          la tuya, pero los botones no van a guardar hasta que vuelva.
+        </p>
+      )}
 
       {mesas && (
         <div className="flex-1 overflow-y-auto px-5 pb-8">
@@ -108,6 +116,7 @@ function Elegir({ bloque, onBloque, onElegir }) {
                       m.estado === 'ocupado' ? 'text-tec-claro'
                       : m.estado === 'break' ? 'text-ambar'
                       : m.estado === 'no_llego' ? 'text-lavanda/40'
+                      : m.estado === 'sin_dato' ? 'text-lavanda/45'
                       : 'text-teal'}`}>
                       {textoEstado(m.estado)}
                     </span>
@@ -125,7 +134,14 @@ function Elegir({ bloque, onBloque, onElegir }) {
 /* ── Mi mesa ──────────────────────────────────────────────────────────────── */
 
 function MiMesa({ numero, bloque, onCambiarMesa }) {
-  const [mesa, setMesa]       = useState(null)
+  // Sembrada del mapa horneado: aunque la base no conteste, el reclutador
+  // confirma que está parado en la mesa correcta.
+  // Memorizada: sin esto cambia de identidad en cada render, `traer` con ella,
+  // y el efecto del canal la seguiría remontando sin parar.
+  const sembrada = useMemo(
+    () => mesasFijas(bloque).find(m => m.numero === numero) ?? null, [numero, bloque])
+  const [mesa, setMesa]       = useState(sembrada)
+  const [fria, setFria]       = useState(true)
   const [error, setError]     = useState(null)
   const [mandando, setMandando] = useState(null)
   const [ahora, setAhora]     = useState(Date.now())
@@ -139,11 +155,14 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
       const mia = todas.find(m => m.numero === numero)
       if (desmontado.current) return
       if (!mia) { setError(`La mesa ${numero} no está asignada en ${etiquetaBloque(bloque)}.`); return }
-      setMesa(mia); setError(null)
+      setMesa(mia); setFria(false); setError(null)
     } catch (e) {
-      if (!desmontado.current) setError(e.message ?? String(e))
+      // Si hay mesa sembrada, la banda de arriba ya explica que la base no
+      // contesta. Abajo solo se quedan los errores de guardado, que sí son
+      // de algo que el reclutador acaba de intentar.
+      if (!desmontado.current && !sembrada) setError(e.message ?? String(e))
     }
-  }, [numero, bloque])
+  }, [numero, bloque, sembrada])
 
   useEffect(() => {
     desmontado.current = false
@@ -213,7 +232,8 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
           <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">
             CVDP · {etiquetaBloque(bloque)}
           </p>
-          <Enlace estado={enlace} alReconectar={() => { setEnlace('conectando'); setIntento(n => n + 1) }} />
+          <Enlace estado={fria ? 'frio' : enlace}
+            alReconectar={() => { setEnlace('conectando'); setIntento(n => n + 1) }} />
         </div>
         <div className="flex items-start gap-3 mt-1.5">
           <span className="w-11 h-11 rounded-xl bg-marino-alto border border-lavanda/20
@@ -259,6 +279,14 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
             )
           })}
         </div>
+
+        {fria && (
+          <p className="text-xs leading-snug rounded-lg border border-ambar/50 bg-ambar/10
+                        text-ambar px-3 py-2">
+            La base no está contestando. Tu mesa y tu empresa son las correctas, pero lo que
+            marques no se va a guardar hasta que vuelva. Avisa a un host.
+          </p>
+        )}
 
         <div className="rounded-xl border border-lavanda/15 bg-marino-alto/40 px-4 py-3">
           <ul className="text-xs text-lavanda/70 space-y-1 leading-relaxed">

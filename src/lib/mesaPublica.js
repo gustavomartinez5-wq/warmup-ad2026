@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js'
+import { sinBase } from './config.js'
 
 /**
  * Lo único que la app hace sin sesión iniciada. Son las dos funciones que
@@ -7,6 +8,7 @@ import { supabase } from './supabase.js'
 
 /** Las mesas de un bloque, con su empresa y su estado. Sin nombres de personas. */
 export async function mesasDelBloque(bloque) {
+  if (sinBase()) throw new Error('Modo de prueba: sin conexión con la base.')
   const { data, error } = await supabase.rpc('mesas_publicas', { p_bloque: bloque })
   if (error) throw error
   return data ?? []
@@ -14,6 +16,7 @@ export async function mesasDelBloque(bloque) {
 
 /** Cambia el estado de una mesa. Marcar Ocupado arranca una sesión nueva. */
 export async function cambiarEstado(numero, bloque, estado) {
+  if (sinBase()) throw new Error('Modo de prueba: sin conexión con la base.')
   const { data, error } = await supabase.rpc('set_estado_mesa', {
     p_numero: numero, p_bloque: bloque, p_estado: estado,
   })

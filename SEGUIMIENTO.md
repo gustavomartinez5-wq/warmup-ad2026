@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **15 de septiembre de 2026**.
+Última actualización: **16 de septiembre de 2026**.
 
 ---
 
@@ -17,9 +17,13 @@ dónde quedamos.
 | Vista de host | https://warmup-ad2026.vercel.app/host |
 | Reclutador, por el QR | https://warmup-ad2026.vercel.app/mesa |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr |
+| Hoja de papel | https://warmup-ad2026.vercel.app/admin/impreso |
 | Latido de la base | https://warmup-ad2026.vercel.app/api/latido |
 
 **Lo que falta, en orden:**
+
+0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
+   desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
 1. **Subir 7 commits.** `git push` falla con 403: git en esta máquina autentica como
    `tsunamipro-dev`, sin escritura en el repo. Lo corre Gustavo desde su terminal.
@@ -29,6 +33,66 @@ dónde quedamos.
 4. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### Plan B: la app sirve aunque la base no conteste · 16-sep-2026
+
+Gustavo preguntó qué le contesta a su jefa cuando pregunte «¿y si falla?». Lo que quería poder
+decir era: aunque falle, seguimos viendo las mesas, quién está en cada una y el buscador.
+**No era cierto todavía.** `/host` pedía todo a la base al abrir, así que sin base la pantalla
+quedaba vacía, y hasta un Recargar normal la dejaba en blanco mientras esperaba.
+
+Quién está en cada mesa no cambia durante el evento: se sabe desde días antes. Ahora eso viaja
+horneado dentro de la app.
+
+| Se cae | Qué se ve |
+|---|---|
+| El tiempo real | Todo. Hay que tocar Recargar |
+| La base entera | El salón completo en gris, con buscador. Sin estados ni relojes |
+| Todo | La hoja impresa |
+
+- `scripts/hornear-mapa.mjs` genera `src/datos/mapa-fijo.json` —mesa, empresa, giro, carreras y
+  el catálogo de 47 carreras— y con `--verificar` avisa si se quedó atrás. **Se commitea a
+  propósito:** generarlo en el build de Vercel arriesga publicar un mapa vacío si ese día la
+  base está pausada. 3.5 kB comprimido.
+- `src/lib/mapaFijo.js` lo sirve a las pantallas. Todas las mesas salen en `sin_dato`.
+- **`estadoVivo.js` pintaba de teal cualquier estado que no reconocía.** Sin arreglar eso, el
+  mapa fijo habría mostrado las 119 mesas en verde y un host habría mandado estudiantes a mesas
+  ocupadas. `sin_dato` tiene ahora rama propia en `pintar`, peso propio en la lista y su lugar
+  en los conteos.
+- `Enlace` tiene cuarto estado, `frio`: **Datos fijos**, en ámbar. Las pastillas de conteo se
+  esconden mientras no se conozcan los estados: contar lo que no se sabe es peor que no contar.
+- `?sinbase=1` finge la caída para poder probarlo desde un celular, sin herramientas de
+  desarrollador. No es una pantalla aparte: hace fallar las mismas llamadas.
+- `/admin/impreso`: dos hojas, una por bloque, del mismo JSON —así el papel y el celular no se
+  pueden desfasar—. Quién está en cada mesa y a qué mesa mandar cada carrera.
+
+**No se hizo, a propósito:** cola de escrituras sin conexión —un «Ocupado» que aterriza diez
+minutos tarde pone un estado falso y arranca un reloj equivocado— y service worker, cuyo modo
+de falla clásico es servir una versión vieja justo el día del evento.
+
+**Verificado, renderizado a 375 px:**
+
+| Prueba | Resultado |
+|---|---|
+| `hornear-mapa.mjs` contra la base | 70 en Bloque 1, 49 en Bloque 2, 47 carreras |
+| `--verificar` después de generar | Al día |
+| Datos de personas en el JSON | Ninguno. Ni un correo ni un teléfono |
+| `/host` con la base caída | Las 70 mesas, empresas y buscador. Nada se ve verde |
+| Buscar «IRS» sin base | «Ingeniería en Robótica y Sistemas Digitales — 32 mesas» |
+| Vista de lista sin base | «Sin dato», punto gris |
+| Cambiar de bloque con la base caída | El mapa fijo del bloque nuevo, no el del viejo |
+| La base se cae **a media jornada** | Se quedan los últimos estados vivos, no el mapa fijo |
+| `/mesa` sin base | Mesa 7, Cemex, y avisa que no va a guardar |
+| Con la base normal | «En vivo», colores, relojes y escritura, igual que antes |
+| Recargar | Ya no deja la pantalla en blanco |
+| Errores de consola | Ninguno |
+| `/admin/impreso` con estilos de impresión | Solo las hojas, tres columnas, legible |
+| `npm run build` | Limpio. El paquete sube 3 kB comprimidos |
+
+**Lo que se encontró al hacerlo:** `sembrada` se recalculaba en cada render y entraba en las
+dependencias de `traer`, así que el efecto del canal se habría remontado sin parar. Se memorizó.
+Y el semáforo en frío traía un «reconectar» que duplicaba el «Reintentar» de la banda y apretaba
+el encabezado hasta partir el título; se quitó.
 
 ### El plan gratuito aguanta, y el latido · 16-sep-2026
 

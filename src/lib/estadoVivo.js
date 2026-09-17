@@ -9,6 +9,12 @@ import { AMBAR, LIMITE, PARPADEO, segundosDesde } from './reloj.js'
  *
  * Break lleva ámbar también, pero como contorno punteado y sin cronómetro: no se
  * confunde con una sesión que ya se pasó de tiempo.
+ *
+ * `sin_dato` es la mesa que viene del mapa horneado cuando la base no contestó.
+ * Tiene su propia rama a propósito: antes cualquier estado desconocido caía al
+ * final y salía teal, o sea idéntico a «disponible». Con el mapa fijo eso habría
+ * pintado el salón entero de verde y un host habría mandado estudiantes a mesas
+ * ocupadas. Gris, hasta el final de la lista, y fuera de los conteos.
  */
 
 export const ESTADOS = [
@@ -19,10 +25,11 @@ export const ESTADOS = [
 ]
 
 export const textoEstado = clave =>
-  ESTADOS.find(e => e.clave === clave)?.texto ?? 'Sin marcar'
+  clave === 'sin_dato' ? 'Sin dato'
+    : ESTADOS.find(e => e.clave === clave)?.texto ?? 'Sin marcar'
 
 /** Orden para la lista: primero lo que sirve para mandar a alguien. */
-const PESO = { disponible: 0, break: 1, ocupado: 2, no_llego: 3 }
+const PESO = { disponible: 0, break: 1, ocupado: 2, no_llego: 3, sin_dato: 4 }
 
 export function pintar(mesa, ahora = Date.now()) {
   const segundos = mesa.estado === 'ocupado' && mesa.ocupado_desde
@@ -42,6 +49,9 @@ export function pintar(mesa, ahora = Date.now()) {
   if (mesa.estado === 'no_llego') {
     return { celda: 'bg-marino-alto/40 border-lavanda/20 text-lavanda/45', segundos: 0, parpadea: false, alerta: false }
   }
+  if (mesa.estado === 'sin_dato') {
+    return { celda: 'bg-marino-alto border-lavanda/30 text-lavanda-suave/80', segundos: 0, parpadea: false, alerta: false }
+  }
   return { celda: 'bg-teal/80 border-teal text-white', segundos: 0, parpadea: false, alerta: false }
 }
 
@@ -59,7 +69,7 @@ export function ordenarParaLista(mesas, ahora = Date.now()) {
 }
 
 export function contarPorEstado(mesas) {
-  const cuenta = { disponible: 0, ocupado: 0, break: 0, no_llego: 0, pasadas: 0 }
+  const cuenta = { disponible: 0, ocupado: 0, break: 0, no_llego: 0, sin_dato: 0, pasadas: 0 }
   const ahora = Date.now()
   for (const m of mesas) {
     cuenta[m.estado] = (cuenta[m.estado] ?? 0) + 1

@@ -11,6 +11,7 @@ const SECCIONES = [
   { a: '/admin/pendientes',   t: 'Pendientes' },
   { a: '/admin/importar',     t: 'Importar Excel' },
   { a: '/admin/qr',           t: 'QR' },
+  { a: '/admin/impreso',      t: 'Hoja de papel' },
 ]
 
 export default function MarcoAdmin() {

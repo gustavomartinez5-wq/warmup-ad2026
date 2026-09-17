@@ -5,11 +5,16 @@
  * actualizarse. El síntoma es una pantalla que parece congelada, y la reacción
  * natural es machacar recargar —que abre otra conexión y empeora el problema.
  * Más vale decirlo.
+ *
+ * `frio` es el otro caso: la base entera no contestó y lo que se ve es el mapa
+ * horneado. Sin esta entrada caería al valor por omisión y diría «Conectando…»,
+ * que es justo lo que no está pasando.
  */
 const PINTA = {
   conectando: { punto: 'bg-lavanda/50',       texto: 'Conectando…',   clase: 'text-lavanda/50' },
   vivo:       { punto: 'bg-teal',             texto: 'En vivo',       clase: 'text-teal' },
   caido:      { punto: 'bg-rojo animate-pulse', texto: 'Sin conexión', clase: 'text-rojo' },
+  frio:       { punto: 'bg-ambar',            texto: 'Datos fijos',  clase: 'text-ambar' },
 }
 
 export default function Enlace({ estado, alReconectar }) {
@@ -18,7 +23,7 @@ export default function Enlace({ estado, alReconectar }) {
     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold">
       <span className={`w-2 h-2 rounded-full shrink-0 ${p.punto}`} />
       <span className={p.clase}>{p.texto}</span>
-      {estado === 'caido' && alReconectar && (
+      {(estado === 'caido' || estado === 'frio') && alReconectar && (
         <button onClick={alReconectar} className="text-cian underline underline-offset-2">
           reconectar
         </button>

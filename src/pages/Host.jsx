@@ -6,6 +6,7 @@ import { bloquePorReloj, comoReloj } from '../lib/reloj'
 import { BLOQUES, etiquetaBloque } from '../lib/cifras'
 import { ESTADOS, textoEstado, pintar, ordenarParaLista, contarPorEstado } from '../lib/estadoVivo'
 import { catalogoDeCarreras } from '../lib/carreras'
+import { mesasFijas, carrerasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import { plano, contiene } from '../lib/texto'
 import RejillaMesas from '../components/RejillaMesas'
 import Cargando from '../components/Cargando'
@@ -128,7 +129,8 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando }) {
 export default function Host() {
   const [bloque, setBloque]   = useState(bloquePorReloj)
   const [vista, setVista]     = useState('rejilla')
-  const [mesas, setMesas]     = useState(null)
+  const [mesas, setMesas]     = useState(() => mesasFijas(bloquePorReloj()))
+  const [fuente, setFuente]   = useState('fija')   // fija · viva · vieja
   const [error, setError]     = useState(null)
   const [ahora, setAhora]     = useState(Date.now())
   const [busca, setBusca]     = useState('')
@@ -141,15 +143,26 @@ export default function Host() {
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const desmontado = useRef(false)
 
+  /**
+   * Nunca deja la pantalla en blanco. Si la base contesta, sus estados pisan al
+   * mapa horneado; si no contesta, el salón se sigue viendo —números, empresas y
+   * buscador— y la banda de arriba dice de cuándo son esos datos.
+   */
   const traer = useCallback(async () => {
-    setMesas(null); setError(null)
+    setError(null)
     try {
       const d = await mesasDelBloque(bloque)
-      if (!desmontado.current) setMesas(d)
-    } catch (e) {
-      if (!desmontado.current) setError(e.message ?? String(e))
+      if (!desmontado.current) { setMesas(d); setFuente('viva') }
+    } catch {
+      // Si ya había datos vivos se quedan, aunque estén viejos: son más ciertos
+      // que el mapa fijo. Si nunca los hubo, lo que hay es el mapa fijo.
+      if (!desmontado.current) setFuente(f => (f === 'viva' || f === 'vieja') ? 'vieja' : 'fija')
     }
   }, [bloque])
+
+  // Al cambiar de bloque, el salón del bloque nuevo aparece completo de inmediato.
+  // No va en el efecto del canal a propósito: reconectar no debe tirar lo vivo.
+  useEffect(() => { setMesas(mesasFijas(bloque)); setFuente('fija') }, [bloque])
 
   useEffect(() => {
     desmontado.current = false
@@ -179,7 +192,7 @@ export default function Host() {
   }, [])
 
   // El catálogo sirve para que el buscador entienda «mecatrónica» y no solo «IMT».
-  useEffect(() => { catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo([])) }, [])
+  useEffect(() => { catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo(carrerasFijas())) }, [])
 
   const carreras = useMemo(
     () => [...new Set((mesas ?? []).flatMap(m => m.carreras ?? []))].sort(),
@@ -269,7 +282,8 @@ export default function Host() {
                 topa en 100 mensajes por segundo y una ráfaga puede pasarse. Las
                 escrituras nunca se pierden —van por REST—, así que recargar
                 siempre trae la verdad. */}
-            <Enlace estado={enlace} alReconectar={reconectar} />
+            <Enlace estado={fuente === 'fija' ? 'frio' : enlace}
+                    alReconectar={fuente === 'fija' ? undefined : reconectar} />
             <button
               onClick={traer}
               className="text-xs text-lavanda/55 hover:text-white transition-colors"
@@ -307,6 +321,7 @@ export default function Host() {
           </div>
         </div>
 
+        {fuente !== 'fija' && (
         <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-4 px-4">
           <Pastilla valor={cuenta.disponible} texto="disponibles" tono="teal" />
           <Pastilla valor={cuenta.ocupado}    texto="ocupadas"    tono="tec" />
@@ -314,6 +329,21 @@ export default function Host() {
           <Pastilla valor={cuenta.break}      texto="en break"    tono="ambar" />
           <Pastilla valor={cuenta.no_llego}   texto="no llegaron" tono="gris" />
         </div>
+        )}
+
+        {fuente !== 'viva' && (
+          <p className="text-[11px] leading-snug rounded-lg border border-ambar/50 bg-ambar/10
+                        text-ambar px-2.5 py-2">
+            {fuente === 'fija'
+              ? `La base no está contestando. Ves el salón del ${fechaDelMapa()}: las mesas, las
+                 empresas y el buscador sirven, pero nadie sabe cuáles están ocupadas.`
+              : 'La base dejó de contestar. Estos estados son los últimos que llegaron.'}
+            {' '}
+            <button onClick={traer} className="underline underline-offset-2 font-semibold">
+              Reintentar
+            </button>
+          </p>
+        )}
 
         {/* En celular no caben los tres en un renglón: el buscador manda y los
             filtros van debajo, a la mitad cada uno. */}
@@ -352,8 +382,8 @@ export default function Host() {
       </header>
 
       <main className="flex-1 px-4 py-4">
+        {/* Solo errores de escritura: los de lectura los cuenta la banda de arriba. */}
         {error && <Cargando error={error} />}
-        {!mesas && !error && <Cargando />}
 
         {mesas && filtradas.length === 0 && (
           <p className="text-sm text-lavanda/50 py-10 text-center">

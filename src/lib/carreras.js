@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js'
+import { sinBase } from './config.js'
 
 /**
  * El catálogo de carreras. Lectura pública: no es dato de nadie.
@@ -6,6 +7,7 @@ import { supabase } from './supabase.js'
  * además de «IMT».
  */
 export async function catalogoDeCarreras() {
+  if (sinBase()) throw new Error('Modo de prueba: sin conexión con la base.')
   const { data, error } = await supabase.from('carreras').select('siglas, nombre, escuela')
   if (error) throw error
   return data ?? []
