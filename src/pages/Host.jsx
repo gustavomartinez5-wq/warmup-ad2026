@@ -291,7 +291,8 @@ export default function Host() {
 
   const mesaAbierta = filtradas.find(m => m.numero === abierta)
     ?? (mesas ?? []).find(m => m.numero === abierta)
-  const mesaEnEdicion = (mesas ?? []).find(m => m.numero === editando)
+  const enAlta = editando === 'nueva'
+  const mesaEnEdicion = enAlta ? null : (mesas ?? []).find(m => m.numero === editando)
 
   const campoFiltro = 'min-w-0 rounded-lg bg-marino-alto border border-lavanda/20 px-2.5 py-2 ' +
                       'text-[13px] outline-none focus:border-cian text-lavanda'
@@ -306,9 +307,9 @@ export default function Host() {
         />
       )}
 
-      {mesaEnEdicion && (
+      {(enAlta || mesaEnEdicion) && (
         <EditarMesa
-          mesa={mesaEnEdicion} bloque={bloque} salon={salon} carreras={catalogo}
+          mesa={mesaEnEdicion ?? null} bloque={bloque} salon={salon} carreras={catalogo}
           cargando={trayendoSalon}
           onCerrar={() => setEditando(null)}
           onGuardado={async () => { await Promise.all([traer(), traerSalon()]); setAbierta(null) }}
@@ -364,6 +365,14 @@ export default function Host() {
               </button>
             ))}
           </div>
+          {fuente === 'viva' && (
+            <button
+              onClick={() => abrirEdicion('nueva')}
+              className="ml-auto text-xs font-semibold text-cian hover:text-white transition-colors"
+            >
+              + Agregar mesa
+            </button>
+          )}
         </div>
 
         {fuente !== 'fija' && (

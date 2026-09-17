@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
-import { filaDeLaMesa, mesaOcupada, cambiarLaMesa, guardarCarreras } from '../lib/mesaEquipo'
+import {
+  filaDeLaMesa, mesaOcupada, cambiarLaMesa, agregarMesa, crearEmpresa, guardarCarreras,
+} from '../lib/mesaEquipo'
 import { etiquetaBloque } from '../lib/cifras'
+import { plano } from '../lib/texto'
 import CarrerasPicker from './CarrerasPicker'
 import Cargando from './Cargando'
 
@@ -13,20 +16,30 @@ import Cargando from './Cargando'
  * en una tabla pensada para el escritorio, no para estar parado en el salón.
  *
  * La empresa de una mesa no está guardada en ningún lado: se deriva de la fila
- * de `reclutadores` que tiene ese número y ese bloque. Por eso esto es un
- * cambio de una fila y no hay tabla de mesas que tocar.
+ * de `reclutadores` que tiene ese número y ese bloque. Por eso cambiarla es
+ * actualizar una fila, y agregar una mesa es insertar otra.
+ *
+ * `mesa` en null es el modo alta: la mesa todavía no existe. Hace falta porque
+ * una mesa libre no sale en la rejilla —`mesas_publicas` solo devuelve las
+ * asignadas—, así que no hay dónde tocarla.
  */
+const NUEVA = '__nueva'
+
 export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, onCerrar, onGuardado }) {
-  const fila = salon ? filaDeLaMesa(salon.filas, bloque, mesa.numero) : null
+  const esAlta = mesa === null
+  const fila = salon && !esAlta ? filaDeLaMesa(salon.filas, bloque, mesa.numero) : null
 
-  const [empresaId, setEmpresaId] = useState(null)
-  const [numero, setNumero]       = useState(String(mesa.numero))
-  const [elegidas, setElegidas]   = useState(null)
-  const [guardando, setGuardando] = useState(false)
-  const [error, setError]         = useState(null)
+  const [empresaId, setEmpresaId]     = useState(esAlta ? NUEVA : null)
+  const [nombreNuevo, setNombreNuevo] = useState('')
+  const [giroNuevo, setGiroNuevo]     = useState('')
+  const [numero, setNumero]           = useState(esAlta ? '' : String(mesa.numero))
+  const [elegidas, setElegidas]       = useState(esAlta ? new Set() : null)
+  const [guardando, setGuardando]     = useState(false)
+  const [error, setError]             = useState(null)
 
-  // Los valores de arranque solo se pueden poner cuando llegan los datos.
+  // En alta no hay fila de dónde sacar el valor de arranque; en edición sí.
   const empresaPuesta = empresaId ?? fila?.empresa_id ?? null
+  const esNueva = empresaPuesta === NUEVA
   const empresa = salon?.empresas.find(e => e.id === empresaPuesta) ?? null
   const carrerasPuestas = elegidas ?? new Set(empresa?.carreras ?? [])
 
@@ -39,25 +52,47 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
   const numeroInt = /^\d+$/.test(numero.trim()) ? parseInt(numero.trim(), 10) : null
   const choca = salon && numeroInt !== null && mesaOcupada(salon.filas, bloque, numeroInt, fila?.id)
 
-  // Cuántas mesas tiene esa empresa, para decir a cuántas afectan las carreras.
-  const susMesas = useMemo(
-    () => salon ? salon.filas.filter(f => f.empresa_id === empresaPuesta).length : 0,
-    [salon, empresaPuesta])
+  // Una empresa con nombre repetido se elige de la lista, no se duplica: la base
+  // tiene unique (edicion, nombre) y el insert tronaría.
+  const yaRegistrada = esNueva && nombreNuevo.trim() && salon
+    ? salon.empresas.find(e => plano(e.nombre) === plano(nombreNuevo)) ?? null
+    : null
 
-  const cambioDeEmpresa = Boolean(fila && empresaPuesta && empresaPuesta !== fila.empresa_id)
-  const cambioDeNumero  = numeroInt !== null && numeroInt !== mesa.numero
-  const cambioCarreras  = elegidas !== null && empresa &&
+  const susMesas = useMemo(
+    () => salon && !esNueva ? salon.filas.filter(f => f.empresa_id === empresaPuesta).length : 0,
+    [salon, empresaPuesta, esNueva])
+
+  const cambioDeEmpresa = Boolean(!esAlta && fila && empresaPuesta && empresaPuesta !== fila.empresa_id)
+  const cambioDeNumero  = !esAlta && numeroInt !== null && numeroInt !== mesa.numero
+  const cambioCarreras  = !esAlta && elegidas !== null && empresa &&
     [...carrerasPuestas].sort().join() !== [...empresa.carreras].sort().join()
-  const hayCambio = cambioDeEmpresa || cambioDeNumero || cambioCarreras
-  const listo = Boolean(salon && fila && empresaPuesta && numeroInt !== null && !choca && hayCambio)
+  const hayCambio = esAlta || cambioDeEmpresa || cambioDeNumero || cambioCarreras
+
+  const empresaLista = esNueva ? Boolean(nombreNuevo.trim()) && !yaRegistrada : Boolean(empresaPuesta)
+  const listo = Boolean(
+    salon && (esAlta || fila) && empresaLista && numeroInt !== null && !choca && hayCambio && !guardando)
 
   async function guardar() {
     setGuardando(true); setError(null)
     try {
-      if (cambioDeEmpresa || cambioDeNumero) {
-        await cambiarLaMesa({ filaId: fila.id, empresaId: empresaPuesta, numero: numeroInt, cambioDeEmpresa })
+      let id = empresaPuesta
+      if (esNueva) {
+        const creada = await crearEmpresa({
+          edicionId: salon.edicionId, nombre: nombreNuevo, giro: giroNuevo,
+        })
+        id = creada.id
       }
-      if (cambioCarreras) await guardarCarreras(empresaPuesta, [...carrerasPuestas])
+
+      if (esAlta) {
+        await agregarMesa({ edicionId: salon.edicionId, bloque, numero: numeroInt, empresaId: id })
+      } else if (cambioDeEmpresa || cambioDeNumero || esNueva) {
+        await cambiarLaMesa({
+          filaId: fila.id, empresaId: id, numero: numeroInt,
+          cambioDeEmpresa: cambioDeEmpresa || esNueva,
+        })
+      }
+
+      if (esNueva || cambioCarreras) await guardarCarreras(id, [...carrerasPuestas])
       await onGuardado()
       onCerrar()
     } catch (e) {
@@ -65,6 +100,9 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
     }
     setGuardando(false)
   }
+
+  const campo = 'w-full rounded-lg bg-marino border border-lavanda/20 px-3 py-2.5 ' +
+                'text-sm outline-none focus:border-cian placeholder-lavanda/30'
 
   return (
     <div
@@ -75,7 +113,9 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
                       w-full sm:max-w-lg max-h-[88dvh] flex flex-col">
         <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-lavanda/15 shrink-0">
           <div className="min-w-0">
-            <p className="font-bold">Editar la mesa <span className="cifra">{mesa.numero}</span></p>
+            <p className="font-bold">
+              {esAlta ? 'Agregar una mesa' : <>Editar la mesa <span className="cifra">{mesa.numero}</span></>}
+            </p>
             <p className="text-xs text-lavanda/55 mt-0.5">{etiquetaBloque(bloque)}</p>
           </div>
           <button onClick={onCerrar} className="text-lavanda/50 hover:text-white text-lg leading-none shrink-0">✕</button>
@@ -88,34 +128,59 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
             <p className="text-sm text-rojo">No se pudieron traer las empresas. Cierra y vuelve a intentar.</p>
           )}
 
-          {!cargando && salon && !fila && (
+          {!cargando && salon && !esAlta && !fila && (
             <p className="text-sm text-ambar">
               Esta mesa ya no aparece asignada. Toca Recargar en la pantalla y vuelve a abrirla.
             </p>
           )}
 
-          {!cargando && salon && fila && (
+          {!cargando && salon && (esAlta || fila) && (
             <>
               <div>
-                <p className="text-xs text-lavanda/55 mb-1.5">Quién está en esta mesa</p>
+                <p className="text-xs text-lavanda/55 mb-1.5">
+                  {esAlta ? 'Quién se sienta aquí' : 'Quién está en esta mesa'}
+                </p>
                 <select
                   value={empresaPuesta ?? ''} onChange={e => elegirEmpresa(e.target.value)}
-                  className="w-full rounded-lg bg-marino border border-lavanda/20 px-3 py-2.5
-                             text-sm outline-none focus:border-cian"
+                  className={campo}
                 >
                   {salon.empresas.map(e => (
                     <option key={e.id} value={e.id}>{e.nombre}</option>
                   ))}
+                  <option value={NUEVA}>Otra empresa…</option>
                 </select>
               </div>
+
+              {esNueva && (
+                <div className="space-y-2">
+                  <input
+                    value={nombreNuevo} onChange={e => setNombreNuevo(e.target.value)}
+                    placeholder="Nombre de la empresa" className={campo}
+                  />
+                  <input
+                    value={giroNuevo} onChange={e => setGiroNuevo(e.target.value)}
+                    placeholder="Giro (opcional)" className={campo}
+                  />
+                  {yaRegistrada && (
+                    <p className="text-xs text-ambar bg-ambar/10 border border-ambar/40 rounded-lg px-3 py-2">
+                      «{yaRegistrada.nombre}» ya está registrada.{' '}
+                      <button
+                        onClick={() => { elegirEmpresa(yaRegistrada.id); setNombreNuevo('') }}
+                        className="underline underline-offset-2 font-semibold"
+                      >
+                        Elegir esa
+                      </button>
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <p className="text-xs text-lavanda/55 mb-1.5">Número de mesa</p>
                 <input
                   value={numero} onChange={e => setNumero(e.target.value)}
-                  inputMode="numeric"
-                  className="w-full rounded-lg bg-marino border border-lavanda/20 px-3 py-2.5
-                             text-sm cifra outline-none focus:border-cian"
+                  inputMode="numeric" placeholder={esAlta ? 'El número del acrílico' : undefined}
+                  className={`${campo} cifra`}
                 />
                 {choca && (
                   <p className="text-xs text-rojo bg-rojo/10 border border-rojo/30 rounded-lg px-3 py-2 mt-2">
@@ -131,7 +196,7 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
                   <span className="cifra text-lavanda/40 ml-1.5">{carrerasPuestas.size}</span>
                 </p>
                 <p className="text-[11px] text-lavanda/40 mb-2 leading-relaxed">
-                  Son de la empresa, no de la mesa
+                  Son las que filtran a quién mandar a esta mesa. Van con la empresa, no con la mesa
                   {susMesas > 1 && <> — {empresa?.nombre} tiene <span className="cifra">{susMesas}</span> mesas
                     y esto vale para todas</>}.
                 </p>
@@ -149,14 +214,14 @@ export default function EditarMesa({ mesa, bloque, salon, carreras, cargando, on
           )}
         </div>
 
-        {!cargando && salon && fila && (
+        {!cargando && salon && (esAlta || fila) && (
           <div className="px-5 py-3 border-t border-lavanda/15 shrink-0">
             <button
-              onClick={guardar} disabled={!listo || guardando}
+              onClick={guardar} disabled={!listo}
               className="w-full rounded-xl bg-tec hover:bg-tec-claro disabled:opacity-40
                          py-3 font-bold text-sm transition-colors"
             >
-              {guardando ? 'Guardando…' : hayCambio ? 'Guardar' : 'Sin cambios'}
+              {guardando ? 'Guardando…' : esAlta ? 'Agregar la mesa' : hayCambio ? 'Guardar' : 'Sin cambios'}
             </button>
           </div>
         )}

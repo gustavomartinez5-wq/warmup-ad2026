@@ -7,8 +7,8 @@ El plan completo está en la conversación; aquí va nada más dónde quedamos.
 
 ---
 
-**Fase en curso:** 3
-**Lo siguiente:** «Otra empresa…» en el selector y el botón «+ Agregar mesa».
+**Fase en curso:** 4
+**Lo siguiente:** el canal `mapa-${bloque}` para que los otros hosts se refresquen solos.
 **Algo a medias en la base:** nada. 54 empresas, 70 y 49 reclutadores, 1,101 etiquetas,
 7 nombres por definir.
 
@@ -46,7 +46,20 @@ equipo de verdad—. Ver «Lo que no se pudo verificar» al final.
 - **Cómo deshacer:** `git revert`. La base quedó como estaba.
 - **Al cerrar:** `1f326c2` · ~14.89 M tokens.
 
-## Fase 3 · Empresa nueva y agregar mesa — pendiente
+## Fase 3 · Empresa nueva y agregar mesa — cerrada
+
+- **Qué quedó hecho:** «Otra empresa…» en el selector, con nombre y giro, y «+ Agregar mesa»
+  en el encabezado de `/host`. `EditarMesa` sirve para las dos cosas: `mesa` en null es el modo
+  alta. Hacía falta porque una mesa libre no sale en la rejilla y no había dónde tocarla.
+- **Qué falta para cerrarla:** nada.
+- **Verificado:** a 375 px, el modo alta arranca en «Otra empresa…» con el número vacío y el
+  botón apagado. Escribir «chubb» en minúsculas reconoce a CHUBB y ofrece «Elegir esa», que
+  cambia a la empresa que ya existe con sus 6 carreras. El botón «+ Agregar mesa» queda en su
+  renglón sin desbordar. Las escrituras contra la base: empresa nueva + mesa 22 de Bloque 1 +
+  dos carreras, `mesas_publicas` la devuelve, empresas sube a 55, y al limpiar la 22 vuelve a
+  quedar libre. Cifras después: 54 · 70 · 49 · 1,101.
+- **Cómo deshacer:** `git revert`. La base quedó como estaba.
+- **Al cerrar:** `05141ac` · ~14.86 M tokens.
 
 ## Fase 4 · Que los otros hosts se enteren solos — pendiente
 
