@@ -96,7 +96,9 @@ mapa (empresa, siglas) as (
   ('Calidra',                  g.manuf || array['LAE','LDE','LAF','LCPF']),
   ('ABB',                      array['IIS','BIE','IM','IMA','IMT','BME','IID','LIN','BGB','LAE','LDE']),
   ('Danfoss',                  g.manuf || array['ITC','ITD','LIN','BGB','LAF','LCPF','LAE','LEM']),
-  ('Heineken México',          g.todas)
+  ('Heineken México',          g.todas),
+  -- Se sumó el 17-sep-2026; las carreras las dio Gustavo
+  ('BECK',                     array['IC','ARQ'])
 
   ) as v(empresa, siglas)
 ),

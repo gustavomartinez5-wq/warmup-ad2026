@@ -27,12 +27,39 @@ dónde quedamos.
 
 1. **Subir 7 commits.** `git push` falla con 403: git en esta máquina autentica como
    `tsunamipro-dev`, sin escritura en el repo. Lo corre Gustavo desde su terminal.
-2. **Mesa 75 de Bloque 1.** El salón tiene 74 y Bloque 1 ocupa 75: hay que conseguir una mesa
-   más o resolver Areya (ver «Hoja del equipo del 17-sep»).
+2. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
+   P&G, Vitro, Redwood), Index como Regal Rexnord, y si Clarios trae a alguien en Bloque 1.
 3. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
 4. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### Revisión con el equipo: registro contra hoja · 17-sep-2026
+
+Se cruzó persona por persona el registro crudo del Forms (62) contra la hoja del equipo (112
+filas) y Gustavo lo revisó con su compañera en `~/Downloads/WarmUp AD26 - Revisión Registro vs
+Reclutadores.xlsx`. Se aplicó lo que decidieron, al libro (respaldo «antes de decisiones
+17-sep») y a la base con la misma lógica del importador:
+
+| Decisión | Efecto |
+|---|---|
+| Areya va en Bloque 2, confirmada | B1 33–35 libres; B2 52–54 |
+| BBVA viene en los dos bloques, confirmada | Sin cambio de mesa |
+| KATCON son 2 | Sale la mesa 75. **Ya no hay excedente** |
+| Gentherm sí es apellido | Se quitaron esas notas y las de mesa que ya no aplicaban |
+| Index viene como Regal Rexnord; Clarios por confirmar | Quedan como pendientes abiertos |
+| ELLAZ era una prueba | Borrada con su etiqueta |
+
+La prueba de Gustavo en el editor no dejó otra huella: las carreras de la base cuadran contra
+`carreras-por-empresa.sql` salvo ELLAZ. BECK se sumó a ese archivo.
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 55 empresas · 71 en B1 · 54 en B2 · 750 de capacidad |
+| Libro contra base (md5) | Idénticos: 125 reclutadores, 55 empresas |
+| Mesas repetidas · mesa más alta | 0 · 74 en B1, 61 en B2 |
+| Etiquetas | 1,103 (1,101 + las 2 de BECK) |
+| Pendientes | 25 abiertos, 3 resueltos (Areya, BBVA, KATCON) |
 
 ### Hoja del equipo del 17-sep · 17-sep-2026
 
@@ -614,16 +641,16 @@ a Pro (500 mensajes por segundo) es de Gustavo; en la simulación no hizo falta.
 
 ## Números del último corte
 
-Del Excel de control, con la hoja del equipo del 17-sep-2026 (Forms con 62 registros).
+Del Excel de control, con la revisión del equipo del 17-sep-2026 (Forms con 62 registros).
 
 | Indicador | Valor |
 |---|---|
 | Empresas registradas | 55 |
-| Reclutadores Bloque 1 (10:00–13:00) | 75 |
-| Reclutadores Bloque 2 (14:00–17:00) | 51 |
-| Mesas apartadas | 75 de 74 — falta una |
-| Capacidad del evento | 756 atenciones |
-| Empresas con algo pendiente | 28 |
+| Reclutadores Bloque 1 (10:00–13:00) | 71 |
+| Reclutadores Bloque 2 (14:00–17:00) | 54 |
+| Mesas apartadas | 71 de 74 |
+| Capacidad del evento | 750 atenciones |
+| Empresas con algo pendiente | 28 (3 ya resueltos) |
 
 La base ya trae estas cifras cargadas y verificadas. Cuando entren registros nuevos, se
 captura en el Excel como siempre y se vuelve a importar.

@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-17T15:07:25.093Z",
+  "generado_en": "2026-09-17T16:00:26.646Z",
   "bloques": {
     "b1": [
       {
@@ -950,39 +950,6 @@
           "LEM",
           "LIN",
           "LIT"
-        ]
-      },
-      {
-        "numero": 33,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
-        ]
-      },
-      {
-        "numero": 34,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
-        ]
-      },
-      {
-        "numero": 35,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
         ]
       },
       {
@@ -2106,24 +2073,6 @@
           "IMT",
           "IRS",
           "ISD"
-        ]
-      },
-      {
-        "numero": 75,
-        "empresa": "KATCON",
-        "giro": "Automotriz",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IE",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "IRS",
-          "ISD",
-          "ITC",
-          "LDI"
         ]
       }
     ],
@@ -3383,6 +3332,39 @@
           "IRS",
           "ISD",
           "ITC"
+        ]
+      },
+      {
+        "numero": 52,
+        "empresa": "Areya",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC",
+          "LDI",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 53,
+        "empresa": "Areya",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC",
+          "LDI",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 54,
+        "empresa": "Areya",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC",
+          "LDI",
+          "LUB"
         ]
       },
       {

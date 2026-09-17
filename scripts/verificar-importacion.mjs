@@ -22,11 +22,11 @@ import { supabase, edicionCompleta } from '../src/lib/supabase.js'
 // Lo que dice el Tablero del Excel al corte del 17-sep-2026.
 const ESPERADO = {
   empresas:       55,
-  reclutadoresB1: 75,
-  reclutadoresB2: 51,
-  mesasApartadas: 75,
-  capacidad:      756,
-  porConfirmar:   15,
+  reclutadoresB1: 71,
+  reclutadoresB2: 54,
+  mesasApartadas: 71,
+  capacidad:      750,
+  porConfirmar:   9,
 }
 
 const rutaArg = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : null
