@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado, recordarMesa, mesaRecordada, olvidarMesa }
   from '../lib/mesaPublica'
 import { bloquePorReloj, segundosDesde, comoReloj, tonoDelTiempo, deMas } from '../lib/reloj'
+import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque } from '../lib/cifras'
 import Cargando from '../components/Cargando'
 
@@ -52,7 +53,9 @@ function Elegir({ bloque, onBloque, onElegir }) {
   return (
     <div className="min-h-dvh max-w-md mx-auto flex flex-col">
       <Encabezado>
-        <p className="text-sm text-lavanda/70 mt-1.5">Busca tu número de mesa y tócalo.</p>
+        <p className="text-sm text-lavanda/70 mt-1.5">
+          Busca el número que trae el acrílico de tu mesa y tócalo.
+        </p>
       </Encabezado>
 
       <div className="px-5 pb-3">
@@ -94,9 +97,18 @@ function Elegir({ bloque, onBloque, onElegir }) {
                     <span className="cifra text-lg font-extrabold text-lavanda/60 w-10 shrink-0 text-right">
                       {m.numero}
                     </span>
-                    <span className="min-w-0">
+                    <span className="min-w-0 flex-1">
                       <span className="block text-[15px] font-semibold truncate">{m.empresa}</span>
                       {m.giro && <span className="block text-xs text-lavanda/50 truncate">{m.giro}</span>}
+                    </span>
+                    {/* El estado distingue dos mesas de la misma empresa, y avisa antes de
+                        entrar a una donde alguien ya está trabajando. */}
+                    <span className={`text-[11px] font-semibold shrink-0 ${
+                      m.estado === 'ocupado' ? 'text-tec-claro'
+                      : m.estado === 'break' ? 'text-ambar'
+                      : m.estado === 'no_llego' ? 'text-lavanda/40'
+                      : 'text-teal'}`}>
+                      {textoEstado(m.estado)}
                     </span>
                   </button>
                 </li>
@@ -227,7 +239,7 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
                 className={`w-full py-4 rounded-2xl font-extrabold text-base transition-all
                             disabled:opacity-50 ${
                   puesto
-                    ? `${b.fondo} text-white ring-4 ring-white/25`
+                    ? `${b.fondo} text-white ring-4 ring-cian shadow-lg`
                     : 'bg-marino-alto text-lavanda/60 hover:text-white border border-lavanda/20'
                 }`}
               >
@@ -239,9 +251,10 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
 
         <div className="rounded-xl border border-lavanda/15 bg-marino-alto/40 px-4 py-3">
           <ul className="text-xs text-lavanda/70 space-y-1 leading-relaxed">
-            <li>Toca Ocupado cuando empiece la sesión. El tiempo arranca solo.</li>
-            <li>Toca Disponible al terminar, para que te manden a la siguiente persona.</li>
-            <li>Toca Break si te levantas un momento.</li>
+            <li>Empieza en Disponible, para que te manden al primer estudiante.</li>
+            <li>Toca Ocupado cuando se siente. El tiempo arranca solo.</li>
+            <li>Cada sesión dura 20 minutos. El reloj se pone ámbar a los 18.</li>
+            <li>Al terminar, Disponible otra vez. Break si te levantas un momento.</li>
           </ul>
         </div>
 

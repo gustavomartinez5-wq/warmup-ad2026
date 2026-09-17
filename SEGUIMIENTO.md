@@ -32,6 +32,57 @@ a mano», abajo.
 
 ## Fases cerradas
 
+### Ensayo de carga y primer agente · 16-sep-2026
+
+Se abrieron **72 websockets reales** contra Supabase —uno por teléfono, con el mismo canal y
+filtro de `src/pages/Mesa.jsx`, más dos hosts sin filtro como `src/pages/Host.jsx`— y se
+escribió por `set_estado_mesa`, el camino del botón. El arnés está en `scripts/arnes-carga.mjs`
+con cuatro escenarios: `apertura`, `regimen`, `rafaga`, `bloque`.
+
+| Escenario | Conexiones | Escrituras | Fallas | Pico msg/s | Perdidos |
+|---|---|---|---|---|---|
+| Apertura, todos a la vez | 72 en 1.1 s | 70 | 0 | 210 | 0 |
+| Régimen, 3 min de ritmo real | 72 | 388 | 0 | **12** | 0 |
+| Ráfaga deliberada | 72 | 350 | 0 | **540** | 0 |
+| Cambio de bloque | 123 | 119 | 0 | 210 | 0 |
+
+**El tope de 100 mensajes por segundo no muerde.** En régimen normal el pico fue de 12, ocho
+veces por debajo. Y en la ráfaga se llegó a 540 —cinco veces el tope documentado— sin perder
+un solo mensaje ni fallar una escritura. La advertencia que quedó anotada el 15-sep queda
+**resuelta: no hace falta subir a Supabase Pro.**
+
+Conectar 72 teléfonos tomó 1.1 segundos, mediana de 346 ms. La apertura del salón no es problema.
+
+**Convergencia de la pantalla real:** con la carga corriendo encima, la vista de host en
+producción se comparó contra la base al parar. 21 disponibles, 34 ocupadas, 15 en break en las
+dos, y mesa por mesa idénticas, sin una sola recarga.
+
+#### Lo que encontró el agente reclutador
+
+Se lanzó un agente con el papel y la liga, sin manual. Encontró lo que ningún script encuentra:
+
+| Hallazgo | ¿Real? |
+|---|---|
+| Una empresa con dos mesas se ve idéntica dos veces; no sabe cuál es la suya | **Sí** — corregido |
+| La lista no decía el estado de cada mesa | **Sí** — corregido |
+| Las instrucciones empezaban por Ocupado cuando lo primero es Disponible | **Sí** — corregido |
+| No decía en ningún lado que la sesión dura 20 minutos | **Sí** — corregido |
+| Nunca se dice dónde encontrar el número de mesa | **Sí** — corregido |
+| Cualquiera puede abrir y controlar la mesa de otro | **Sí, por diseño.** Decisión de Gustavo |
+| El break no lleva reloj | Sí, por diseño |
+| «El buscador se queda pegado» | No. Verificado: 49 → 2 → 49 |
+| «Bloque 1 no muestra mesas» | No. Verificado: muestra sus 70 |
+| «Ningún botón aparece marcado al entrar» | No, sí está marcado — pero el anillo era tan sutil que un agente mirando fijo no lo vio. Se hizo cian |
+
+Lo corregido: las tarjetas del selector ahora muestran el estado —que distingue dos mesas de
+la misma empresa y avisa antes de entrar donde alguien trabaja—, las instrucciones van en el
+orden en que se usan y dicen los 20 minutos, la primera línea dice que el número está en el
+acrílico, y el anillo del botón activo pasó a cian.
+
+**Falta correr los dos agentes de host.** El del reclutador dio suficiente material para una
+tanda de correcciones; los de host se corren después de que Gustavo decida sobre lo de las
+dos mesas.
+
 ### Simulación del evento · 15-sep-2026
 
 Se corrió el Bloque 1 completo —71 mesas— con la vista de host abierta y un reclutador real
@@ -352,6 +403,9 @@ la hoja `Reclutadores` del Excel: mover la fila de Claudia a Bloque 2 con mesa 2
 a la columna Mesa de las filas de Bloque 2 que hoy digan de 23 a 47.
 
 ## El tope del plan gratuito de Supabase
+
+**Resuelto el 16-sep:** el ensayo llegó a 540 mensajes por segundo sin perder nada. Lo que
+sigue abajo se deja como referencia de los límites, pero no es un riesgo abierto.
 
 Las cifras del plan Free, confirmadas en la documentación el 15-sep-2026:
 
