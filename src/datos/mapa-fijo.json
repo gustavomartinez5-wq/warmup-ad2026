@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-17T20:45:49.959Z",
+  "generado_en": "2026-09-18T20:55:35.022Z",
   "bloques": {
     "b1": [
       {
@@ -3362,28 +3362,6 @@
         ]
       },
       {
-        "numero": 53,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
-        ]
-      },
-      {
-        "numero": 54,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
-        ]
-      },
-      {
         "numero": 56,
         "empresa": "COPARMEX",
         "giro": "Sindicato patronal",
@@ -3423,6 +3401,24 @@
           "LIT",
           "LTP"
         ]
+      },
+      {
+        "numero": 57,
+        "empresa": "Linde",
+        "giro": "Químico",
+        "carreras": []
+      },
+      {
+        "numero": 58,
+        "empresa": "Linde",
+        "giro": "Químico",
+        "carreras": []
+      },
+      {
+        "numero": 59,
+        "empresa": "Linde",
+        "giro": "Químico",
+        "carreras": []
       },
       {
         "numero": 61,
