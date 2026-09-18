@@ -6,7 +6,9 @@ import MarcoAdmin from './components/MarcoAdmin'
 
 import Entrar from './pages/Entrar'
 import Mesa from './pages/Mesa'
+import Turno from './pages/Turno'
 import Host from './pages/Host'
+import Fila from './pages/Fila'
 
 import Tablero from './pages/admin/Tablero'
 import Mesas from './pages/admin/Mesas'
@@ -31,12 +33,15 @@ export default function App() {
     <BrowserRouter>
       <ProveedorSesion>
         <Routes>
-          {/* Sin sesión: el reclutador entra por aquí desde el QR. */}
+          {/* Sin sesión: el reclutador entra por el QR de su mesa y el
+              estudiante por el QR de la entrada. */}
           <Route path="/mesa" element={<Mesa />} />
+          <Route path="/turno" element={<Turno />} />
           <Route path="/entrar" element={<Entrar />} />
 
           {/* Con la cuenta del equipo. */}
           <Route path="/host" element={<Protegida><Host /></Protegida>} />
+          <Route path="/fila" element={<Protegida><Fila /></Protegida>} />
           <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
