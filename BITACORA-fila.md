@@ -3,7 +3,8 @@
 Se escribe al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo
 que dice dónde quedamos.
 
-Última actualización: **18 de septiembre de 2026**, fases 0, 1 y 2 cerradas.
+Última actualización: **18 de septiembre de 2026**, fases 0, 1, 2, 4 y 5 cerradas.
+Falta la 3, que pide cuenta del equipo.
 
 ---
 
@@ -30,18 +31,11 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 1 | Migración en la base | ✅ 18-sep |
 | 2 | Verificar al estudiante | ✅ 18-sep |
 | 3 | Verificar a Cecilia | ⬜ pide cuenta del equipo — es de Gustavo |
-| 4 | `git push` y producción | ⬜ |
-| 5 | Dejar el repo al día | ⬜ |
+| 4 | `git push` y producción | ✅ 18-sep |
+| 5 | Dejar el repo al día | ✅ 18-sep |
 
-**Lo siguiente, en orden:**
-
-1. **Fase 3.** Abrir `/fila` con la cuenta del equipo y correr las cinco pruebas
-   de abajo. Es lo único que falta para dar la fila por buena.
-2. **`git push`.** Sigue abierto el pendiente del 17-sep: git en esta máquina
-   autentica como `tsunamipro-dev` y falla con 403. Sale de la terminal de
-   Gustavo. **Hasta que no se despliegue, producción no tiene la fila**, aunque
-   la base ya la tenga.
-3. **Fase 5,** la documentación.
+**Lo único que falta es la fase 3:** abrir `/fila` con la cuenta del equipo y
+correr las cinco pruebas de abajo. Con eso la fila queda dada por buena.
 
 ---
 
@@ -142,25 +136,32 @@ Gustavo:
 
 ---
 
-## Fase 4 — Producción · pendiente
+## Fase 4 — Producción · 18-sep
 
-La base ya está. Falta el código:
+**El 403 del 17-sep ya no está.** El push salió sin problema; se había arreglado
+al reconectar el conector de GitHub en Vercel.
 
-1. `git push` desde la terminal de Gustavo.
-2. Probar `/turno` en producción desde un celular de verdad.
+- Commit `d120f8c`, ocho archivos, 1,324 líneas.
+- Vercel desplegó solo: `dpl_rVM6sm2ww…`, estado READY en producción.
+- `https://warmup-ad2026.vercel.app/turno` probado en vivo: saca turno, devuelve
+  folio y muestra «Eres el siguiente». El turno de prueba se borró.
+
+Falta probarlo desde un celular de verdad, no desde el navegador emulado.
 
 ---
 
-## Fase 5 — El repo al día · pendiente
+## Fase 5 — El repo al día · 18-sep
 
-1. **`CLAUDE.md`.** En *Fuera de alcance* dice «lista de espera... y cualquier
-   pantalla para estudiantes». Ya no es cierto. Hay que quitarlo, y agregar
-   `turnos` a la tabla de tablas, `/turno` y `/fila` a la de rutas, y las dos
-   funciones nuevas al bloque de *Quién ve qué*.
-2. **`SEGUIMIENTO.md`.** Una sección de la fila apuntando aquí.
-3. **`/admin/qr`.** El QR de la entrada que apunta a `/turno`, para que salga en
-   la misma hoja imprimible. *(Por confirmar: si se imprime en Canva aparte, no
-   hace falta.)*
+- **`CLAUDE.md`.** Se quitó la lista de espera de *Fuera de alcance*. Se agregaron
+  `turnos` a la tabla de tablas, `/turno` y `/fila` a la de rutas, las cuatro
+  funciones públicas al bloque de *Quién ve qué*, los archivos nuevos al árbol, una
+  sección propia de la fila, y dos reglas a *Lo que no se rompe*: que la fila no
+  guarda datos de personas, y que `pool_de` y `poolDe` tienen que decir lo mismo.
+- **Esta bitácora** queda apuntada desde el encabezado del `CLAUDE.md`.
+
+Pendiente menor: el **QR de la entrada** hacia `/turno` en `/admin/qr`, para que
+salga en la misma hoja imprimible que los de mesa. Por confirmar con Gustavo: si
+lo imprime en Canva aparte, no hace falta.
 
 ---
 
