@@ -435,3 +435,13 @@ la simulación quedó marcado con lo aplicado.
 
 **Queda fuera, porque es de operación:** el letrero físico «Lista de espera» en el módulo.
 
+---
+
+## Ajuste del 21-sep — los cerrados dejan de contar
+
+Gustavo vio en `/fila` que un turno atendido seguía sumando minutos («437:29 ·
+Atendido»). Ahora un turno cerrado muestra un dato fijo: **«Esperó 17 min»**, de que
+sacó turno a que lo llamaron; o, si nunca lo llamaron, **«Turno de las 2:59 p.m.»**.
+Verificado montando `/fila` aparte: el texto no cambia con el paso del tiempo y no hay
+desbordes a 390 px. Los turnos en espera y llamados siguen contando, que es donde sirve.
+

@@ -165,8 +165,16 @@ function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
                 {turno.destino === 'mesa' ? `mesa ${turno.mesa_numero}` : 'sin mesa'}
               </span>
             )}
+            {/* Un turno cerrado ya no cuenta tiempo: se queda con un dato fijo. Cuánto
+                esperó hasta que lo llamaron, o, si nunca lo llamaron, a qué hora
+                sacó turno. */}
             {!activo && (
-              <><span className="cifra">{comoReloj(espera)}</span> · {textoEstadoTurno(turno.estado)}</>
+              <>
+                {turno.llamado_en
+                  ? <>Esperó <span className="cifra">{Math.max(0, Math.round(segundosDesde(turno.creado_en, new Date(turno.llamado_en).getTime()) / 60))}</span> min</>
+                  : <>Turno de las <span className="cifra">{new Date(turno.creado_en).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' })}</span></>}
+                {' · '}{textoEstadoTurno(turno.estado)}
+              </>
             )}
           </p>
           {turno.estado === 'llamado' && pasoTolerancia && (
