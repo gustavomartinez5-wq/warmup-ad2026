@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
-  SERVICIOS, textoServicio, UMBRAL_ADELANTE, TEXTO_FILA_LARGA, CANAL_FILA,
+  SERVICIOS, textoServicio, UMBRAL_ADELANTE, TEXTO_FILA_LARGA, CANAL_FILA, INDICACION_MODULO,
   sacarTurno, miTurno, recordarTurno, turnoRecordado, olvidarTurno,
 } from '../lib/fila'
 import { prepararAlerta, sonarAlerta, mantenerPantallaEncendida } from '../lib/alerta'
@@ -13,7 +13,7 @@ import Cargando from '../components/Cargando'
  *
  * Muestra a propósito muy poco. Con la fila larga no decimos cuántos van
  * delante, porque el número hace que la gente calcule y se vaya. Con pocos
- * delante sí, porque entonces sirve para que no se aleje.
+ * delante sí, porque entonces le dice que ya viene su turno.
  */
 
 // Cada cuánto vuelve a preguntar por su cuenta. El aviso real llega por el canal
@@ -82,10 +82,6 @@ function Sacar({ onSacado }) {
           </p>
         )}
 
-        <p className="text-xs text-lavanda/40 leading-relaxed text-center mt-3">
-          No te pedimos tu nombre ni tu matrícula.<br />
-          Te llamamos por tu número.
-        </p>
       </div>
     </div>
   )
@@ -174,11 +170,14 @@ function MiTurno({ id, onOtroTurno }) {
   const servicio = textoServicio(turno.servicio)
 
   /* ── Llamado ─────────────────────────────────────────────────────────────
+     Siempre al módulo, nunca directo a una mesa: ahí le toman sus datos y el
+     host la lleva con la empresa. Aunque el gestor le haya apartado mesa, eso
+     es para el equipo, no para la persona.
+
      Teal, no rojo. En esta app el color es el estado (DEC-019) y el rojo ya
      significa «se pasó de los 20 minutos». Aquí lo que pasa es que se abrió
      un lugar, que es justo lo que dice el teal. */
   if (turno.estado === 'llamado') {
-    const aMesa = turno.destino === 'mesa' && turno.mesa_numero
     return (
       <div className="min-h-dvh grid place-items-center px-5 py-8 bg-teal">
         <div className="w-full max-w-sm text-center">
@@ -193,20 +192,9 @@ function MiTurno({ id, onOtroTurno }) {
           </div>
 
           <div className="rounded-2xl bg-white text-marino px-5 py-4 mt-3">
-            <p className="text-[11px] uppercase tracking-widest text-marino/50">Ve a</p>
-            {aMesa ? (
-              <>
-                <p className="text-[26px] leading-tight font-extrabold mt-0.5">
-                  Mesa <span className="cifra">{turno.mesa_numero}</span>
-                </p>
-                {turno.empresa && <p className="text-sm text-marino/70 mt-0.5">{turno.empresa}</p>}
-              </>
-            ) : (
-              <>
-                <p className="text-[22px] leading-tight font-extrabold mt-0.5">Con el host</p>
-                <p className="text-sm text-marino/70 mt-0.5">Ahí te dicen a qué mesa pasar</p>
-              </>
-            )}
+            <p className="text-[11px] uppercase tracking-widest text-marino/50">Ahora</p>
+            <p className="text-[22px] leading-tight font-extrabold mt-0.5 text-balance">{INDICACION_MODULO}</p>
+            <p className="text-sm text-marino/70 mt-1">De ahí el host te lleva con la empresa.</p>
           </div>
 
           <p className="text-sm text-white/75 mt-4">{servicio}</p>
@@ -223,11 +211,10 @@ function MiTurno({ id, onOtroTurno }) {
         <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
           <p className="text-2xl font-extrabold">Listo</p>
           <p className="text-sm text-lavanda/65 leading-relaxed">
-            Ya pasaste. Aprovecha el resto del salón: puedes recorrer las mesas y platicar
-            con las empresas que te interesen.
+            Ya pasaste con la empresa. Si quieres pasar con otra, saca un turno nuevo.
           </p>
           <button onClick={onOtroTurno}
-            className="text-xs text-lavanda/50 hover:text-cian underline underline-offset-2 mt-2">
+            className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
             Sacar otro turno
           </button>
         </div>
@@ -260,9 +247,9 @@ function MiTurno({ id, onOtroTurno }) {
     adelante >= UMBRAL_ADELANTE
       ? { titulo: TEXTO_FILA_LARGA, pie: 'Te avisamos en esta misma pantalla.' }
       : adelante === 0
-        ? { titulo: 'Eres el siguiente', pie: 'No te alejes del módulo.' }
+        ? { titulo: 'Eres el siguiente', pie: 'Te avisamos aquí en cualquier momento.' }
         : { titulo: `${adelante} ${adelante === 1 ? 'persona' : 'personas'} delante de ti`,
-            pie: 'Ya casi. Mantente cerca.' }
+            pie: 'Ya casi. Te avisamos aquí.' }
 
   return (
     <div className="min-h-dvh max-w-md mx-auto flex flex-col">
@@ -275,6 +262,14 @@ function MiTurno({ id, onOtroTurno }) {
           <p className="text-[11px] uppercase tracking-widest text-lavanda/40">Tu número</p>
           <p className="text-[84px] leading-none font-extrabold cifra text-cian mt-1">
             {turno.folio}
+          </p>
+        </div>
+
+        {/* Lo primero que tiene que hacer con su número: ir al módulo a dar sus datos. */}
+        <div className="rounded-2xl border border-cian/50 bg-cian/10 px-5 py-4 text-center">
+          <p className="text-lg font-extrabold leading-snug">{INDICACION_MODULO}</p>
+          <p className="text-sm text-lavanda/70 mt-1 leading-snug">
+            Ahí te toman tus datos. Después puedes esperar sentado en la zona de lista de espera.
           </p>
         </div>
 

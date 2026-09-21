@@ -6,7 +6,7 @@ import { bloquePorReloj, comoReloj, segundosDesde } from '../lib/reloj'
 import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import {
-  SERVICIOS, textoServicio, textoEstadoTurno, poolDe, CANAL_FILA,
+  SERVICIOS, textoServicio, textoEstadoTurno, poolDe, CANAL_FILA, INDICACION_MODULO,
 } from '../lib/fila'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
@@ -35,9 +35,10 @@ function useAvisoFila() {
 /* ── Hoja de llamado ──────────────────────────────────────────────────────── */
 
 /**
- * A dónde se manda a la persona. Híbrido a propósito: a veces el gestor ya sabe
- * qué mesa está libre y la manda directo, y a veces prefiere mandarla con el
- * host para que él decida con el salón enfrente.
+ * Llamar un turno. La persona siempre ve lo mismo en su celular —pasar al módulo
+ * de lista de espera—, porque ahí le toman sus datos y de ahí el host la lleva
+ * con la empresa. Lo que se elige aquí es para el equipo: apartarle una mesa si
+ * ya se sabe cuál está libre, o dejar que el host la decida.
  */
 function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
   const dePortafolio = poolDe(turno.servicio) === 'portafolio'
@@ -65,6 +66,7 @@ function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
               <span className="cifra">{turno.folio}</span>
               <span className="text-lavanda/60 font-semibold text-sm"> · {textoServicio(turno.servicio)}</span>
             </p>
+            <p className="text-xs text-lavanda/55 mt-1">En su celular dice: «{INDICACION_MODULO}».</p>
           </div>
           <button onClick={onCerrar} className="text-lavanda/50 hover:text-white text-lg leading-none shrink-0">✕</button>
         </div>
@@ -73,14 +75,14 @@ function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
 
           <button onClick={() => onElegir('host', null)}
             className="w-full text-left rounded-xl bg-tec hover:bg-tec-claro px-4 py-4 transition-colors">
-            <span className="block text-sm font-extrabold">Mandar con el host</span>
-            <span className="block text-xs text-white/70 mt-0.5">El host le asigna la mesa allá</span>
+            <span className="block text-sm font-extrabold">Llamar sin mesa</span>
+            <span className="block text-xs text-white/70 mt-0.5">La mesa la decide el host</span>
           </button>
 
           <div>
             <div className="flex items-baseline justify-between gap-2 mb-2">
               <p className="text-[11px] uppercase tracking-wider text-lavanda/45 font-semibold">
-                O mandar directo a una mesa
+                O llamar y apartarle una mesa
               </p>
               <button onClick={() => onBloque(bloque === 'b1' ? 'b2' : 'b1')}
                 className="text-[11px] text-lavanda/50 hover:text-cian underline underline-offset-2">
@@ -149,7 +151,7 @@ function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
             {turno.estado === 'llamado' && (
               <span className="text-cian font-semibold">
                 {' · '}
-                {turno.destino === 'mesa' ? `mesa ${turno.mesa_numero}` : 'con el host'}
+                {turno.destino === 'mesa' ? `mesa ${turno.mesa_numero}` : 'sin mesa'}
               </span>
             )}
             {!activo && <span> · {textoEstadoTurno(turno.estado)}</span>}
@@ -314,12 +316,12 @@ export default function Fila() {
    */
   function bajarReporte() {
     const filas = [
-      ['Turno', 'Servicio', 'Estado', 'Destino', 'Sacó turno', 'Lo llamaron', 'Esperó (min)'],
+      ['Turno', 'Servicio', 'Estado', 'Mesa apartada', 'Sacó turno', 'Lo llamaron', 'Esperó (min)'],
       ...(turnos ?? []).map(t => [
         t.folio,
         textoServicio(t.servicio),
         textoEstadoTurno(t.estado),
-        t.destino === 'mesa' ? `Mesa ${t.mesa_numero}` : t.destino === 'host' ? 'Host' : '',
+        t.destino === 'mesa' ? `Mesa ${t.mesa_numero}` : t.destino === 'host' ? 'Sin mesa' : '',
         new Date(t.creado_en).toLocaleTimeString('es-MX'),
         t.llamado_en ? new Date(t.llamado_en).toLocaleTimeString('es-MX') : '',
         t.llamado_en ? Math.round(segundosDesde(t.creado_en, new Date(t.llamado_en).getTime()) / 60) : '',

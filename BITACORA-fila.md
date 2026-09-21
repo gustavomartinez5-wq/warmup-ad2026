@@ -3,8 +3,8 @@
 Se escribe al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo
 que dice dónde quedamos.
 
-Última actualización: **18 de septiembre de 2026**, fases 0, 1, 2, 4 y 5 cerradas.
-Falta la 3, que pide cuenta del equipo.
+Última actualización: **21 de septiembre de 2026**, con los textos ajustados al recorrido
+real del día. Fases 0, 1, 2, 4 y 5 cerradas; falta la 3, que pide cuenta del equipo.
 
 ---
 
@@ -91,8 +91,8 @@ Verificado en local contra la base real, a 390 px.
 | 3 | 3 delante | ✅ «3 personas delante de ti» |
 | 4 | 1 delante | ✅ «1 persona delante de ti», en singular |
 | 5 | 0 delante | ✅ «Eres el siguiente» |
-| 6 | Llamado a mesa | ✅ «Mesa 3 · Index Nuevo León» |
-| 7 | Llamado con el host | ✅ «Con el host» |
+| 6 | Llamado a mesa | ✅ «Mesa 3 · Index Nuevo León» — *cambió el 21-sep, ver abajo* |
+| 7 | Llamado con el host | ✅ «Con el host» — *cambió el 21-sep, ver abajo* |
 | 8 | No llegó | ✅ pantalla propia y botón para formarse otra vez |
 | 9 | Volver a entrar | ✅ cae en su turno, no saca otro |
 | 10 | Sin desbordes a 390 px | ✅ ningún elemento con `scrollWidth > clientWidth` |
@@ -165,8 +165,44 @@ lo imprime en Canva aparte, no hace falta.
 
 ---
 
+## Ajustes del 21-sep — los textos siguen el recorrido real
+
+Observaciones de Gustavo después de probar. El recorrido del día es siempre:
+turno por el QR → **módulo de lista de espera**, donde le toman sus datos →
+el host la lleva con la empresa. Nadie elige empresa ni camina por las mesas, y
+para pasar con otra empresa se saca otro turno.
+
+| Antes | Ahora |
+|---|---|
+| Pantalla principal: «No te pedimos tu nombre ni tu matrícula» | Se quitó |
+| Portafolio: «Zona aparte, al fondo del salón» | «Para carreras creativas» |
+| Esperando: sin indicación | Banda fija: «Pasa al módulo de lista de espera. Ahí te toman tus datos. Después puedes esperar sentado en la zona de lista de espera» |
+| 0 delante: «No te alejes del módulo» | «Te avisamos aquí en cualquier momento» |
+| 1 a 3 delante: «Ya casi. Mantente cerca» | «Ya casi. Te avisamos aquí» |
+| Llamado: «Mesa 3 · Index» o «Con el host» | Siempre «Pasa al módulo de lista de espera. De ahí el host te lleva con la empresa» |
+| Atendido: «Aprovecha el resto del salón…» | «Ya pasaste con la empresa. Si quieres pasar con otra, saca un turno nuevo», con el botón al frente |
+
+En `/fila` la mesa apartada se queda, pero como dato del equipo: la hoja dice
+«Llamar sin mesa — la decide el host» y «O llamar y apartarle una mesa», y avisa
+qué ve la persona en su celular. En el reporte la columna es «Mesa apartada».
+
+El texto del módulo vive en un solo lugar: `INDICACION_MODULO` en `src/lib/fila.js`.
+
+Verificado a 390 px contra la base: fila larga, 1 delante, llamado con mesa
+apartada (el celular no menciona la mesa) y atendido, sin desbordes. El caso de 0
+delante no se pintó: había un turno de ustedes en espera (folio 8) y no se tocó.
+Solo cambió su texto de pie.
+
+**Los folios 1 a 8 de la base son de ustedes**, del 21-sep entre 15:29 y 21:06.
+Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
+
+---
+
 ## Decisiones, para no rediscutirlas
 
+- **El celular siempre manda al módulo de lista de espera, nunca a una mesa.** Ahí
+  le toman sus datos y el host la lleva con la empresa. La mesa apartada en `/fila`
+  es para el equipo.
 - **La fila se cuenta por pool de mesas, no por etiqueta.** CV y entrevista
   comparten mesas: contarlos por separado daría un número falso, porque quien
   viene por CV también espera a los de entrevista. Portafolio sí es pool aparte y

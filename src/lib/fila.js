@@ -16,18 +16,28 @@ import { sinBase } from './config.js'
 export const SERVICIOS = [
   { clave: 'cv',         texto: 'Revisión de CV',          pie: 'Que un reclutador te lea el CV y te diga qué cambiar' },
   { clave: 'entrevista', texto: 'Simulacro de entrevista',  pie: 'Practicar una entrevista real y recibir retroalimentación' },
-  { clave: 'portafolio', texto: 'Revisión de portafolio',   pie: 'Para carreras creativas. Zona aparte, al fondo del salón' },
+  { clave: 'portafolio', texto: 'Revisión de portafolio',   pie: 'Para carreras creativas' },
 ]
 
 export const textoServicio = clave =>
   SERVICIOS.find(s => s.clave === clave)?.texto ?? clave
 
 /**
+ * Lo que la persona hace después de sacar turno, y otra vez cuando la llaman.
+ *
+ * El recorrido del día es siempre el mismo: turno por el QR, módulo de lista de
+ * espera —ahí le toman sus datos—, y de ahí el host la lleva con la empresa. Nadie
+ * elige empresa ni camina por las mesas, así que la pantalla nunca manda directo
+ * a una mesa: siempre al módulo. Para pasar con otra empresa, se saca otro turno.
+ */
+export const INDICACION_MODULO = 'Pasa al módulo de lista de espera'
+
+/**
  * A partir de cuántas personas delante dejamos de dar el número.
  *
  * Con la fila larga, ver «van 23 delante» hace que la gente calcule, se
- * desespere y se vaya. Con pocos delante el número sí sirve: le dice que no se
- * aleje. Gustavo lo puso en cuatro.
+ * desespere y se vaya. Con pocos delante el número sí sirve: le dice que ya
+ * viene su turno. Gustavo lo puso en cuatro.
  */
 export const UMBRAL_ADELANTE   = 4
 export const TEXTO_FILA_LARGA  = 'En un momento más pasarás'
