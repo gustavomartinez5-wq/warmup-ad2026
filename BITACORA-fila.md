@@ -38,8 +38,8 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ✅ 21-sep |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
-| 11 | Pantallas del estudiante según el reporte marcado | ✅ 21-sep, sin desplegar |
-| 12 | `/fila` según el reporte, y estado «Cedió su turno» (migración 11) | ⬜ |
+| 11 | Pantallas del estudiante según el reporte marcado | ✅ 21-sep |
+| 12 | `/fila` según el reporte, y estado «Cedió su turno» (migración 11) | ✅ 21-sep |
 | 13 | Verificar, desplegar y dejar la documentación al día | ⬜ |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
@@ -386,4 +386,20 @@ Código listo y compilado; **sin desplegar** hasta que la migración 11 esté ap
   regresa a la fila.
 - **Cediste tu turno:** agrega «Si regresas más tarde, saca un turno nuevo».
 - La hora del turno necesita que `mi_turno` devuelva `creado_en`: va en la migración 11.
+
+---
+
+## Fase 12 — Cecilia y estado «Cedió» · 21-sep
+
+- **Migración 11 aplicada en producción**, en dos pasos: `turno_t` gana el valor
+  `cedio`; `ceder_turno` ahora escribe `cedio`; `mi_turno` devuelve también
+  `creado_en`. Para volver atrás basta con que `ceder_turno` escriba `no_llego`; el
+  valor del tipo no se puede quitar sin rehacerlo.
+- `fila.js`: estado «Cedió su turno», `CERRADOS` y `TOLERANCIA_MIN`.
+- `/fila`: «Llamar sin mesa — Se le asigna al llegar al módulo»; el llamado dice
+  «Llamado hace N min · mesa 7» y se pone ámbar con «Ya pasaron los 5 minutos para
+  llegar»; el turno a mano muestra «Turno 27 · Revisión de CV — Dáselo a la persona»
+  por 10 s; en cerrados «44:20 · No llegó», sin «esperando»; arriba se agrega
+  «cedieron».
+- Se verifica y despliega en la fase 13.
 

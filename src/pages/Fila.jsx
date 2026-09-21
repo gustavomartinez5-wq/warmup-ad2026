@@ -7,6 +7,7 @@ import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import {
   SERVICIOS, textoServicio, textoEstadoTurno, poolDe, CANAL_FILA, INDICACION_MODULO,
+  TOLERANCIA_MIN, CERRADOS,
 } from '../lib/fila'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
@@ -76,7 +77,7 @@ function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
           <button onClick={() => onElegir('host', null)}
             className="w-full text-left rounded-xl bg-tec hover:bg-tec-claro px-4 py-4 transition-colors">
             <span className="block text-sm font-extrabold">Llamar sin mesa</span>
-            <span className="block text-xs text-white/70 mt-0.5">La mesa la decide el host</span>
+            <span className="block text-xs text-white/70 mt-0.5">Se le asigna al llegar al módulo</span>
           </button>
 
           <div>
@@ -133,10 +134,15 @@ function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
   const espera = segundosDesde(turno.creado_en, ahora)
   const activo = turno.estado === 'espera' || turno.estado === 'llamado'
 
+  // Al llamado le importa cuánto lleva desde que se le llamó, no desde que sacó
+  // turno. Pasada la tolerancia, Cecilia ya puede marcarlo «No llegó».
+  const minLlamado = turno.llamado_en ? Math.floor(segundosDesde(turno.llamado_en, ahora) / 60) : null
+  const pasoTolerancia = minLlamado !== null && minLlamado >= TOLERANCIA_MIN
+
   const marco =
     turno.estado === 'llamado'  ? 'border-cian/60 bg-cian/5'
     : turno.estado === 'atendido' ? 'border-teal/40 bg-teal/5'
-    : turno.estado === 'no_llego' ? 'border-lavanda/15 bg-marino-alto/25 opacity-60'
+    : CERRADOS.includes(turno.estado) ? 'border-lavanda/15 bg-marino-alto/25 opacity-60'
     : 'border-lavanda/20 bg-marino-alto/50'
 
   return (
@@ -147,15 +153,27 @@ function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate">{textoServicio(turno.servicio)}</p>
           <p className="text-xs text-lavanda/50 mt-0.5">
-            <span className="cifra">{comoReloj(espera)}</span> esperando
+            {turno.estado === 'espera' && (
+              <><span className="cifra">{comoReloj(espera)}</span> esperando</>
+            )}
             {turno.estado === 'llamado' && (
-              <span className="text-cian font-semibold">
+              <span className={`font-semibold ${pasoTolerancia ? 'text-ambar' : 'text-cian'}`}>
+                {minLlamado === null ? 'Llamado'
+                  : minLlamado < 1 ? 'Llamado hace menos de 1 min'
+                  : `Llamado hace ${minLlamado} min`}
                 {' · '}
                 {turno.destino === 'mesa' ? `mesa ${turno.mesa_numero}` : 'sin mesa'}
               </span>
             )}
-            {!activo && <span> · {textoEstadoTurno(turno.estado)}</span>}
+            {!activo && (
+              <><span className="cifra">{comoReloj(espera)}</span> · {textoEstadoTurno(turno.estado)}</>
+            )}
           </p>
+          {turno.estado === 'llamado' && pasoTolerancia && (
+            <p className="text-[11px] text-ambar/90 mt-0.5">
+              Ya pasaron los {TOLERANCIA_MIN} minutos para llegar
+            </p>
+          )}
         </div>
 
         {activo && (
@@ -217,6 +235,8 @@ export default function Fila() {
   const [verCerrados, setVerCerrados] = useState(false)
 
   const avisar = useAvisoFila()
+  const [nuevo, setNuevo] = useState(null)   // el turno a mano recién sacado
+  const nuevoReloj = useRef(null)
   const desmontado = useRef(false)
 
   const traer = useCallback(async () => {
@@ -302,10 +322,17 @@ export default function Fila() {
     avisar()
   }
 
-  // Turno para quien llega sin celular: el gestor le canta el número.
+  // Turno para quien llega sin celular. Se muestra qué número salió, porque
+  // Cecilia tiene que dárselo a la persona y antes tenía que buscarlo en la lista.
   async function agregarAMano(servicio) {
-    const { error: err } = await supabase.rpc('sacar_turno', { p_servicio: servicio })
+    const { data, error: err } = await supabase.rpc('sacar_turno', { p_servicio: servicio })
     if (err) { setError(err.message); return }
+    const fila = Array.isArray(data) ? data[0] : data
+    if (fila?.folio) {
+      setNuevo({ folio: fila.folio, servicio })
+      clearTimeout(nuevoReloj.current)
+      nuevoReloj.current = setTimeout(() => setNuevo(null), 10000)
+    }
     avisar()
   }
 
@@ -349,9 +376,10 @@ export default function Fila() {
   }
 
   const esperando = turnos.filter(t => t.estado === 'espera' || t.estado === 'llamado')
-  const cerrados  = turnos.filter(t => t.estado === 'atendido' || t.estado === 'no_llego')
+  const cerrados  = turnos.filter(t => CERRADOS.includes(t.estado))
   const atendidos = turnos.filter(t => t.estado === 'atendido').length
   const noLlegaron = turnos.filter(t => t.estado === 'no_llego').length
+  const cedieron   = turnos.filter(t => t.estado === 'cedio').length
   const visibles  = verCerrados ? cerrados : esperando
 
   return (
@@ -372,13 +400,15 @@ export default function Fila() {
         </div>
         <h1 className="text-xl font-extrabold leading-tight mt-0.5">{edicion.nombre}</h1>
 
-        <div className="flex items-center gap-4 mt-3 text-sm">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm">
           <span><b className="cifra text-cian">{esperando.length}</b>
             <span className="text-lavanda/50"> en fila</span></span>
           <span><b className="cifra text-teal">{atendidos}</b>
             <span className="text-lavanda/50"> pasaron</span></span>
           <span><b className="cifra text-lavanda/60">{noLlegaron}</b>
             <span className="text-lavanda/50"> no llegaron</span></span>
+          <span><b className="cifra text-lavanda/60">{cedieron}</b>
+            <span className="text-lavanda/50"> cedieron</span></span>
         </div>
 
         <div className="flex items-center gap-3 mt-3">
@@ -429,6 +459,14 @@ export default function Fila() {
       </div>
 
       <div className="px-5 py-3 border-t border-lavanda/15">
+        {nuevo && (
+          <div className="aparece rounded-xl border border-cian/50 bg-cian/10 px-4 py-2.5 mb-2.5 text-center">
+            <p className="text-sm font-extrabold">
+              Turno <span className="cifra">{nuevo.folio}</span> · {textoServicio(nuevo.servicio)}
+            </p>
+            <p className="text-[11px] text-lavanda/60">Dáselo a la persona</p>
+          </div>
+        )}
         <p className="text-[11px] text-lavanda/40 mb-2">Turno a mano, para quien llega sin celular</p>
         <div className="flex gap-1.5">
           {SERVICIOS.map(s => (
