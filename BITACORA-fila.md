@@ -38,6 +38,9 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ✅ 21-sep |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
+| 11 | Pantallas del estudiante según el reporte marcado | ⬜ |
+| 12 | `/fila` según el reporte, y estado «Cedió su turno» (migración 11) | ⬜ |
+| 13 | Verificar, desplegar y dejar la documentación al día | ⬜ |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
 cuántos van delante, un botón para ceder el turno (queda como «No llegó») y una
@@ -337,4 +340,25 @@ sonido te avisa igual». Con el teléfono bloqueado la página deja de correr.
   que la persona ve un número de espera, y el árbol de `fila.js` ya no dice «umbral».
 - *Decisiones* de esta bitácora al día. Las menciones del umbral en las fases 0 y 2
   se quedan: son registro de lo que se probó entonces.
+
+---
+
+## Plan del 21-sep, segunda vuelta — lo que Gustavo marcó en el reporte
+
+Del reporte `WarmUp AD26 - Simulación de la fila.md`, con sus comentarios:
+
+- **11 · Estudiante.** Hora en que sacó turno, punto «En vivo» y una animación suave
+  en la espera; consejos de búsqueda de empleo que rotan, sacados de los decks de CV
+  y Estrategias; «De ahí te llevamos con la empresa»; «Tienes 5 minutos para llegar
+  al módulo»; en «Tu turno ya pasó», «Si ya estás en el módulo, avísanos ahí»;
+  «Listo» con «Muchas gracias por participar…»; «Revisa esta página para saber
+  cuándo sigue tu turno»; ceder como botón con borde; al ceder, «Si regresas más
+  tarde, saca un turno nuevo» (no hay hora límite).
+- **12 · Cecilia.** «Llamar sin mesa — Se le asigna al llegar al módulo»; al llamado,
+  «Llamado hace N min», y aviso cuando pasan los 5 minutos; el turno a mano muestra
+  qué número salió; en cerrados sin «esperando»; **se reabre** el estado «Cedió su
+  turno» (migración 11), aparte de «No llegó».
+- **Regla nueva:** si alguien regresa al módulo después de «No llegó», Cecilia usa
+  «Regresar a la fila» y no le pide otro turno.
+- **Operación, no código:** letrero físico «Lista de espera» en el módulo.
 
