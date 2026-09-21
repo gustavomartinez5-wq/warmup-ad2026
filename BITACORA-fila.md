@@ -176,7 +176,7 @@ para pasar con otra empresa se saca otro turno.
 |---|---|
 | Pantalla principal: «No te pedimos tu nombre ni tu matrícula» | Se quitó |
 | Portafolio: «Zona aparte, al fondo del salón» | «Para carreras creativas» |
-| Esperando: sin indicación | Banda fija: «Pasa al módulo de lista de espera. Ahí te toman tus datos. Después puedes esperar sentado en la zona de lista de espera» |
+| Esperando: sin indicación | Banda fija: «Puedes tomar asiento, en un momento más te avisaremos tu turno». *Primero decía «Pasa al módulo…»; Gustavo lo cambió el mismo día* |
 | 0 delante: «No te alejes del módulo» | «Te avisamos aquí en cualquier momento» |
 | 1 a 3 delante: «Ya casi. Mantente cerca» | «Ya casi. Te avisamos aquí» |
 | Llamado: «Mesa 3 · Index» o «Con el host» | Siempre «Pasa al módulo de lista de espera. De ahí el host te lleva con la empresa» |

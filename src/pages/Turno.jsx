@@ -265,11 +265,9 @@ function MiTurno({ id, onOtroTurno }) {
           </p>
         </div>
 
-        {/* Lo primero que tiene que hacer con su número: ir al módulo a dar sus datos. */}
         <div className="rounded-2xl border border-cian/50 bg-cian/10 px-5 py-4 text-center">
-          <p className="text-lg font-extrabold leading-snug">{INDICACION_MODULO}</p>
-          <p className="text-sm text-lavanda/70 mt-1 leading-snug">
-            Ahí te toman tus datos. Después puedes esperar sentado en la zona de lista de espera.
+          <p className="text-lg font-extrabold leading-snug text-balance">
+            Puedes tomar asiento, en un momento más te avisaremos tu turno
           </p>
         </div>
 
