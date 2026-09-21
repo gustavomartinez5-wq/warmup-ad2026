@@ -36,7 +36,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 6 | Quitar el conteo de personas delante | ✅ 21-sep |
 | 7 | Ceder turno (migración 10) | ✅ 21-sep |
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
-| 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ⬜ |
+| 9 | Simulación con agentes Sonnet: guion, agentes, reporte | 🟡 9a hecho |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ⬜ |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
@@ -293,4 +293,16 @@ Los folios 1 a 11 son de ustedes y no se tocaron.
 
 Desplegado: commit `afaf433`. El paquete de producción trae «cede tu turno» y
 «Cediste tu turno», y ya no trae «Eres el siguiente» ni «delante de ti».
+
+---
+
+## Fase 9 — Simulación · en curso
+
+**9a · Guion ✅ 21-sep.** En el vault:
+`12 - Programa Becarios/WarmUp/Ediciones/WarmUp AD26/WarmUp AD26 - Guion de pantallas de la fila.md`.
+Siete pantallas del estudiante y tres de Cecilia, con el texto exacto marcado por
+tamaño y tipo. Las del estudiante salieron de la app contra la base (folio 12, ya
+borrado); `/fila` se montó aislado con datos de mentira, sin sesión ni base.
+
+**9b · Agentes:** pendiente. **9c · Reporte:** pendiente.
 
