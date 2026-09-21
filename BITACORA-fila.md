@@ -36,7 +36,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 6 | Quitar el conteo de personas delante | ✅ 21-sep |
 | 7 | Ceder turno (migración 10) | ✅ 21-sep |
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
-| 9 | Simulación con agentes Sonnet: guion, agentes, reporte | 🟡 9a hecho |
+| 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ✅ 21-sep |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
@@ -297,7 +297,7 @@ Desplegado: commit `afaf433`. El paquete de producción trae «cede tu turno» y
 
 ---
 
-## Fase 9 — Simulación · en curso
+## Fase 9 — Simulación · 21-sep
 
 **9a · Guion ✅ 21-sep.** En el vault:
 `12 - Programa Becarios/WarmUp/Ediciones/WarmUp AD26/WarmUp AD26 - Guion de pantallas de la fila.md`.
@@ -311,7 +311,19 @@ semestre por entrevista, y Cecilia). A los estudiantes se les pasaron solo las
 pantallas y lo que se ve en el salón; a Cecilia, el guion completo. Si se corta,
 se retoma con `resumeFromRunId` y los agentes que ya terminaron no se repiten.
 
-**9c · Reporte:** pendiente.
+Terminó en 2 min 43 s, los cuatro sin error.
+
+**9c · Reporte ✅ 21-sep.** En el vault:
+`12 - Programa Becarios/WarmUp/Ediciones/WarmUp AD26/WarmUp AD26 - Simulación de la fila.md`,
+con las respuestas completas en el `.json` de al lado. **Nada aplicado:** Gustavo marca.
+
+Tres hallazgos de dos o más agentes: la espera larga no da señal de vida (los tres
+estudiantes), «el host» no se sabe quién es, y no se sabe cuánto tiempo hay para
+llegar al ser llamado. Este último depende de una regla de operación que no está
+escrita: cuánto espera Cecilia antes de marcar «No llegó».
+
+Una propuesta de agente es falsa y está marcada: «puedes bloquear tu celular, el
+sonido te avisa igual». Con el teléfono bloqueado la página deja de correr.
 
 ---
 
