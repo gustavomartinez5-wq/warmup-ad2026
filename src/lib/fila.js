@@ -33,14 +33,10 @@ export const textoServicio = clave =>
 export const INDICACION_MODULO = 'Pasa al módulo de lista de espera'
 
 /**
- * A partir de cuántas personas delante dejamos de dar el número.
- *
- * Con la fila larga, ver «van 23 delante» hace que la gente calcule, se
- * desespere y se vaya. Con pocos delante el número sí sirve: le dice que ya
- * viene su turno. Gustavo lo puso en cuatro.
+ * La pantalla no dice cuántos van delante. «Eres el siguiente» podía quedarse
+ * mucho rato si la fila se atoraba, y confundía. `mi_turno` sigue devolviendo
+ * `adelante`: si algún día se quiere de vuelta, es un cambio de pantalla.
  */
-export const UMBRAL_ADELANTE   = 4
-export const TEXTO_FILA_LARGA  = 'En un momento más pasarás'
 
 /**
  * El aviso de que la fila se movió. Va por difusión y no lleva datos: cada

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
-  SERVICIOS, textoServicio, UMBRAL_ADELANTE, TEXTO_FILA_LARGA, CANAL_FILA, INDICACION_MODULO,
+  SERVICIOS, textoServicio, CANAL_FILA, INDICACION_MODULO,
   sacarTurno, miTurno, recordarTurno, turnoRecordado, olvidarTurno,
 } from '../lib/fila'
 import { prepararAlerta, sonarAlerta, mantenerPantallaEncendida } from '../lib/alerta'
@@ -11,9 +11,8 @@ import Cargando from '../components/Cargando'
  * La pantalla de quien espera. Se entra por el QR de la entrada, sin contraseña
  * y sin escribir nada: toca lo que busca y recibe un número.
  *
- * Muestra a propósito muy poco. Con la fila larga no decimos cuántos van
- * delante, porque el número hace que la gente calcule y se vaya. Con pocos
- * delante sí, porque entonces le dice que ya viene su turno.
+ * Muestra a propósito muy poco: su número, que puede tomar asiento, y que se
+ * le avisa aquí. No dice cuántos van delante; ver fila.js.
  */
 
 // Cada cuánto vuelve a preguntar por su cuenta. El aviso real llega por el canal
@@ -242,15 +241,6 @@ function MiTurno({ id, onOtroTurno }) {
   }
 
   /* ── Esperando ────────────────────────────────────────────────────────── */
-  const adelante = turno.adelante ?? 0
-  const aviso =
-    adelante >= UMBRAL_ADELANTE
-      ? { titulo: TEXTO_FILA_LARGA, pie: 'Te avisamos en esta misma pantalla.' }
-      : adelante === 0
-        ? { titulo: 'Eres el siguiente', pie: 'Te avisamos aquí en cualquier momento.' }
-        : { titulo: `${adelante} ${adelante === 1 ? 'persona' : 'personas'} delante de ti`,
-            pie: 'Ya casi. Te avisamos aquí.' }
-
   return (
     <div className="min-h-dvh max-w-md mx-auto flex flex-col">
       <Encabezado>
@@ -269,11 +259,6 @@ function MiTurno({ id, onOtroTurno }) {
           <p className="text-lg font-extrabold leading-snug text-balance">
             Puedes tomar asiento, en un momento más te avisaremos tu turno
           </p>
-        </div>
-
-        <div className="rounded-2xl border border-lavanda/20 bg-marino-alto/50 px-5 py-6 text-center">
-          <p className="text-xl font-extrabold leading-snug">{aviso.titulo}</p>
-          <p className="text-sm text-lavanda/55 mt-1.5">{aviso.pie}</p>
         </div>
 
         <p className="text-xs text-lavanda/45 text-center leading-relaxed">

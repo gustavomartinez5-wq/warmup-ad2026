@@ -33,9 +33,16 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 3 | Verificar a Cecilia | ⬜ pide cuenta del equipo — es de Gustavo |
 | 4 | `git push` y producción | ✅ 18-sep |
 | 5 | Dejar el repo al día | ✅ 18-sep |
+| 6 | Quitar el conteo de personas delante | ✅ 21-sep |
+| 7 | Ceder turno (migración 10) | ⬜ |
+| 8 | Verificar y desplegar 6 y 7 | ⬜ |
+| 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ⬜ |
+| 10 | Documentación: `CLAUDE.md` y decisiones | ⬜ |
 
-**Lo único que falta es la fase 3:** abrir `/fila` con la cuenta del equipo y
-correr las cinco pruebas de abajo. Con eso la fila queda dada por buena.
+**Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
+cuántos van delante, un botón para ceder el turno (queda como «No llegó») y una
+simulación con agentes para saber si los textos confunden. El plan completo está al
+final, en *Plan del 21-sep*. **La fase 3** sigue siendo de ustedes: pide sesión.
 
 ---
 
@@ -222,3 +229,35 @@ Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
 - **El prototipo de mayo no se usa.** `Proyecto Nueva app para WarmUp (1)/warmup-app`
   tiene la misma función, construida antes de encontrar esta app. No se despliega
   y no se mantiene.
+
+---
+
+## Plan del 21-sep
+
+- **6 · Sin conteo.** La espera queda en número, banda «Puedes tomar asiento, en un
+  momento más te avisaremos tu turno» y «Deja esta pantalla abierta». La base no se
+  toca: `mi_turno` sigue dando `adelante`, la pantalla no lo pinta.
+- **7 · Ceder.** Migración 10 con `ceder_turno(p_id)`: pasa a `no_llego` solo desde
+  `espera` o `llamado`. Botón «¿Tienes que irte? No te preocupes, cede tu turno»,
+  confirmación en la pantalla, y pantalla de «Cediste tu turno».
+- **8 · Verificar.** Cinco pruebas a 390 px contra la base; los turnos de prueba se
+  borran por folio, sin tocar los de ustedes. Push y paquete de producción.
+- **9 · Simulación.** Guion con el texto exacto de cada pantalla; cuatro agentes
+  Sonnet (tres estudiantes y Cecilia); reporte en
+  `WarmUp AD26 - Simulación de la fila.md` con casillas para que Gustavo elija.
+  No se aplica nada.
+- **10 · Documentación.** `CLAUDE.md` de la app con el recorrido real, sin conteo y
+  con ceder, redacción aprobada con el plan.
+
+---
+
+## Fase 6 — Sin conteo · 21-sep
+
+- `Turno.jsx`: la espera quedó en número, banda «Puedes tomar asiento, en un momento
+  más te avisaremos tu turno» y «Deja esta pantalla abierta». Salió la tarjeta de
+  estado con sus tres variantes.
+- `fila.js`: salieron `UMBRAL_ADELANTE` y `TEXTO_FILA_LARGA`.
+- **Se queda en la base sin usarse:** `mi_turno.adelante` y `pool_de`. No estorban;
+  `poolDe` sí se sigue usando en `/fila` para ofrecer mesas de portafolio aparte.
+- Build limpio. Se verifica pintado en la fase 8, junto con ceder.
+
