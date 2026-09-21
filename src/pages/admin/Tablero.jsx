@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useDatos } from '../../lib/datos'
 import { calcularCifras, faltan } from '../../lib/cifras'
 import Cargando from '../../components/Cargando'
+import EnlacesCompartir from '../../components/EnlacesCompartir'
 
 function Cifra({ valor, etiqueta, nota, tono }) {
   const acento = {
@@ -105,6 +106,7 @@ export default function Tablero() {
           </p>
         </div>
       )}
+      <EnlacesCompartir />
     </section>
   )
 }
