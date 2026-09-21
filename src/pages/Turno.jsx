@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
-  SERVICIOS, textoServicio, CANAL_FILA, INDICACION_MODULO,
+  SERVICIOS, textoServicio, CANAL_FILA, INDICACION_MODULO, TOLERANCIA_MIN, consejosPara,
   sacarTurno, miTurno, cederTurno, recordarTurno, turnoRecordado, olvidarTurno,
 } from '../lib/fila'
 import { prepararAlerta, sonarAlerta, mantenerPantallaEncendida } from '../lib/alerta'
@@ -18,6 +18,55 @@ import Cargando from '../components/Cargando'
 // Cada cuánto vuelve a preguntar por su cuenta. El aviso real llega por el canal
 // de difusión; esto es el respaldo para cuando el canal se cae y nadie se entera.
 const RESPALDO_MS = 15000
+
+// Cada cuánto cambia el consejo de la pantalla de espera.
+const CONSEJO_MS = 12000
+
+const hora = iso => new Date(iso).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' })
+
+/**
+ * La señal de que la pantalla sigue viva. En la simulación del 21-sep los tres
+ * estudiantes, tras 25 a 45 minutos sin cambios, dudaron si la app se había
+ * congelado. El punto late mientras la conexión está arriba.
+ */
+function Latido({ estado }) {
+  if (estado === 'vivo') {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal">
+        <span className="relative flex w-2 h-2">
+          <span className="absolute inline-flex w-full h-full rounded-full bg-teal opacity-75 animate-ping" />
+          <span className="relative inline-flex w-2 h-2 rounded-full bg-teal" />
+        </span>
+        En vivo
+      </span>
+    )
+  }
+  // Si el canal se cae, el respaldo de 15 segundos sigue preguntando: no es para asustarse.
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-lavanda/50">
+      <span className="w-2 h-2 rounded-full bg-lavanda/50" />
+      {estado === 'caido' ? 'Reconectando…' : 'Conectando…'}
+    </span>
+  )
+}
+
+/** Un consejo de búsqueda de empleo a la vez, como pantalla de carga. */
+function Consejos({ servicio, folio }) {
+  const lista = consejosPara(servicio)
+  // Arranca en un lugar distinto según el folio, para que no todos vean el mismo.
+  const [i, setI] = useState(() => (folio ?? 0) % lista.length)
+  useEffect(() => {
+    const id = setInterval(() => setI(n => (n + 1) % lista.length), CONSEJO_MS)
+    return () => clearInterval(id)
+  }, [lista.length])
+
+  return (
+    <div className="rounded-2xl border border-lavanda/15 bg-marino-alto/40 px-5 py-4 text-center min-h-[96px]">
+      <p className="text-[11px] uppercase tracking-widest text-lavanda/40">Mientras esperas</p>
+      <p key={i} className="aparece text-sm text-lavanda/85 leading-snug mt-1.5 text-balance">{lista[i]}</p>
+    </div>
+  )
+}
 
 function Encabezado({ children }) {
   return (
@@ -111,12 +160,16 @@ function CederTurno({ id, sobreTeal = false, onCedido }) {
     }
   }
 
-  const tenue = sobreTeal ? 'text-white/80 hover:text-white' : 'text-lavanda/55 hover:text-cian'
+  // Botón con borde y no liga: en la simulación casi no se veía al fondo de la
+  // pantalla. Sigue sin relleno para no competir con el número.
+  const borde = sobreTeal
+    ? 'border border-white/60 text-white hover:bg-white/10'
+    : 'border border-lavanda/30 text-lavanda/80 hover:border-cian/60 hover:text-white'
 
   if (paso === 'boton') {
     return (
       <button onClick={() => setPaso('pregunta')}
-        className={`w-full text-sm underline underline-offset-2 py-2 ${tenue}`}>
+        className={`w-full rounded-xl text-sm font-semibold py-3 px-4 transition-colors ${borde}`}>
         ¿Tienes que irte? No te preocupes, cede tu turno
       </button>
     )
@@ -154,6 +207,7 @@ function MiTurno({ id, onOtroTurno }) {
   // La base guarda igual a quien cedió y a quien no llegó. El teléfono sí sabe
   // cuál fue, así que la pantalla de «Cediste tu turno» sale de aquí.
   const [cedido, setCedido] = useState(false)
+  const [enlace, setEnlace] = useState('conectando')
   const avisado = useRef(false)
   const desmontado = useRef(false)
 
@@ -188,7 +242,11 @@ function MiTurno({ id, onOtroTurno }) {
     // datos: cada teléfono vuelve a preguntar solo por lo suyo.
     const canal = supabase.channel(CANAL_FILA)
       .on('broadcast', { event: 'movio' }, () => { if (!desmontado.current) traer() })
-      .subscribe()
+      .subscribe(estado => {
+        if (desmontado.current) return
+        if (estado === 'SUBSCRIBED') setEnlace('vivo')
+        else if (['CHANNEL_ERROR', 'TIMED_OUT', 'CLOSED'].includes(estado)) setEnlace('caido')
+      })
 
     const reloj = setInterval(traer, RESPALDO_MS)
 
@@ -214,13 +272,15 @@ function MiTurno({ id, onOtroTurno }) {
     setCedido(true)
   }
 
-  if (cedido) {
+  if (cedido || turno?.estado === 'cedio') {
     return (
       <div className="min-h-dvh max-w-md mx-auto flex flex-col">
         <Encabezado />
         <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
           <p className="text-2xl font-extrabold">Cediste tu turno</p>
-          <p className="text-sm text-lavanda/65 leading-relaxed">Gracias por avisar.</p>
+          <p className="text-sm text-lavanda/65 leading-relaxed">
+            Gracias por avisar. Si regresas más tarde, saca un turno nuevo.
+          </p>
           <button onClick={onOtroTurno}
             className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
             Sacar otro turno
@@ -276,7 +336,8 @@ function MiTurno({ id, onOtroTurno }) {
           <div className="rounded-2xl bg-white text-marino px-5 py-4 mt-3">
             <p className="text-[11px] uppercase tracking-widest text-marino/50">Ahora</p>
             <p className="text-[22px] leading-tight font-extrabold mt-0.5 text-balance">{INDICACION_MODULO}</p>
-            <p className="text-sm text-marino/70 mt-1">De ahí el host te lleva con la empresa.</p>
+            <p className="text-base font-bold mt-2">Tienes {TOLERANCIA_MIN} minutos para llegar al módulo.</p>
+            <p className="text-sm text-marino/70 mt-1">De ahí te llevamos con la empresa.</p>
           </div>
 
           <p className="text-sm text-white/75 mt-4">{servicio}</p>
@@ -297,7 +358,7 @@ function MiTurno({ id, onOtroTurno }) {
         <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
           <p className="text-2xl font-extrabold">Listo</p>
           <p className="text-sm text-lavanda/65 leading-relaxed">
-            Ya pasaste con la empresa. Si quieres pasar con otra, saca un turno nuevo.
+            Muchas gracias por participar, puedes sacar un turno nuevo en el módulo de lista de espera.
           </p>
           <button onClick={onOtroTurno}
             className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
@@ -316,11 +377,17 @@ function MiTurno({ id, onOtroTurno }) {
         <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
           <p className="text-2xl font-extrabold">Tu turno ya pasó</p>
           <p className="text-sm text-lavanda/65 leading-relaxed">
-            Te llamamos y no alcanzaste a llegar. Puedes formarte otra vez.
+            Te llamamos y no alcanzaste a llegar. Si ya estás en el módulo, avísanos ahí.
+          </p>
+          {/* Cecilia lo regresa a la fila desde /fila y esta pantalla cambia sola.
+              Por eso no hay botón grande para sacar otro turno: duplicaría a la
+              persona. Queda uno discreto por si ya se fue y volvió más tarde. */}
+          <p className="text-xs text-lavanda/45 leading-relaxed">
+            Esta pantalla cambia sola cuando te regresemos a la fila.
           </p>
           <button onClick={onOtroTurno}
-            className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
-            Formarme otra vez
+            className="text-xs text-lavanda/50 hover:text-cian underline underline-offset-2 mt-2">
+            Sacar un turno nuevo
           </button>
         </div>
       </div>
@@ -335,11 +402,15 @@ function MiTurno({ id, onOtroTurno }) {
       </Encabezado>
 
       <div className="flex-1 flex flex-col justify-center px-5 pb-10 gap-4">
-        <div className="rounded-2xl border border-lavanda/20 bg-marino-alto/50 px-5 py-8 text-center">
+        <div className="rounded-2xl border border-lavanda/20 bg-marino-alto/50 px-5 py-6 text-center">
+          <div className="flex justify-center mb-2"><Latido estado={enlace} /></div>
           <p className="text-[11px] uppercase tracking-widest text-lavanda/40">Tu número</p>
           <p className="text-[84px] leading-none font-extrabold cifra text-cian mt-1">
             {turno.folio}
           </p>
+          {turno.creado_en && (
+            <p className="text-xs text-lavanda/50 mt-2">Sacaste tu turno a las {hora(turno.creado_en)}</p>
+          )}
         </div>
 
         <div className="rounded-2xl border border-cian/50 bg-cian/10 px-5 py-4 text-center">
@@ -348,11 +419,13 @@ function MiTurno({ id, onOtroTurno }) {
           </p>
         </div>
 
+        <Consejos servicio={turno.servicio} folio={turno.folio} />
+
         <p className="text-xs text-lavanda/45 text-center leading-relaxed">
-          Deja esta pantalla abierta. Aquí te avisamos, con sonido, cuando sea tu turno.
+          Revisa esta página para saber cuándo sigue tu turno.
         </p>
 
-        <div className="mt-4">
+        <div className="mt-2">
           <CederTurno id={id} onCedido={alCeder} />
         </div>
 

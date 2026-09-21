@@ -38,6 +38,14 @@ body {
 @keyframes latido { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 .late { animation: latido 1s ease-in-out infinite; }
 
+/* Entrada suave de cada consejo en la pantalla de espera. */
+@keyframes aparece { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
+.aparece { animation: aparece .5s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aparece, .animate-ping { animation: none; }
+}
+
 /* Al imprimir el QR queda solo la hoja blanca: sin marco, sin menú, sin botones. */
 @media print {
   /* La regla borra el relleno de la hoja, así que el margen lo pone la página. */

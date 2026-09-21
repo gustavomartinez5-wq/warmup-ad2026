@@ -38,7 +38,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ✅ 21-sep |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
-| 11 | Pantallas del estudiante según el reporte marcado | ⬜ |
+| 11 | Pantallas del estudiante según el reporte marcado | ✅ 21-sep, sin desplegar |
 | 12 | `/fila` según el reporte, y estado «Cedió su turno» (migración 11) | ⬜ |
 | 13 | Verificar, desplegar y dejar la documentación al día | ⬜ |
 
@@ -361,4 +361,29 @@ Del reporte `WarmUp AD26 - Simulación de la fila.md`, con sus comentarios:
 - **Regla nueva:** si alguien regresa al módulo después de «No llegó», Cecilia usa
   «Regresar a la fila» y no le pide otro turno.
 - **Operación, no código:** letrero físico «Lista de espera» en el módulo.
+
+---
+
+## Fase 11 — Estudiante · 21-sep
+
+Código listo y compilado; **sin desplegar** hasta que la migración 11 esté aplicada
+(fase 12). Commit local.
+
+- **Espera:** punto «En vivo» que late (se detiene con *reducir movimiento*), «Sacaste
+  tu turno a las …», consejos que rotan cada 12 s y «Revisa esta página para saber
+  cuándo sigue tu turno». Ceder pasó a botón con borde.
+- **Consejos:** 19, en `CONSEJOS` de `src/lib/fila.js`, sacados de los decks cerrados
+  de CV estratégico y Estrategias de búsqueda de empleo. Se muestran los del servicio
+  elegido y luego los generales; portafolio solo ve los generales, porque no hay deck
+  de portafolio.
+- **Llamado:** «Tienes 5 minutos para llegar al módulo» y «De ahí te llevamos con la
+  empresa». `TOLERANCIA_MIN` en `fila.js`.
+- **Listo:** «Muchas gracias por participar, puedes sacar un turno nuevo en el módulo
+  de lista de espera». Se dejó el botón «Sacar otro turno».
+- **Tu turno ya pasó:** «Si ya estás en el módulo, avísanos ahí» y «Esta pantalla
+  cambia sola cuando te regresemos a la fila». El botón grande de «Formarme otra vez»
+  bajó a una liga discreta, «Sacar un turno nuevo», para no duplicar a quien Cecilia
+  regresa a la fila.
+- **Cediste tu turno:** agrega «Si regresas más tarde, saca un turno nuevo».
+- La hora del turno necesita que `mi_turno` devuelva `creado_en`: va en la migración 11.
 

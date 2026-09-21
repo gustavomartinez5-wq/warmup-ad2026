@@ -49,7 +49,57 @@ export const ESTADOS_TURNO = [
   { clave: 'llamado',  texto: 'Llamado' },
   { clave: 'atendido', texto: 'Atendido' },
   { clave: 'no_llego', texto: 'No llegó' },
+  // Quien avisó que se iba, aparte de quien no se presentó. Reabierto el 21-sep
+  // porque Cecilia necesita la cuenta real de ausencias.
+  { clave: 'cedio',    texto: 'Cedió su turno' },
 ]
+
+/** Estados de un turno que ya se cerró y no cuenta para la fila. */
+export const CERRADOS = ['atendido', 'no_llego', 'cedio']
+
+/**
+ * Minutos que tiene la persona para llegar al módulo después de que la llaman.
+ * Pasado este tiempo Cecilia puede marcarla «No llegó». Si regresa después, se
+ * usa «Regresar a la fila» y no se le pide otro turno. Decidido el 21-sep.
+ */
+export const TOLERANCIA_MIN = 5
+
+/**
+ * Consejos que rotan mientras la persona espera, como en la pantalla de carga de
+ * un videojuego. Salen de los decks cerrados del CVDP —CV estratégico y
+ * Estrategias de búsqueda de empleo—, no se inventan. Si cambia un deck, se
+ * revisan aquí.
+ */
+export const CONSEJOS = {
+  cv: [
+    'Tu CV cabe en una página y en una sola columna.',
+    'Cada viñeta de tu CV responde «¿y eso qué logró?».',
+    'Empieza cada viñeta con un verbo: «Elaboré el reporte» dice más que «Apoyé en el reporte».',
+    'Usa en tu CV las palabras de la vacante, siempre que sean ciertas.',
+    'No inventes cifras: una estimación honesta se defiende en entrevista; un número falso, no.',
+    'Envía tu CV en PDF, con el nombre «Nombre Apellido CV.pdf».',
+    'Deja fuera de tu CV la foto, la edad, el estado civil y el CURP.',
+  ],
+  entrevista: [
+    'Cuando te pidan un ejemplo, responde con STAR: situación, tarea, acción y resultado.',
+    'Ten dos historias preparadas. Tu respuesta no termina hasta que dices el resultado.',
+    'Ensaya tu presentación en voz alta. Si pasa de tres minutos, recórtala.',
+    'Prepara por qué esta vacante: qué te interesa de esta empresa y de este puesto.',
+    'Cuando te pregunten si tienes dudas, ten tus tres preguntas listas.',
+    'Al día siguiente, manda un correo breve de agradecimiento.',
+  ],
+  general: [
+    'El rechazo es información, no una evaluación de tu valor.',
+    'Lleva un registro de tus postulaciones: te dice en qué paso se detiene tu proceso.',
+    'Da seguimiento una vez, a la semana siguiente. Si no hay respuesta, sigue con la siguiente empresa.',
+    'Guarda tus búsquedas y activa las alertas: la vacante te llega el día que se publica.',
+    'Escríbele a una persona esta semana, aunque no haya vacante publicada.',
+    'En el CVDP revisamos tu CV y practicamos entrevista contigo, en asesoría individual.',
+  ],
+}
+
+/** Los consejos del servicio que eligió, y después los generales. */
+export const consejosPara = servicio => [...(CONSEJOS[servicio] ?? []), ...CONSEJOS.general]
 
 export const textoEstadoTurno = clave =>
   ESTADOS_TURNO.find(e => e.clave === clave)?.texto ?? clave
