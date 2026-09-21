@@ -40,7 +40,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
 | 11 | Pantallas del estudiante según el reporte marcado | ✅ 21-sep |
 | 12 | `/fila` según el reporte, y estado «Cedió su turno» (migración 11) | ✅ 21-sep |
-| 13 | Verificar, desplegar y dejar la documentación al día | ⬜ |
+| 13 | Verificar, desplegar y dejar la documentación al día | ✅ 21-sep |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
 cuántos van delante, un botón para ceder el turno (queda como «No llegó») y una
@@ -222,8 +222,11 @@ Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
   cuatro delante; se quitó porque «Eres el siguiente» podía quedarse mucho rato si
   la fila se atoraba. `mi_turno` sigue devolviendo `adelante`, sin pintarse.
 - **No hay tiempo estimado.** Hace que la gente calcule y se vaya.
-- **Ceder el turno queda como «No llegó»** (21-sep), sin estado nuevo. El teléfono
-  distingue a quien cedió porque sabe que fue él; la base y `/fila` no.
+- **Ceder el turno es «Cedió su turno»**, aparte de «No llegó». Primero se juntaron;
+  se separaron el mismo 21-sep porque Cecilia necesita la cuenta real de ausencias.
+- **Hay 5 minutos para llegar al módulo** al ser llamado. Si alguien regresa después
+  de «No llegó», Cecilia usa «Regresar a la fila» y no le pide otro turno.
+- **Los consejos de la espera salen de los decks del CVDP**, no se inventan.
 - **La pantalla de llamado va en teal, no en rojo.** Aquí el color es el estado
   (DEC-019) y el rojo ya significa «se pasó de los 20 minutos». Lo que pasa
   cuando llaman a alguien es que se abrió un lugar, que es lo que dice el teal.
@@ -402,4 +405,33 @@ Código listo y compilado; **sin desplegar** hasta que la migración 11 esté ap
   por 10 s; en cerrados «44:20 · No llegó», sin «esperando»; arriba se agrega
   «cedieron».
 - Se verifica y despliega en la fase 13.
+
+---
+
+## Fase 13 — Verificación y documentación · 21-sep
+
+A 390 px contra la base, con un turno de prueba (folio 12) ya borrado. Los folios 1
+a 11 son de ustedes y no se tocaron.
+
+| # | Prueba | Resultado |
+|---|---|---|
+| 1 | Espera | ✅ «En vivo», «Sacaste tu turno a las 4:34 p.m.», consejo de entrevista, «Revisa esta página…», ceder con borde. Sin desbordes |
+| 2 | Llamado | ✅ «Tienes 5 minutos para llegar al módulo» y «De ahí te llevamos con la empresa» |
+| 3 | Tu turno ya pasó | ✅ texto nuevo y liga discreta |
+| 4 | Regresar a la fila | ✅ sin recargar, el teléfono volvió solo a la espera con el mismo número |
+| 5 | Ceder | ✅ la base guarda `cedio` y `mi_turno` trae la hora |
+| 6 | Listo | ✅ «Muchas gracias por participar…» |
+| 7 | `/fila`, montado aparte | ✅ «Llamado hace 7 min · mesa 7» en ámbar con el aviso de los 5 minutos; «Turno 27 · Revisión de CV — Dáselo a la persona»; «1 cedieron»; cerrados «40:22 · Cedió su turno» |
+
+**Dos ajustes que salieron de mirar la pantalla pintada:**
+- El consejo entraba desde opacidad cero. En el panel de prueba la animación se quedó
+  congelada y el texto invisible. En un celular sí corre, pero ahora arranca en media
+  opacidad: si algo la congela, se sigue leyendo.
+- El botón de ceder dejaba «turno» solo en el segundo renglón. Se balanceó.
+
+**Documentación:** el `CLAUDE.md` de la app, con la tolerancia de 5 minutos, la regla de
+«Regresar a la fila», los consejos y «Cedió su turno» como estado aparte. El reporte de
+la simulación quedó marcado con lo aplicado.
+
+**Queda fuera, porque es de operación:** el letrero físico «Lista de espera» en el módulo.
 

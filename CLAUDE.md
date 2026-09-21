@@ -63,7 +63,7 @@ src/
 │   ├── supabase.js      cliente + edicionActiva()
 │   ├── mapaFijo.js      lo que se ve cuando la base no contesta
 │   ├── mesaEquipo.js    editar el salón: las seis funciones y la bitácora
-│   ├── fila.js          la fila: servicios, texto del módulo y las tres funciones sin sesión
+│   ├── fila.js          la fila: servicios, estados, consejos y las tres funciones sin sesión
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
@@ -185,22 +185,33 @@ Tablero del Excel**. Al corte del 17-sep-2026, con los expertos de portafolio: 6
 **El recorrido es siempre el mismo.** El estudiante saca turno con el QR de la entrada, en
 `/turno`, sin contraseña y sin escribir nada: toca lo que busca y recibe un número. Pasa al
 módulo de lista de espera, donde le toman sus datos fuera de la app, y espera sentado. Cecilia
-lo llama desde `/fila`; su celular dice «Pasa al módulo de lista de espera», y de ahí el host lo
-lleva con la empresa. **Nadie elige empresa ni camina por las mesas**, y para pasar con otra se
-saca otro turno. Detalle y estado de las pruebas en `BITACORA-fila.md`.
+lo llama desde `/fila`; su celular dice «Pasa al módulo de lista de espera», y de ahí lo llevan
+con la empresa. **Nadie elige empresa ni camina por las mesas**, y para pasar con otra se saca
+otro turno. Detalle y estado de las pruebas en `BITACORA-fila.md`.
+
+**Tiene 5 minutos para llegar al módulo** desde que lo llaman (`TOLERANCIA_MIN`). Pasado ese
+tiempo, `/fila` pone el llamado en ámbar y Cecilia puede marcarlo «No llegó». **Si regresa
+después, Cecilia usa «Regresar a la fila» y no le pide otro turno**: su celular vuelve solo a la
+espera con el mismo número. Por eso «Tu turno ya pasó» no tiene botón grande para sacar otro.
 
 **El celular nunca manda a una mesa.** Cecilia puede apartarle mesa en `/fila`, pero eso es dato
 del equipo: la persona siempre ve el módulo. El texto vive en `INDICACION_MODULO`,
 en `src/lib/fila.js`.
 
-**El celular no dice cuántos van delante.** Solo su número y «Puedes tomar asiento, en un
-momento más te avisaremos tu turno». «Eres el siguiente» podía quedarse mucho rato si la fila se
-atoraba, y confundía. No hay tiempo estimado. `mi_turno` sigue devolviendo `adelante`; la
-pantalla no lo pinta.
+**El celular no dice cuántos van delante.** Solo su número, la hora en que lo sacó y «Puedes
+tomar asiento, en un momento más te avisaremos tu turno». «Eres el siguiente» podía quedarse
+mucho rato si la fila se atoraba, y confundía. No hay tiempo estimado. `mi_turno` sigue
+devolviendo `adelante`; la pantalla no lo pinta.
 
-**Ceder el turno queda como «No llegó».** El botón «¿Tienes que irte? No te preocupes, cede tu
-turno» pide confirmar en la pantalla y llama a `ceder_turno`. La base guarda igual a quien cedió
-y a quien no se presentó; el teléfono sí los distingue, porque sabe que fue él.
+**La espera da señales de vida sin prometer nada.** Un punto «En vivo» que late y un consejo de
+búsqueda de empleo que cambia cada 12 segundos. Los consejos están en `CONSEJOS` de
+`src/lib/fila.js` y **salen de los decks cerrados del CVDP** —CV estratégico y Estrategias de
+búsqueda de empleo—; no se inventan. Si cambia un deck, se revisan ahí.
+
+**Ceder el turno es un estado aparte: «Cedió su turno».** El botón «¿Tienes que irte? No te
+preocupes, cede tu turno» pide confirmar en la pantalla y llama a `ceder_turno`, que escribe
+`cedio`. Primero se guardaba como «No llegó»; se separó el 21-sep porque Cecilia necesita la
+cuenta real de quién no se presentó.
 
 **Las mesas se agrupan por pool, no por servicio.** Las mesas no están tipificadas: el mismo
 reclutador revisa un CV y luego hace una entrevista. CV y entrevista son un solo pool, y
