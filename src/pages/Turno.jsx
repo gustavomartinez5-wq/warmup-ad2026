@@ -169,7 +169,7 @@ function CederTurno({ id, sobreTeal = false, onCedido }) {
   if (paso === 'boton') {
     return (
       <button onClick={() => setPaso('pregunta')}
-        className={`w-full rounded-xl text-sm font-semibold py-3 px-4 transition-colors ${borde}`}>
+        className={`w-full rounded-xl text-sm font-semibold py-3 px-4 text-balance transition-colors ${borde}`}>
         ¿Tienes que irte? No te preocupes, cede tu turno
       </button>
     )
