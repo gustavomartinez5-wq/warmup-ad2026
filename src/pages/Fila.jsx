@@ -420,7 +420,7 @@ export default function Fila() {
         </div>
 
         <div className="flex items-center gap-3 mt-3">
-          <Link to="/host"
+          <Link to="/host?desde=fila"
             className="text-xs text-lavanda/50 hover:text-cian underline underline-offset-2">
             Ver el salón completo
           </Link>

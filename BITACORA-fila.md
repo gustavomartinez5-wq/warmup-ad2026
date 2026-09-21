@@ -445,3 +445,13 @@ sacó turno a que lo llamaron; o, si nunca lo llamaron, **«Turno de las 2:59 p.
 Verificado montando `/fila` aparte: el texto no cambia con el paso del tiempo y no hay
 desbordes a 390 px. Los turnos en espera y llamados siguen contando, que es donde sirve.
 
+---
+
+## Ajuste del 21-sep — regreso de `/host` a la lista de espera
+
+«Ver el salón completo» en `/fila` llevaba a `/host` sin forma de volver. Ahora la liga
+va a `/host?desde=fila`, y `/host` muestra «← Regresar a la lista de espera» arriba del
+título solo en ese caso: los hosts que entran directo no lo ven. Verificado montando
+`/host` aparte: con `?desde=fila` aparece y al tocarlo llega a `/fila`; sin él no
+aparece; sin desbordes a 390 px.
+

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
 import { bloquePorReloj, comoReloj } from '../lib/reloj'
@@ -141,6 +141,10 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }
 /* ── La pantalla ──────────────────────────────────────────────────────────── */
 
 export default function Host() {
+  // Si se llegó desde la lista de espera, se ofrece el regreso. Los hosts que
+  // entran directo no lo necesitan y no se les muestra.
+  const [params] = useSearchParams()
+  const desdeFila = params.get('desde') === 'fila'
   const [bloque, setBloque]   = useState(bloquePorReloj)
   const [vista, setVista]     = useState('rejilla')
   const [mesas, setMesas]     = useState(() => mesasFijas(bloquePorReloj()))
@@ -365,6 +369,12 @@ export default function Host() {
                          bg-marino/85 backdrop-blur space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
+            {desdeFila && (
+              <Link to="/fila"
+                className="inline-block text-xs font-semibold text-cian hover:text-white mb-1.5">
+                ← Regresar a la lista de espera
+              </Link>
+            )}
             <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP · Host</p>
             <h1 className="text-lg font-extrabold leading-tight">Warm Up AD2026</h1>
           </div>
