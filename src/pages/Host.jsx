@@ -141,8 +141,8 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }
 /* ── La pantalla ──────────────────────────────────────────────────────────── */
 
 export default function Host() {
-  // Si se llegó desde la lista de espera, se ofrece el regreso. Los hosts que
-  // entran directo no lo necesitan y no se les muestra.
+  // La lista de espera siempre está a un toque. Si se llegó desde ahí, la liga
+  // se lee como regreso; si se entró directo, como ir a verla.
   const [params] = useSearchParams()
   const desdeFila = params.get('desde') === 'fila'
   const [bloque, setBloque]   = useState(bloquePorReloj)
@@ -369,12 +369,10 @@ export default function Host() {
                          bg-marino/85 backdrop-blur space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            {desdeFila && (
-              <Link to="/fila"
-                className="inline-block text-xs font-semibold text-cian hover:text-white mb-1.5">
-                ← Regresar a la lista de espera
-              </Link>
-            )}
+            <Link to="/fila"
+              className="inline-block text-xs font-semibold text-cian hover:text-white mb-1.5">
+              {desdeFila ? '← Regresar a la lista de espera' : 'Lista de espera →'}
+            </Link>
             <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP · Host</p>
             <h1 className="text-lg font-extrabold leading-tight">Warm Up AD2026</h1>
           </div>

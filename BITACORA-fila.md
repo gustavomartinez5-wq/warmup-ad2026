@@ -455,3 +455,8 @@ título solo en ese caso: los hosts que entran directo no lo ven. Verificado mon
 `/host` aparte: con `?desde=fila` aparece y al tocarlo llega a `/fila`; sin él no
 aparece; sin desbordes a 390 px.
 
+Complemento, a pedido de Gustavo: `/host` **siempre** muestra la liga, en el mismo lugar.
+Si se llegó desde la fila dice «← Regresar a la lista de espera»; si se entró directo,
+«Lista de espera →». Verificado en los dos casos; la tira de contadores de `/host` es la
+única que se desliza de lado, como ya estaba.
+
