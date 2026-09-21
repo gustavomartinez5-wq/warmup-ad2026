@@ -35,7 +35,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 5 | Dejar el repo al día | ✅ 18-sep |
 | 6 | Quitar el conteo de personas delante | ✅ 21-sep |
 | 7 | Ceder turno (migración 10) | ✅ 21-sep |
-| 8 | Verificar y desplegar 6 y 7 | ⬜ |
+| 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ⬜ |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ⬜ |
 
@@ -275,4 +275,22 @@ Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
   Gracias por avisar» y «Sacar otro turno». El teléfono olvida el turno al ceder.
 - `/fila` no cambió: lo ve pasar a «No llegó».
 - Build limpio. Se verifica en la fase 8.
+
+---
+
+## Fase 8 — Verificación · 21-sep
+
+A 390 px contra la base real, con un turno de prueba (folio 12) que ya se borró.
+Los folios 1 a 11 son de ustedes y no se tocaron.
+
+| # | Prueba | Resultado |
+|---|---|---|
+| 1 | Espera sin conteo | ✅ número, banda y aviso; sin desbordes |
+| 2 | Ceder | ✅ «Me quedo» regresa sin cambios; «Sí» deja `no_llego`, muestra «Cediste tu turno» y el teléfono olvida el turno. Probado desde el llamado, con el fondo teal |
+| 3 | Ceder un turno ya cerrado | ✅ `false`, sin cambios |
+| 4 | Ceder un uuid inventado | ✅ `false` |
+| 5 | Tabla cerrada a la clave pública | ✅ `select`, `update` y `delete` en 401; `ceder_turno` sí responde |
+
+Desplegado: commit `afaf433`. El paquete de producción trae «cede tu turno» y
+«Cediste tu turno», y ya no trae «Eres el siguiente» ni «delante de ti».
 
