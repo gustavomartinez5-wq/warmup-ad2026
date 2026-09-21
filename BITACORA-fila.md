@@ -34,7 +34,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 4 | `git push` y producción | ✅ 18-sep |
 | 5 | Dejar el repo al día | ✅ 18-sep |
 | 6 | Quitar el conteo de personas delante | ✅ 21-sep |
-| 7 | Ceder turno (migración 10) | ⬜ |
+| 7 | Ceder turno (migración 10) | ✅ 21-sep |
 | 8 | Verificar y desplegar 6 y 7 | ⬜ |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | ⬜ |
 | 10 | Documentación: `CLAUDE.md` y decisiones | ⬜ |
@@ -260,4 +260,19 @@ Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
 - **Se queda en la base sin usarse:** `mi_turno.adelante` y `pool_de`. No estorban;
   `poolDe` sí se sigue usando en `/fila` para ofrecer mesas de portafolio aparte.
 - Build limpio. Se verifica pintado en la fase 8, junto con ceder.
+
+---
+
+## Fase 7 — Ceder turno · 21-sep
+
+- **Migración 10 aplicada en producción:** `ceder_turno(p_id uuid) returns boolean`,
+  `SECURITY DEFINER`, ejecutable por anon. Pasa a `no_llego` solo desde `espera` o
+  `llamado`. Deshacerla: `drop function if exists ceder_turno(uuid);`
+- `fila.js`: `cederTurno(id)`.
+- `Turno.jsx`: componente `CederTurno` al pie de la espera y del llamado. Pide
+  confirmar en la pantalla: «¿Ceder tu turno? Tu número se libera y no se puede
+  recuperar», con «Me quedo» y «Sí, ceder mi turno». Después: «Cediste tu turno.
+  Gracias por avisar» y «Sacar otro turno». El teléfono olvida el turno al ceder.
+- `/fila` no cambió: lo ve pasar a «No llegó».
+- Build limpio. Se verifica en la fase 8.
 

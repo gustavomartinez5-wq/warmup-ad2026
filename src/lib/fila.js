@@ -78,6 +78,17 @@ export async function miTurno(id) {
 }
 
 /**
+ * Ceder el turno: la persona avisa que se tiene que ir. Queda como «No llegó».
+ * Devuelve `true` si lo cedió, `false` si el turno ya estaba cerrado.
+ */
+export async function cederTurno(id) {
+  if (sinBase()) throw new Error('Modo de prueba: sin conexión con la base.')
+  const { data, error } = await supabase.rpc('ceder_turno', { p_id: id })
+  if (error) throw error
+  return data === true
+}
+
+/**
  * El turno que sacó esta persona, para que una recarga no la haga sacar otro.
  * Vive solo en su teléfono. Si se pierde, saca uno nuevo y ya.
  */

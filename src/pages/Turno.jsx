@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
   SERVICIOS, textoServicio, CANAL_FILA, INDICACION_MODULO,
-  sacarTurno, miTurno, recordarTurno, turnoRecordado, olvidarTurno,
+  sacarTurno, miTurno, cederTurno, recordarTurno, turnoRecordado, olvidarTurno,
 } from '../lib/fila'
 import { prepararAlerta, sonarAlerta, mantenerPantallaEncendida } from '../lib/alerta'
 import Cargando from '../components/Cargando'
@@ -86,12 +86,74 @@ function Sacar({ onSacado }) {
   )
 }
 
+/* ── Ceder el turno ───────────────────────────────────────────────────────── */
+
+/**
+ * El botón para quien se tiene que ir. Pide confirmar en la misma pantalla y no
+ * con el confirm() del navegador, que en celular se ve como un error.
+ * `sobreTeal` es para la pantalla de llamado, que tiene otro fondo.
+ */
+function CederTurno({ id, sobreTeal = false, onCedido }) {
+  const [paso, setPaso]   = useState('boton')   // 'boton' · 'pregunta' · 'mandando'
+  const [error, setError] = useState(null)
+
+  async function ceder() {
+    setPaso('mandando')
+    setError(null)
+    try {
+      await cederTurno(id)
+      // Si ya estaba cerrado, igual lo damos por cedido: para la persona el
+      // resultado es el mismo, ya no tiene turno.
+      onCedido()
+    } catch (e) {
+      setError(e.message ?? String(e))
+      setPaso('pregunta')
+    }
+  }
+
+  const tenue = sobreTeal ? 'text-white/80 hover:text-white' : 'text-lavanda/55 hover:text-cian'
+
+  if (paso === 'boton') {
+    return (
+      <button onClick={() => setPaso('pregunta')}
+        className={`w-full text-sm underline underline-offset-2 py-2 ${tenue}`}>
+        ¿Tienes que irte? No te preocupes, cede tu turno
+      </button>
+    )
+  }
+
+  return (
+    <div className={`rounded-2xl px-5 py-4 text-center ${
+      sobreTeal ? 'bg-white text-marino' : 'border border-lavanda/25 bg-marino-alto/70'}`}>
+      <p className="font-extrabold">¿Ceder tu turno?</p>
+      <p className={`text-sm mt-1 ${sobreTeal ? 'text-marino/70' : 'text-lavanda/65'}`}>
+        Tu número se libera y no se puede recuperar.
+      </p>
+      <div className="flex gap-2 mt-3">
+        <button onClick={() => setPaso('boton')} disabled={paso === 'mandando'}
+          className={`flex-1 rounded-xl py-3 text-sm font-bold transition-colors disabled:opacity-50 ${
+            sobreTeal ? 'border border-marino/25' : 'border border-lavanda/25 hover:border-cian/60'}`}>
+          Me quedo
+        </button>
+        <button onClick={ceder} disabled={paso === 'mandando'}
+          className="flex-1 rounded-xl py-3 text-sm font-bold bg-tec hover:bg-tec-claro text-white transition-colors disabled:opacity-50">
+          {paso === 'mandando' ? 'Cediendo…' : 'Sí, ceder mi turno'}
+        </button>
+      </div>
+      {error && <p className="text-xs text-rojo mt-2">{error}</p>}
+    </div>
+  )
+}
+
 /* ── Mi turno ─────────────────────────────────────────────────────────────── */
 
 function MiTurno({ id, onOtroTurno }) {
   const [turno, setTurno]   = useState(null)
   const [error, setError]   = useState(null)
   const [perdido, setPerdido] = useState(false)
+  // La base guarda igual a quien cedió y a quien no llegó. El teléfono sí sabe
+  // cuál fue, así que la pantalla de «Cediste tu turno» sale de aquí.
+  const [cedido, setCedido] = useState(false)
   const avisado = useRef(false)
   const desmontado = useRef(false)
 
@@ -147,6 +209,27 @@ function MiTurno({ id, onOtroTurno }) {
     }
   }, [])
 
+  function alCeder() {
+    olvidarTurno()
+    setCedido(true)
+  }
+
+  if (cedido) {
+    return (
+      <div className="min-h-dvh max-w-md mx-auto flex flex-col">
+        <Encabezado />
+        <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
+          <p className="text-2xl font-extrabold">Cediste tu turno</p>
+          <p className="text-sm text-lavanda/65 leading-relaxed">Gracias por avisar.</p>
+          <button onClick={onOtroTurno}
+            className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
+            Sacar otro turno
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (perdido) {
     return (
       <div className="min-h-dvh max-w-md mx-auto flex flex-col">
@@ -197,6 +280,10 @@ function MiTurno({ id, onOtroTurno }) {
           </div>
 
           <p className="text-sm text-white/75 mt-4">{servicio}</p>
+
+          <div className="mt-8">
+            <CederTurno id={id} sobreTeal onCedido={alCeder} />
+          </div>
         </div>
       </div>
     )
@@ -264,6 +351,10 @@ function MiTurno({ id, onOtroTurno }) {
         <p className="text-xs text-lavanda/45 text-center leading-relaxed">
           Deja esta pantalla abierta. Aquí te avisamos, con sonido, cuando sea tu turno.
         </p>
+
+        <div className="mt-4">
+          <CederTurno id={id} onCedido={alCeder} />
+        </div>
 
         {error && (
           <p className="text-xs text-ambar bg-ambar/10 border border-ambar/40 rounded-lg px-3 py-2">
