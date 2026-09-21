@@ -37,7 +37,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 | 7 | Ceder turno (migración 10) | ✅ 21-sep |
 | 8 | Verificar y desplegar 6 y 7 | ✅ 21-sep |
 | 9 | Simulación con agentes Sonnet: guion, agentes, reporte | 🟡 9a hecho |
-| 10 | Documentación: `CLAUDE.md` y decisiones | ⬜ |
+| 10 | Documentación: `CLAUDE.md` y decisiones | ✅ 21-sep |
 
 **Fases 6 a 10**, del 21-sep, salen de tres observaciones de Gustavo: no decir
 cuántos van delante, un botón para ceder el turno (queda como «No llegó») y una
@@ -210,16 +210,17 @@ Se dejaron como estaban; de la prueba solo se borraron los folios 9 a 14.
 - **El celular siempre manda al módulo de lista de espera, nunca a una mesa.** Ahí
   le toman sus datos y el host la lleva con la empresa. La mesa apartada en `/fila`
   es para el equipo.
-- **La fila se cuenta por pool de mesas, no por etiqueta.** CV y entrevista
-  comparten mesas: contarlos por separado daría un número falso, porque quien
-  viene por CV también espera a los de entrevista. Portafolio sí es pool aparte y
-  sale del giro `GIRO_PORTAFOLIO`, no del número de mesa. La regla vive en dos
-  lados que tienen que decir lo mismo: `pool_de` en la migración 09 y `poolDe` en
+- **Las mesas se agrupan por pool, no por servicio.** CV y entrevista comparten
+  mesas; portafolio es zona aparte y sale del giro `GIRO_PORTAFOLIO`, no del número
+  de mesa. `/fila` lo usa para ofrecer mesas al llamar. La regla vive en dos lados
+  que tienen que decir lo mismo: `pool_de` en la migración 09 y `poolDe` en
   `src/lib/fila.js`.
-- **Con la fila larga no se da el número.** Ver «van 23 delante» hace que la
-  gente calcule y se vaya. El umbral es 4 y es una constante en `src/lib/fila.js`,
-  junto al texto. No hay pantalla de configuración.
-- **No hay tiempo estimado.** Mismo motivo.
+- **El celular no dice cuántos van delante** (21-sep). Primero se daba con menos de
+  cuatro delante; se quitó porque «Eres el siguiente» podía quedarse mucho rato si
+  la fila se atoraba. `mi_turno` sigue devolviendo `adelante`, sin pintarse.
+- **No hay tiempo estimado.** Hace que la gente calcule y se vaya.
+- **Ceder el turno queda como «No llegó»** (21-sep), sin estado nuevo. El teléfono
+  distingue a quien cedió porque sabe que fue él; la base y `/fila` no.
 - **La pantalla de llamado va en teal, no en rojo.** Aquí el color es el estado
   (DEC-019) y el rojo ya significa «se pasó de los 20 minutos». Lo que pasa
   cuando llaman a alguien es que se abrió un lugar, que es lo que dice el teal.
@@ -304,5 +305,24 @@ Siete pantallas del estudiante y tres de Cecilia, con el texto exacto marcado po
 tamaño y tipo. Las del estudiante salieron de la app contra la base (folio 12, ya
 borrado); `/fila` se montó aislado con datos de mentira, sin sesión ni base.
 
-**9b · Agentes:** pendiente. **9c · Reporte:** pendiente.
+**9b · Agentes:** lanzados el 21-sep. Corrida `wf_1c42d7a0-c98`: cuatro agentes Sonnet
+en paralelo (E1 primer semestre por CV, E2 diseño por portafolio con prisa, E3 último
+semestre por entrevista, y Cecilia). A los estudiantes se les pasaron solo las
+pantallas y lo que se ve en el salón; a Cecilia, el guion completo. Si se corta,
+se retoma con `resumeFromRunId` y los agentes que ya terminaron no se repiten.
+
+**9c · Reporte:** pendiente.
+
+---
+
+## Fase 10 — Documentación · 21-sep
+
+- **`CLAUDE.md` de la app**, con la redacción aprobada en el plan: la sección *La fila
+  del día del evento* reescrita con el recorrido real (módulo, host, nadie elige
+  empresa), el celular que nunca manda a una mesa, sin conteo, y ceder como «No
+  llegó». *Quién ve qué* pasa a cinco funciones públicas con `ceder_turno`.
+- De paso, dos líneas que habían envejecido: la regla de los pools ya no puede decir
+  que la persona ve un número de espera, y el árbol de `fila.js` ya no dice «umbral».
+- *Decisiones* de esta bitácora al día. Las menciones del umbral en las fases 0 y 2
+  se quedan: son registro de lo que se probó entonces.
 

@@ -36,8 +36,9 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   forma de cumplirlo es no tenerlos. Si alguna vez hace falta un dato de la persona, no se
   agrega una columna: se captura fuera de la app.
 - **La regla de los pools vive en dos lados y tienen que decir lo mismo.** `pool_de` en la
-  migración 09 y `poolDe` en `src/lib/fila.js`. Si se separan, la persona ve un número de
-  espera que no corresponde a la fila en la que está.
+  migración 09 y `poolDe` en `src/lib/fila.js`. Hoy la pantalla del estudiante no muestra el
+  conteo que sale de `pool_de`, pero si vuelve a mostrarse y se separan, la persona vería un
+  número de espera que no corresponde a su fila.
 - **`reclutadores` no entra a la publicación de tiempo real.** Trae nombres de personas de fuera
   del Tec. Los cambios de forma del salón se avisan por el canal de difusión `salon-<bloque>`, y
   el aviso no lleva datos: el texto que se lee vive en la pantalla, no en el mensaje.
@@ -62,7 +63,7 @@ src/
 │   ├── supabase.js      cliente + edicionActiva()
 │   ├── mapaFijo.js      lo que se ve cuando la base no contesta
 │   ├── mesaEquipo.js    editar el salón: las seis funciones y la bitácora
-│   ├── fila.js          la fila: servicios, umbral y las dos funciones sin sesión
+│   ├── fila.js          la fila: servicios, texto del módulo y las tres funciones sin sesión
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
@@ -117,20 +118,22 @@ Una mesa es excedente cuando su número pasa de `ediciones.total_mesas`.
 ### Quién ve qué
 
 - Sin sesión: `carreras`, `ediciones` (solo `id, nombre, fecha, activa`), `mesas_estado`,
-  y cuatro funciones: `mesas_publicas(bloque)` y `set_estado_mesa(numero, bloque, estado)`
-  para el reclutador, `sacar_turno(servicio)` y `mi_turno(id)` para el estudiante.
+  y cinco funciones: `mesas_publicas(bloque)` y `set_estado_mesa(numero, bloque, estado)`
+  para el reclutador; `sacar_turno(servicio)`, `mi_turno(id)` y `ceder_turno(id)` para el
+  estudiante.
 - Con sesión y en `equipo`: todo.
 - Con sesión y fuera de `equipo`: nada.
 
-Las cuatro son `SECURITY DEFINER` y ejecutables por `anon` **a propósito**: son las dos
+Las cinco son `SECURITY DEFINER` y ejecutables por `anon` **a propósito**: son las dos
 puertas sin contraseña de la app. El asesor de seguridad de Supabase las marca; es una
 excepción aceptada, no un descuido. `set_estado_mesa` solo escribe `estado` y `ocupado_desde`,
 y rechaza una mesa que no esté asignada en ese bloque.
 
 `turnos` no se abre a `anon` ni para leerla. `mi_turno` devuelve **un** renglón y pide el uuid
-completo, así que un teléfono no puede listar la fila ni leer el turno de alguien más; y
-`sacar_turno` solo inserta un turno nuevo en espera. Llamar, cerrar y borrar pasan por la
-tabla, y eso pide cuenta del equipo.
+completo, así que un teléfono no puede listar la fila ni leer el turno de alguien más.
+`sacar_turno` solo inserta un turno nuevo en espera. `ceder_turno` solo cierra uno que siga en
+espera o llamado, y también pide el uuid completo. Llamar, cerrar y borrar pasan por la tabla,
+y eso pide cuenta del equipo.
 
 Para dar de alta una cuenta: se crea en el panel de Supabase y se agrega a `equipo` por SQL.
 Ver el comentario al final de `supabase/migrations/06_lista_del_equipo.sql`.
@@ -179,19 +182,30 @@ Tablero del Excel**. Al corte del 17-sep-2026, con los expertos de portafolio: 6
 
 ## La fila del día del evento
 
-El estudiante que llega y tiene que esperar entra por `/turno`, sin contraseña y sin escribir
-nada: toca lo que busca y recibe un número. Cecilia lo llama desde `/fila`, y elige si lo manda
-directo a una mesa o con el host para que él asigne. Detalle completo y estado de las pruebas
-en `BITACORA-fila.md`.
+**El recorrido es siempre el mismo.** El estudiante saca turno con el QR de la entrada, en
+`/turno`, sin contraseña y sin escribir nada: toca lo que busca y recibe un número. Pasa al
+módulo de lista de espera, donde le toman sus datos fuera de la app, y espera sentado. Cecilia
+lo llama desde `/fila`; su celular dice «Pasa al módulo de lista de espera», y de ahí el host lo
+lleva con la empresa. **Nadie elige empresa ni camina por las mesas**, y para pasar con otra se
+saca otro turno. Detalle y estado de las pruebas en `BITACORA-fila.md`.
 
-**La fila se cuenta por pool de mesas, no por etiqueta.** Las mesas no están tipificadas por
-servicio: el mismo reclutador revisa un CV y luego hace una entrevista. Así que CV y entrevista
-son un solo pool, y portafolio va aparte porque sí es una zona distinta. Contar por etiqueta
-daría un número mentiroso: quien viene por CV también espera a los de entrevista.
+**El celular nunca manda a una mesa.** Cecilia puede apartarle mesa en `/fila`, pero eso es dato
+del equipo: la persona siempre ve el módulo. El texto vive en `INDICACION_MODULO`,
+en `src/lib/fila.js`.
 
-**Con la fila larga no se da el número.** A partir de cuatro personas delante, la pantalla dice
-«En un momento más pasarás» en vez de la cuenta, y no hay tiempo estimado. Ver «van 23 delante»
-hace que la gente calcule y se vaya. El umbral y el texto son constantes en `src/lib/fila.js`.
+**El celular no dice cuántos van delante.** Solo su número y «Puedes tomar asiento, en un
+momento más te avisaremos tu turno». «Eres el siguiente» podía quedarse mucho rato si la fila se
+atoraba, y confundía. No hay tiempo estimado. `mi_turno` sigue devolviendo `adelante`; la
+pantalla no lo pinta.
+
+**Ceder el turno queda como «No llegó».** El botón «¿Tienes que irte? No te preocupes, cede tu
+turno» pide confirmar en la pantalla y llama a `ceder_turno`. La base guarda igual a quien cedió
+y a quien no se presentó; el teléfono sí los distingue, porque sabe que fue él.
+
+**Las mesas se agrupan por pool, no por servicio.** Las mesas no están tipificadas: el mismo
+reclutador revisa un CV y luego hace una entrevista. CV y entrevista son un solo pool, y
+portafolio va aparte porque sí es una zona distinta, reconocida por `GIRO_PORTAFOLIO`. Es lo que
+usa `/fila` para ofrecer mesas al llamar.
 
 **En iPhone las notificaciones web no llegan** salvo que la persona instale la página en su
 pantalla de inicio. Por eso el aviso es la pantalla abierta que cambia sola, más sonido; y el
