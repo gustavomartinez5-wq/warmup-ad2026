@@ -402,6 +402,16 @@ function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA }) {
           </ul>
         </div>
 
+        {/* La misma salida que «Cambiar», hasta abajo y en gris: quien se dio
+            cuenta tarde de que la mesa no es la suya ya leyó toda la pantalla. */}
+        <button
+          onClick={onCambiarMesa}
+          className="text-xs text-lavanda/45 hover:text-lavanda underline underline-offset-4
+                     decoration-lavanda/30 transition-colors py-2.5"
+        >
+          ¿Esta no es tu empresa? Elige otra mesa
+        </button>
+
         {error && (
           <p className="text-xs text-rojo bg-rojo/10 border border-rojo/30 rounded-lg px-3 py-2">
             {error}
