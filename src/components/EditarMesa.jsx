@@ -35,12 +35,13 @@ import Cargando from './Cargando'
 const NUEVA = '__nueva'
 
 export default function EditarMesa({
-  mesa, bloque, salon, carreras, cargando, onCerrar, onGuardado,
+  mesa, bloque, salon, carreras, cargando, onCerrar, onGuardado, numeroInicial = null,
 }) {
   const esAlta = mesa === null
   const fila = salon && !esAlta ? filaDeLaMesa(salon.filas, bloque, mesa.numero) : null
 
-  const hueco = salon ? primerHueco(salon.filas, bloque, salon.totalMesas) : null
+  // Si se abrió tocando un hueco de la rejilla, se ofrece ese número y no el primero libre.
+  const hueco = numeroInicial ?? (salon ? primerHueco(salon.filas, bloque, salon.totalMesas) : null)
 
   const [empresaId, setEmpresaId]     = useState(esAlta ? NUEVA : null)
   const [nombreNuevo, setNombreNuevo] = useState('')
@@ -51,6 +52,7 @@ export default function EditarMesa({
   const [elegidas, setElegidas]       = useState(esAlta ? new Set() : null)
   const [guardando, setGuardando]     = useState(null)   // qué se está haciendo
   const [confirmaLiberar, setConfirmaLiberar] = useState(false)
+  const [confirma, setConfirma]       = useState(null)   // 'intercambiar' · 'recorrer'
   const [error, setError]             = useState(null)
 
   // En alta no hay fila de dónde sacar el valor de arranque; en edición sí.
@@ -246,7 +248,7 @@ export default function EditarMesa({
                   <p className="text-xs text-lavanda/55 mb-1.5">Número de mesa</p>
                   <input
                     value={numeroTexto}
-                    onChange={e => { setTocoNumero(true); setNumero(e.target.value) }}
+                    onChange={e => { setTocoNumero(true); setNumero(e.target.value); setConfirma(null) }}
                     inputMode="numeric" placeholder="El número del acrílico"
                     className={`${campo} cifra`}
                   />
@@ -254,7 +256,7 @@ export default function EditarMesa({
                 <div>
                   <p className="text-xs text-lavanda/55 mb-1.5">Bloque</p>
                   <select
-                    value={bloqueElegido} onChange={e => setBloque(e.target.value)}
+                    value={bloqueElegido} onChange={e => { setBloque(e.target.value); setConfirma(null) }}
                     className={campo}
                   >
                     {BLOQUES.map(b => <option key={b.clave} value={b.clave}>{b.nombre}</option>)}
@@ -264,7 +266,8 @@ export default function EditarMesa({
 
               {esAlta && !tocoNumero && hueco !== null && (
                 <p className="text-[11px] text-lavanda/45 -mt-2">
-                  La <span className="cifra">{hueco}</span> es la primera libre de{' '}
+                  La <span className="cifra">{hueco}</span>{' '}
+                  {numeroInicial !== null ? 'está libre en' : 'es la primera libre de'}{' '}
                   {etiquetaBloque(bloqueElegido).toLowerCase()}. Cámbiala si el acrílico dice otra.
                 </p>
               )}
@@ -284,28 +287,63 @@ export default function EditarMesa({
                     {etiquetaBloque(bloqueElegido).toLowerCase()} la tiene{' '}
                     <span className="font-bold">{empresaDe(otraFila.empresa_id)}</span>.
                   </p>
+                  {/* Las dos mueven mesas con reclutadores sentados: se confirman
+                      antes, como Liberar. Un pulgar distraído no reacomoda el salón. */}
+                  {confirma ? (
+                    <div className="rounded-lg border border-cian/50 bg-marino px-3 py-3 space-y-2">
+                      <p className="text-xs text-lavanda leading-relaxed">
+                        {confirma === 'intercambiar'
+                          ? <>{esNueva ? (nombreNuevo.trim() || 'La empresa nueva') : empresaDe(empresaPuesta)} pasa a la <span className="cifra">{numeroInt}</span> y{' '}
+                              {empresaDe(otraFila.empresa_id)} a la <span className="cifra">{mesa.numero}</span>.</>
+                          : <>Se {recorrido.mesas === 1 ? 'mueve' : 'mueven'}{' '}
+                              <span className="cifra">{recorrido.mesas}</span>{' '}
+                              {recorrido.mesas === 1 ? 'mesa' : 'mesas'} con su empresa, de la{' '}
+                              <span className="cifra">{numeroInt}</span> a la{' '}
+                              <span className="cifra">{recorrido.hueco}</span>.</>}
+                        {' '}Avisa a esos reclutadores: su pantalla les va a pedir ir a su mesa nueva.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => guardar(confirma)} disabled={Boolean(guardando)}
+                          className="flex-1 rounded-lg bg-tec hover:bg-tec-claro disabled:opacity-40
+                                     py-2.5 text-[13px] font-bold transition-colors"
+                        >
+                          {guardando === 'intercambiar' ? 'Intercambiando…'
+                            : guardando === 'recorrer' ? 'Recorriendo…' : 'Sí, mover'}
+                        </button>
+                        <button
+                          onClick={() => setConfirma(null)} disabled={Boolean(guardando)}
+                          className="flex-1 rounded-lg border border-lavanda/25 text-lavanda/70
+                                     py-2.5 text-[13px] font-bold"
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                  <>
                   {!esAlta && (
                     <button
-                      onClick={() => guardar('intercambiar')} disabled={Boolean(guardando)}
+                      onClick={() => setConfirma('intercambiar')} disabled={Boolean(guardando)}
                       className={salida}
                     >
-                      {guardando === 'intercambiar' ? 'Intercambiando…'
-                        : `Intercambiar: se va a la ${mesa.numero}`}
+                      Intercambiar: {empresaDe(otraFila.empresa_id)} se va a la {mesa.numero}
                     </button>
                   )}
                   {recorrido.hueco !== null ? (
                     <button
-                      onClick={() => guardar('recorrer')} disabled={Boolean(guardando)}
+                      onClick={() => setConfirma('recorrer')} disabled={Boolean(guardando)}
                       className={salida}
                     >
-                      {guardando === 'recorrer' ? 'Recorriendo…'
-                        : `Recorrer: ${recorrido.mesas} ${recorrido.mesas === 1 ? 'mesa' : 'mesas'} suben una, de la ${numeroInt} a la ${recorrido.hueco}`}
+                      {`Recorrer: ${recorrido.mesas} ${recorrido.mesas === 1 ? 'mesa' : 'mesas'} suben una, de la ${numeroInt} a la ${recorrido.hueco}`}
                     </button>
                   ) : (
                     <p className="text-[11px] text-ambar/80">
                       De la {numeroInt} a la {salon.totalMesas} no hay ninguna libre, así que no se
                       puede recorrer. Hay que conseguir otra mesa.
                     </p>
+                  )}
+                  </>
                   )}
                 </div>
               )}

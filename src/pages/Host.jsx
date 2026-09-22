@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { supabase, edicionCompleta } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
 import { bloquePorReloj, comoReloj } from '../lib/reloj'
 import { BLOQUES, etiquetaBloque } from '../lib/cifras'
@@ -158,6 +158,8 @@ export default function Host() {
   const [marcando, setMarcando] = useState(null)
   const [catalogo, setCatalogo] = useState([])
   const [editando, setEditando] = useState(null)   // número de mesa que se está editando
+  const [huecoTocado, setHuecoTocado] = useState(null)   // la mesa libre que se tocó en la rejilla
+  const [totalMesas, setTotalMesas] = useState(null)
   const [salon, setSalon]       = useState(null)   // empresas y filas; solo para el equipo
   const [trayendoSalon, setTrayendoSalon] = useState(false)
   const [enlace, setEnlace] = useState('conectando')
@@ -267,6 +269,12 @@ export default function Host() {
   // El catálogo sirve para que el buscador entienda «mecatrónica» y no solo «IMT».
   useEffect(() => { catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo(carrerasFijas())) }, [])
 
+  // Cuántas mesas tiene el salón, para pintar también las libres. Si no
+  // contesta, la rejilla llega hasta la mesa asignada más alta.
+  useEffect(() => {
+    edicionCompleta().then(e => setTotalMesas(e?.total_mesas ?? null)).catch(() => {})
+  }, [])
+
   const carreras = useMemo(
     () => [...new Set((mesas ?? []).flatMap(m => m.carreras ?? []))].sort(),
     [mesas])
@@ -277,23 +285,29 @@ export default function Host() {
   const q = plano(busca)
 
   /**
-   * Las siglas que coinciden con lo escrito. La sigla se busca por principio
+   * Se busca por palabras, y una mesa sale si coincide con todas: «IMT
+   * manufactura» trae las de mecatrónica que además son de manufactura.
+   *
+   * Por cada palabra, las siglas que coinciden. La sigla se busca por principio
    * —«IRS» encuentra IRS, «IM» encuentra IM, IMA, IMD e IMT— y el nombre por
    * cualquier parte, para que «robotica» también llegue a IRS.
    */
-  const siglasQueCoinciden = useMemo(() => {
+  const palabras = useMemo(() => {
     if (!q) return []
-    return catalogo
-      .filter(c => plano(c.siglas).startsWith(q) || contiene(c.nombre, q))
-      .map(c => c.siglas)
+    return q.split(/\s+/).map(p => ({
+      p,
+      siglas: catalogo
+        .filter(c => plano(c.siglas).startsWith(p) || contiene(c.nombre, p))
+        .map(c => c.siglas),
+    }))
   }, [q, catalogo])
 
   const filtradas = (mesas ?? []).filter(m => {
-    const porTexto = !q
-      || contiene(m.empresa, q)
-      || contiene(m.giro, q)
-      || String(m.numero).includes(q)
-      || (m.carreras ?? []).some(c => siglasQueCoinciden.includes(c))
+    const porTexto = palabras.every(({ p, siglas }) =>
+      contiene(m.empresa, p)
+      || contiene(m.giro, p)
+      || String(m.numero).includes(p)
+      || (m.carreras ?? []).some(c => siglas.includes(c)))
     return porTexto
       && (!carrera || (m.carreras ?? []).includes(carrera))
       && (!giro || m.giro === giro)
@@ -302,13 +316,28 @@ export default function Host() {
   // Qué carreras se reconocieron, para que quede claro por qué salió esa lista.
   const carrerasReconocidas = useMemo(() => {
     const enUso = new Set((mesas ?? []).flatMap(m => m.carreras ?? []))
+    const todas = new Set(palabras.flatMap(w => w.siglas))
     return catalogo
-      .filter(c => siglasQueCoinciden.includes(c.siglas) && enUso.has(c.siglas))
+      .filter(c => todas.has(c.siglas) && enUso.has(c.siglas))
       .slice(0, 3)
-  }, [siglasQueCoinciden, catalogo, mesas])
+  }, [palabras, catalogo, mesas])
 
   const cuenta = contarPorEstado(mesas ?? [])
   const hayFiltro = Boolean(q || carrera || giro)
+
+  /**
+   * Sin filtro, la rejilla es el salón completo: cada número en su lugar, y la
+   * mesa libre como hueco punteado. Antes solo salían las asignadas, así que al
+   * liberar una todas las de después se recorrían un lugar y el hueco no se
+   * veía. Con filtro se quedan solo las que coinciden: ahí los huecos estorban.
+   */
+  const celdas = useMemo(() => {
+    const lista = mesas ?? []
+    if (hayFiltro) return lista
+    const porNumero = new Map(lista.map(m => [m.numero, m]))
+    const alto = Math.max(totalMesas ?? 0, ...lista.map(m => m.numero), 0)
+    return Array.from({ length: alto }, (_, i) => porNumero.get(i + 1) ?? { numero: i + 1, libre: true })
+  }, [mesas, hayFiltro, totalMesas])
 
   // Cambiar `intento` vuelve a correr el efecto: cierra el canal muerto y abre uno nuevo.
   function reconectar() {
@@ -316,8 +345,9 @@ export default function Host() {
     setIntento(n => n + 1)
   }
 
-  function abrirEdicion(numero) {
+  function abrirEdicion(numero, hueco = null) {
     setEditando(numero)
+    setHuecoTocado(hueco)
     if (!salon) traerSalon()
   }
 
@@ -354,8 +384,8 @@ export default function Host() {
       {(enAlta || mesaEnEdicion) && (
         <EditarMesa
           mesa={mesaEnEdicion ?? null} bloque={bloque} salon={salon} carreras={catalogo}
-          cargando={trayendoSalon}
-          onCerrar={() => setEditando(null)}
+          cargando={trayendoSalon} numeroInicial={enAlta ? huecoTocado : null}
+          onCerrar={() => { setEditando(null); setHuecoTocado(null) }}
           onGuardado={async () => {
             await Promise.all([traer(), traerSalon()])
             setAbierta(null)
@@ -509,8 +539,24 @@ export default function Host() {
         )}
 
         {mesas && filtradas.length > 0 && vista === 'rejilla' && (
-          <RejillaMesas total={filtradas.length}>
-            {filtradas.map(m => {
+          <RejillaMesas total={hayFiltro ? filtradas.length : celdas.length}>
+            {(hayFiltro ? filtradas : celdas).map(m => {
+              if (m.libre) {
+                // Con la base viva se puede asignar ahí mismo; sin ella, solo se ve.
+                const tocable = fuente === 'viva'
+                return (
+                  <button
+                    key={m.numero} disabled={!tocable}
+                    onClick={() => abrirEdicion('nueva', m.numero)}
+                    className="rounded-lg border border-dashed border-lavanda/25 bg-transparent px-2 py-2
+                               text-left min-h-[62px] flex flex-col justify-between text-lavanda/40
+                               transition-transform active:scale-95 disabled:active:scale-100"
+                  >
+                    <span className="text-[11px] font-bold cifra">{m.numero}</span>
+                    <span className="text-[11px] leading-tight">Libre</span>
+                  </button>
+                )
+              }
               const p = pintar(m, ahora)
               return (
                 <button

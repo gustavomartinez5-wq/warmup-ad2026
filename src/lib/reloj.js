@@ -5,6 +5,9 @@
  * parpadeante al llegar a 20, y rojo fijo de ahí en adelante para ver cuánto
  * lleva de más. Los usan igual la pantalla del reclutador y la del host: si el
  * reclutador ve rojo, el equipo tiene que ver rojo.
+ *
+ * El parpadeo solo se pinta en la hoja de detalle de `/host`. En `/mesa` se
+ * quitó el 21-sep: frente al estudiante, el reclutador lo sentía como regaño.
  */
 
 export const AMBAR    = 18 * 60

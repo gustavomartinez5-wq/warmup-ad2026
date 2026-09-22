@@ -4,6 +4,7 @@ import { mesasDelBloque, cambiarEstado, recordarMesa, mesaRecordada, olvidarMesa
   from '../lib/mesaPublica'
 import { bloquePorReloj, segundosDesde, comoReloj, tonoDelTiempo, deMas } from '../lib/reloj'
 import { textoEstado } from '../lib/estadoVivo'
+import { mantenerPantallaEncendida } from '../lib/alerta'
 import { etiquetaBloque } from '../lib/cifras'
 import { mesasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import Cargando from '../components/Cargando'
@@ -34,12 +35,12 @@ function Encabezado({ children }) {
 
 /* ── Elegir mesa ──────────────────────────────────────────────────────────── */
 
-function Elegir({ bloque, onBloque, onElegir }) {
+function Elegir({ bloque, onBloque, onElegir, buscaInicial = '' }) {
   // Arranca con el mapa horneado: la lista se ve completa desde el primer
   // instante, y si la base no contesta al menos se puede encontrar la mesa.
   const [mesas, setMesas] = useState(() => mesasFijas(bloque))
   const [fria, setFria]   = useState(true)
-  const [busca, setBusca] = useState('')
+  const [busca, setBusca] = useState(buscaInicial)
 
   useEffect(() => {
     let vivo = true
@@ -98,7 +99,7 @@ function Elegir({ bloque, onBloque, onElegir }) {
               {lista.map(m => (
                 <li key={m.numero}>
                   <button
-                    onClick={() => onElegir(m.numero)}
+                    onClick={() => onElegir(m.numero, m.empresa)}
                     className="w-full flex items-center gap-3 text-left rounded-xl border border-lavanda/20
                                bg-marino-alto/50 hover:border-cian/60 active:scale-[0.99]
                                px-4 py-3.5 transition-all"
@@ -133,13 +134,15 @@ function Elegir({ bloque, onBloque, onElegir }) {
 
 /* ── Mi mesa ──────────────────────────────────────────────────────────────── */
 
-function MiMesa({ numero, bloque, onCambiarMesa }) {
+function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA, onVerEmpresa }) {
   // Sembrada del mapa horneado: aunque la base no conteste, el reclutador
-  // confirma que está parado en la mesa correcta.
+  // confirma que está parado en la mesa correcta. Si el mapa ya dice otra
+  // empresa en ese número, no se siembra: sería enseñarle una mesa ajena.
   // Memorizada: sin esto cambia de identidad en cada render, `traer` con ella,
   // y el efecto del canal la seguiría remontando sin parar.
   const sembrada = useMemo(
-    () => mesasFijas(bloque).find(m => m.numero === numero) ?? null, [numero, bloque])
+    () => mesasFijas(bloque).find(m => m.numero === numero && (!empresa || m.empresa === empresa)) ?? null,
+    [numero, bloque, empresa])
   const [mesa, setMesa]       = useState(sembrada)
   const [fria, setFria]       = useState(true)
   const [error, setError]     = useState(null)
@@ -147,6 +150,7 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
   const [ahora, setAhora]     = useState(Date.now())
   const [enlace, setEnlace]   = useState('conectando')
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
+  const [cambio, setCambio]   = useState(null)   // el equipo movió la mesa
   const desmontado = useRef(false)
 
   const traer = useCallback(async () => {
@@ -154,15 +158,29 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
       const todas = await mesasDelBloque(bloque)
       const mia = todas.find(m => m.numero === numero)
       if (desmontado.current) return
+      // El equipo pudo mover la mesa, intercambiarla o liberarla. El QR es uno
+      // solo, así que el teléfono no se entera por el acrílico: se entera
+      // porque en su número ya no está su empresa.
+      if (empresa && (!mia || mia.empresa !== empresa)) {
+        setCambio({
+          ahora: mia?.empresa ?? null,
+          suyas: todas.filter(m => m.empresa === empresa).map(m => m.numero),
+        })
+        setFria(false); setError(null)
+        return
+      }
       if (!mia) { setError(`La mesa ${numero} no está asignada en ${etiquetaBloque(bloque)}.`); return }
-      setMesa(mia); setFria(false); setError(null)
+      // Un teléfono que eligió su mesa antes de que se guardara la empresa la
+      // aprende aquí, de la base, para poder notar un cambio después.
+      if (!empresa) onEmpresa(mia.empresa)
+      setCambio(null); setMesa(mia); setFria(false); setError(null)
     } catch (e) {
       // Si hay mesa sembrada, la banda de arriba ya explica que la base no
       // contesta. Abajo solo se quedan los errores de guardado, que sí son
       // de algo que el reclutador acaba de intentar.
       if (!desmontado.current && !sembrada) setError(e.message ?? String(e))
     }
-  }, [numero, bloque, sembrada])
+  }, [numero, bloque, sembrada, empresa, onEmpresa])
 
   useEffect(() => {
     desmontado.current = false
@@ -204,6 +222,15 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
     return () => clearInterval(id)
   }, [])
 
+  // A media entrevista la pantalla no se apaga: el reclutador no tiene que
+  // desbloquear el teléfono frente al estudiante para ver el tiempo. Fuera de
+  // una sesión se deja apagar, para que la batería aguante el bloque.
+  const ocupada = mesa?.estado === 'ocupado'
+  useEffect(() => {
+    if (!ocupada) return
+    return mantenerPantallaEncendida()
+  }, [ocupada])
+
   async function marcar(estado) {
     setMandando(estado)
     try {
@@ -214,6 +241,52 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
       setError(e.message ?? String(e))
     }
     setMandando(null)
+  }
+
+  if (cambio) {
+    const [unica] = cambio.suyas
+    const enBloque = etiquetaBloque(bloque).toLowerCase()
+    return (
+      <div className="min-h-dvh max-w-md mx-auto flex flex-col">
+        <Encabezado />
+        <div className="px-5 space-y-4">
+          <div className="rounded-2xl border border-cian/50 bg-cian/10 px-4 py-4">
+            <p className="text-lg font-extrabold">Tu mesa cambió</p>
+            <p className="text-sm text-lavanda/80 mt-1.5 leading-relaxed">
+              {cambio.ahora
+                ? <>La mesa <span className="cifra">{numero}</span> ahora es de {cambio.ahora}.</>
+                : <>La mesa <span className="cifra">{numero}</span> ya no está asignada en {enBloque}.</>}
+              {' '}
+              {cambio.suyas.length === 1
+                ? <>{empresa} está en la mesa <span className="cifra">{unica}</span>.</>
+                : cambio.suyas.length > 1
+                  ? <>{empresa} tiene <span className="cifra">{cambio.suyas.length}</span> mesas en
+                      este bloque.</>
+                  : <>{empresa} no aparece en {enBloque}. Pregunta a un host.</>}
+            </p>
+          </div>
+          {cambio.suyas.length === 1 && (
+            <button onClick={() => onIrA(unica)}
+              className="w-full rounded-2xl bg-teal hover:bg-teal-hondo py-4 font-extrabold text-base
+                         transition-colors">
+              Ir a la mesa <span className="cifra">{unica}</span>
+            </button>
+          )}
+          {cambio.suyas.length > 1 && (
+            <button onClick={() => onVerEmpresa(empresa)}
+              className="w-full rounded-2xl bg-teal hover:bg-teal-hondo py-4 font-extrabold text-base
+                         transition-colors">
+              Ver las mesas de {empresa}
+            </button>
+          )}
+          <button onClick={onCambiarMesa}
+            className="w-full rounded-xl border border-lavanda/25 text-lavanda/75 hover:text-white
+                       py-3 font-bold text-sm transition-colors">
+            Elegir otra mesa
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (error && !mesa) {
@@ -254,10 +327,16 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
                            grid place-items-center text-base font-extrabold cifra shrink-0">
             {numero}
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="text-lg font-extrabold leading-tight">{mesa.empresa}</h1>
             {mesa.giro && <p className="text-xs text-lavanda/55 mt-0.5">{mesa.giro}</p>}
           </div>
+          {/* Junto al número, que es donde se nota que se eligió mal. */}
+          <button onClick={onCambiarMesa}
+            className="shrink-0 mt-0.5 rounded-lg border border-cian/50 text-cian hover:bg-cian/10
+                       px-2.5 py-1 text-xs font-semibold transition-colors">
+            Cambiar
+          </button>
         </div>
       </div>
 
@@ -266,8 +345,10 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
           <p className="text-[11px] uppercase tracking-widest text-lavanda/40">
             {corriendo ? 'Sesión en curso' : 'Sin sesión'}
           </p>
+          {/* Sin parpadeo: frente al estudiante se leía como regaño. El rojo y
+              «de más» ya dicen que se pasó. */}
           <p className={`text-[64px] leading-none font-extrabold cifra mt-1.5 transition-colors
-                         ${corriendo ? tono.clase : 'text-lavanda/20'} ${tono.parpadea ? 'late' : ''}`}>
+                         ${corriendo ? tono.clase : 'text-lavanda/20'}`}>
             {comoReloj(segundos)}
           </p>
           {exceso && corriendo && (
@@ -317,13 +398,6 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
           </p>
         )}
       </div>
-
-      <div className="px-5 pb-6">
-        <button onClick={onCambiarMesa}
-          className="text-xs text-lavanda/40 hover:text-lavanda underline underline-offset-2">
-          Esta no es mi mesa
-        </button>
-      </div>
     </div>
   )
 }
@@ -331,22 +405,42 @@ function MiMesa({ numero, bloque, onCambiarMesa }) {
 /* ── La ruta ──────────────────────────────────────────────────────────────── */
 
 export default function Mesa() {
-  const guardada = mesaRecordada()
-  const [bloque, setBloque] = useState(guardada?.bloque ?? bloquePorReloj())
-  const [numero, setNumero] = useState(guardada?.numero ?? null)
+  const [guardada] = useState(mesaRecordada)
+  const [bloque, setBloque]   = useState(guardada?.bloque ?? bloquePorReloj())
+  const [numero, setNumero]   = useState(guardada?.numero ?? null)
+  const [empresa, setEmpresa] = useState(guardada?.empresa ?? null)
+  const [buscaInicial, setBuscaInicial] = useState('')
 
-  function elegir(n) {
-    setNumero(n)
-    recordarMesa(n, bloque)
+  function elegir(n, emp) {
+    setNumero(n); setEmpresa(emp ?? null)
+    recordarMesa(n, bloque, emp ?? null)
   }
 
+  // Estable: `traer` la tiene de dependencia y remontaría el canal en cada render.
+  const aprenderEmpresa = useCallback(emp => {
+    setEmpresa(emp)
+    if (numero !== null) recordarMesa(numero, bloque, emp)
+  }, [numero, bloque])
+
   function cambiarMesa() {
-    setNumero(null)
+    setNumero(null); setEmpresa(null); setBuscaInicial('')
     olvidarMesa()
     setBloque(bloquePorReloj())
   }
 
+  // La mesa nueva de su empresa. El bloque no cambia: el equipo la movió dentro de él.
+  function irA(n) {
+    setNumero(n)
+    recordarMesa(n, bloque, empresa)
+  }
+
+  function verEmpresa(emp) {
+    setNumero(null); setEmpresa(null); setBuscaInicial(emp)
+    olvidarMesa()
+  }
+
   return numero === null
-    ? <Elegir bloque={bloque} onBloque={setBloque} onElegir={elegir} />
-    : <MiMesa numero={numero} bloque={bloque} onCambiarMesa={cambiarMesa} />
+    ? <Elegir bloque={bloque} onBloque={setBloque} onElegir={elegir} buscaInicial={buscaInicial} />
+    : <MiMesa key={`${bloque}-${numero}`} numero={numero} bloque={bloque} empresa={empresa}
+        onEmpresa={aprenderEmpresa} onCambiarMesa={cambiarMesa} onIrA={irA} onVerEmpresa={verEmpresa} />
 }

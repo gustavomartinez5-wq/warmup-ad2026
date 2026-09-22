@@ -3,8 +3,8 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **17 de septiembre de 2026**, con los expertos de portafolio y el
-control completo del salón.
+Última actualización: **21 de septiembre de 2026**, con los ajustes al salón que salieron de la
+simulación de Antigravity.
 
 ---
 
@@ -27,10 +27,8 @@ control completo del salón.
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
-1. **Commitear y subir lo del 17-sep por la tarde, más los 7 commits de antes.** `git push`
-   falla con 403: git en esta máquina autentica como `tsunamipro-dev`, sin escritura en el
-   repo. Lo corre Gustavo desde su terminal. **Hasta que no se despliegue, producción sigue
-   con el salón de 74 mesas y sin los expertos**; la base ya está al día.
+1. ~~Subir lo del 17-sep.~~ Resuelto: desde el 21-sep el `git push` funciona desde esta máquina
+   y Vercel despliega solo.
 
 2. **Las dos pruebas que piden sesión del equipo.** Son dos minutos y las tiene que hacer
    Gustavo, porque las contraseñas no pasan por el chat: abrir `/host` con la cuenta del
@@ -42,6 +40,28 @@ control completo del salón.
 5. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
 
 ## Fases cerradas
+
+### Ajustes al salón por la simulación de Antigravity · 21-sep-2026
+
+Cuatro agentes (dos reclutadores y dos hosts) recorrieron `/mesa` y `/host`. El reporte está en
+`Ediciones/WarmUp AD26/WarmUp AD26 - Simulación del salón y reclutadores.md`. Gustavo eligió qué
+aplicar:
+
+- **`/mesa` se da cuenta si le mueven la mesa.** El teléfono guarda la empresa junto con el
+  número. Si en su número ya no está su empresa, sale «Tu mesa cambió»: con una sola mesa en el
+  bloque, «Ir a la mesa N»; con varias, la lista filtrada por su empresa. Cubre también el
+  intercambio, en el que el número sigue asignado pero a otra empresa. El QR sigue siendo uno solo.
+- **`/mesa`:** el reloj ya no parpadea a los 20 (queda rojo con «de más»); «Cambiar» pasó del pie al
+  encabezado; la pantalla no se apaga mientras la mesa está Ocupado.
+- **`EditarMesa`:** Recorrer e Intercambiar piden confirmar, como Liberar, y dicen qué empresas se
+  mueven.
+- **`/host`:** sin filtro, la Rejilla pinta del 1 al total y la mesa libre queda punteada; al
+  tocarla se abre Agregar con ese número. El buscador busca por palabras: «IMT manufactura» trae
+  las que coinciden con las dos.
+
+Verificado a 390 px con datos simulados: los tres casos de mesa cambiada, el reloj sin `late`, el
+wake lock que se pide y se suelta, «18 · Libre» en su lugar y la confirmación sin llamada a la base
+hasta tocar «Sí, mover».
 
 ### Expertos de portafolio, 75 mesas y control completo del salón · 17-sep-2026
 

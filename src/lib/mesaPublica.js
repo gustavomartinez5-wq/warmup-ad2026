@@ -30,17 +30,20 @@ export async function cambiarEstado(numero, bloque, estado) {
  */
 const LLAVE = 'warmup-mi-mesa'
 
-export function recordarMesa(numero, bloque) {
-  try { localStorage.setItem(LLAVE, JSON.stringify({ numero, bloque })) } catch { /* modo privado */ }
+// La empresa se guarda para darse cuenta si el equipo mueve la mesa: el QR es
+// uno solo, así que el número recordado es lo único que conecta al teléfono con
+// su lugar en el salón.
+export function recordarMesa(numero, bloque, empresa = null) {
+  try { localStorage.setItem(LLAVE, JSON.stringify({ numero, bloque, empresa })) } catch { /* modo privado */ }
 }
 
 export function mesaRecordada() {
   try {
     const crudo = localStorage.getItem(LLAVE)
     if (!crudo) return null
-    const { numero, bloque } = JSON.parse(crudo)
+    const { numero, bloque, empresa } = JSON.parse(crudo)
     return Number.isInteger(numero) && (bloque === 'b1' || bloque === 'b2')
-      ? { numero, bloque } : null
+      ? { numero, bloque, empresa: typeof empresa === 'string' ? empresa : null } : null
   } catch { return null }
 }
 

@@ -31,6 +31,10 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   medias. Van por las funciones de la migración 08 —`mover_mesa`, `intercambiar_mesas`,
   `recorrer_mesas`, `liberar_mesa`, `agregar_mesa`, `cambiar_empresa_de_mesa`—, que hacen el
   baile completo en una transacción y anotan en la bitácora.
+- **El QR de las mesas es uno solo, y el teléfono recuerda número y empresa.** Si el equipo mueve,
+  intercambia o libera la mesa, `/mesa` lo nota porque en su número ya no está su empresa, y
+  muestra «Tu mesa cambió» con la mesa nueva. Si se quita la empresa de lo que se guarda en
+  `recordarMesa`, el reclutador se queda marcando una mesa ajena sin enterarse.
 - **La fila no guarda datos de personas.** Un turno es folio, servicio y estado. Ni nombre, ni
   matrícula, ni carrera: los datos de estudiantes no pueden subir a Supabase ni a Vercel, y la
   forma de cumplirlo es no tenerlos. Si alguna vez hace falta un dato de la persona, no se
