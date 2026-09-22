@@ -1,37 +1,9 @@
 {
-  "generado_en": "2026-09-18T20:55:35.022Z",
+  "generado_en": "2026-09-22T16:44:02.652Z",
   "bloques": {
     "b1": [
       {
         "numero": 1,
-        "empresa": "Management Solutions",
-        "giro": "Consultoría",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "BME",
-          "IDM",
-          "IFI",
-          "IID",
-          "IIS",
-          "IMT",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LEC",
-          "LIN",
-          "LIT",
-          "LRI"
-        ]
-      },
-      {
-        "numero": 2,
         "empresa": "Management Solutions",
         "giro": "Consultoría",
         "carreras": [
@@ -164,38 +136,6 @@
           "LTM",
           "LTP",
           "LUB"
-        ]
-      },
-      {
-        "numero": 5,
-        "empresa": "Redwood Logistics",
-        "giro": "Logística y transporte",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "IIS",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LIN",
-          "LRI"
-        ]
-      },
-      {
-        "numero": 6,
-        "empresa": "Redwood Logistics",
-        "giro": "Logística y transporte",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "IIS",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LIN",
-          "LRI"
         ]
       },
       {
@@ -2076,6 +2016,14 @@
         ]
       },
       {
+        "numero": 73,
+        "empresa": "Portafolio · Diseño (Steelcase)",
+        "giro": "Revisión de portafolio",
+        "carreras": [
+          "LDI"
+        ]
+      },
+      {
         "numero": 74,
         "empresa": "Portafolio · Diseño",
         "giro": "Revisión de portafolio",
@@ -2122,51 +2070,7 @@
         ]
       },
       {
-        "numero": 2,
-        "empresa": "Management Solutions",
-        "giro": "Consultoría",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "BME",
-          "IDM",
-          "IFI",
-          "IID",
-          "IIS",
-          "IMT",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LEC",
-          "LIN",
-          "LIT",
-          "LRI"
-        ]
-      },
-      {
         "numero": 5,
-        "empresa": "Redwood Logistics",
-        "giro": "Logística y transporte",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "IIS",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LIN",
-          "LRI"
-        ]
-      },
-      {
-        "numero": 6,
         "empresa": "Redwood Logistics",
         "giro": "Logística y transporte",
         "carreras": [
@@ -3359,6 +3263,29 @@
           "IC",
           "LDI",
           "LUB"
+        ]
+      },
+      {
+        "numero": 53,
+        "empresa": "GPvivienda",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC",
+          "LDI"
+        ]
+      },
+      {
+        "numero": 54,
+        "empresa": "EATON",
+        "giro": "Manufactura",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT"
         ]
       },
       {

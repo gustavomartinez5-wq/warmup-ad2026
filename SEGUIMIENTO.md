@@ -42,6 +42,43 @@ día completo.
 
 ## Fases cerradas
 
+### Management Solutions y GPvivienda · 22-sep-2026
+
+Dos cambios que avisó Gustavo, con los datos del Forms del 22-sep (`… 28 de septiembre (3).xlsx`).
+Libro con Excel COM (respaldo «antes de Management Solutions y GPvivienda 22-sep») y base por SQL.
+
+| Cambio | Mesa |
+|---|---|
+| Management Solutions baja a 1 persona en los dos bloques. Se queda el consultor de la oficina MTY | B1-1 y B2-1. La 2 queda libre en los dos bloques |
+| GPvivienda, empresa nueva (registro 65): Arquitectura y construcción, ARQ, IC y LDI | B2-53 |
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 62 empresas · 72 en B1 · 58 en B2 · 780 de capacidad |
+| Lector de la app sobre el libro | 62 y 130, sin avisos |
+| Libro contra base (md5) | Idénticos: 130 reclutadores, 62 empresas |
+| `hornear-mapa.mjs --verificar` | Al día: 72 y 58 |
+| `npm run build` | Limpio |
+
+Después, con el OK de Gustavo, entró lo demás del mismo archivo (respaldo «antes de Steelcase,
+Redwood y EATON 22-sep»):
+
+| Cambio | Mesa |
+|---|---|
+| Una persona de Steelcase revisa portafolio LDI. Experta aparte: `Portafolio · Diseño (Steelcase)`, EP-6 | B1-73. La zona de portafolio de B1 pasa a 73–75 |
+| Redwood, registro 64: 1 persona, solo B2. Sale de B1 y sale la segunda «Por definir». Queda como pendiente confirmar B1 | B2-5. Libres B1-5, B1-6, B2-6 |
+| EATON, empresa nueva (registro 66): Manufactura, IIS, BIE, IM, IMA, IMT, BME. El correo dice «.con»: pendiente | B2-54 |
+| Definity, Areya y BECK también revisan portafolio, sin mesa extra | — |
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 64 empresas · 71 en B1 · 58 en B2 · 774 de capacidad · 10 por confirmar |
+| Libro contra base (md5) | Idénticos: 129 reclutadores, 64 empresas |
+| `hornear-mapa.mjs --verificar` | Al día: 71 y 58 |
+
+La hoja «Expertos Portafolio» pone a tres personas de Areya en B2 que no están en el libro (ahí
+Areya solo tiene una persona, en B2-52). No se les dio mesa: revisan en la de su empresa.
+
 ### Lo que se aplicó de la simulación del día completo · 22-sep-2026
 
 Gustavo marcó el reporte.

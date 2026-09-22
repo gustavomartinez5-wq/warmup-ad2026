@@ -156,15 +156,20 @@ Paleta CVDP. Teal, ámbar y rojo son semánticos (DEC-019): aquí el color **es*
 
 ## Los expertos de portafolio
 
-Cinco personas de EAAD dan revisión de portafolio creativo, no reclutamiento. Entran como una
+Seis personas dan revisión de portafolio creativo, no reclutamiento: cinco de EAAD y una de
+Steelcase, `Portafolio · Diseño (Steelcase)`. Entran como una
 empresa cada una —`Portafolio · Diseño`, `Portafolio · Urbanismo`…— porque **las carreras van
 pegadas a la empresa y no a la mesa**: con una sola empresa de cinco mesas, el estudiante de
 urbanismo saldría mandado a la mesa de animación.
 
-Las cinco llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
+Las seis llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
 Es lo que saca la zona completa con el filtro de giro de `/host` y lo que hace que la hoja
 impresa las nombre aparte. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
-Bloque 1 solo la 74 y la 75, y la 73 queda libre para cualquier empresa (decidido el 22-sep).
+Bloque 1 también son 73, 74 y 75: la 73, que se había dejado libre el 22-sep, la ocupa la experta
+de Steelcase desde ese mismo día.
+
+Las empresas que además revisan portafolio (Definity, Areya, BECK) no llevan mesa extra: la
+hoja «Expertos Portafolio» del equipo solo dice quién revisa. Mesa aparte solo para expertos.
 
 **Tipografía: Inter, no Neue Haas.** Neue Haas está licenciada y el repo es público. Inter es
 neo-grotesca como ella y se carga de Google Fonts. Es la única desviación consciente del

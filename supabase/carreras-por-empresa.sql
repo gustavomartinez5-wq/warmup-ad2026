@@ -98,7 +98,10 @@ mapa (empresa, siglas) as (
   ('Danfoss',                  g.manuf || array['ITC','ITD','LIN','BGB','LAF','LCPF','LAE','LEM']),
   ('Heineken México',          g.todas),
   -- Se sumó el 17-sep-2026; las carreras las dio Gustavo
-  ('BECK',                     array['IC','ARQ'])
+  ('BECK',                     array['IC','ARQ']),
+  -- Se sumaron el 22-sep-2026
+  ('GPvivienda',               array['ARQ','IC','LDI']),
+  ('EATON',                    array['IIS','BIE','IM','IMA','IMT','BME'])
 
   ) as v(empresa, siglas)
 ),
