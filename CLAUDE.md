@@ -46,6 +46,10 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
 - **`reclutadores` no entra a la publicación de tiempo real.** Trae nombres de personas de fuera
   del Tec. Los cambios de forma del salón se avisan por el canal de difusión `salon-<bloque>`, y
   el aviso no lleva datos: el texto que se lee vive en la pantalla, no en el mensaje.
+- **La forma del salón vive en `src/lib/plano.js` y dice lo mismo que el mapa oficial**
+  (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento.html`, en el vault): 15 columnas de 5,
+  zigzag desde la mesa 1 abajo a la derecha, acceso frente a las mesas 31 a 40. Es lo que pinta la
+  vista Plano de `/host`. Si el salón cambia, se corrigen los dos.
 - **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
   `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
   cuando la base no contesta y lo que sale en la hoja impresa; si se queda atrás, el día del

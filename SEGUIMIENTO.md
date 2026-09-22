@@ -42,6 +42,28 @@ día completo.
 
 ## Fases cerradas
 
+### Plano del salón en /host · 22-sep-2026
+
+Tercera vista en `/host`: Rejilla · Plano · Lista. Pinta las mesas donde están en el piso, según el
+mapa oficial del vault (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento.html`). La forma vive
+en `src/lib/plano.js` y la pinta `src/components/PlanoSalon.jsx`.
+
+- Abajo de 900 px va vertical: mesa 1 arriba, puertas de servicio a la izquierda, acceso a la
+  derecha. Desde 900 px va como el mapa oficial: mesa 1 abajo a la derecha, acceso abajo.
+- Nombre completo de la empresa en hasta tres renglones; una palabra larga baja un punto para no
+  partirse. Portafolio lleva contorno punteado y se nombra por su perfil.
+- Mismos colores, reloj, hoja de detalle y alta en mesa libre que la rejilla. Con filtro, las que
+  no coinciden se apagan sin moverse.
+
+| Prueba | Resultado |
+|---|---|
+| Posición de 1, 5, 6, 10, 31, 35, 36, 40, 71 y 75 contra el mapa oficial | Cuadran; acceso frente a 31–40 |
+| 390, 768, 1024 y 1280 px, los dos bloques | Sin nombres cortados, sin palabras partidas, sin scroll lateral |
+| `npm run build` | Limpio |
+
+Se verificó en una página local temporal con el mapa fijo y estados de mentira, porque `/host` pide
+sesión. Falta que Gustavo lo vea en `/host` real. Si convence, se replica en admin.
+
 ### Management Solutions y GPvivienda · 22-sep-2026
 
 Dos cambios que avisó Gustavo, con los datos del Forms del 22-sep (`… 28 de septiembre (3).xlsx`).

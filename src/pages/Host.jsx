@@ -9,6 +9,7 @@ import { catalogoDeCarreras } from '../lib/carreras'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import { plano, contiene } from '../lib/texto'
 import RejillaMesas from '../components/RejillaMesas'
+import PlanoSalon from '../components/PlanoSalon'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
 import EditarMesa from '../components/EditarMesa'
@@ -336,13 +337,16 @@ export default function Host() {
    * liberar una todas las de después se recorrían un lugar y el hueco no se
    * veía. Con filtro se quedan solo las que coinciden: ahí los huecos estorban.
    */
-  const celdas = useMemo(() => {
+  const salonCompleto = useMemo(() => {
     const lista = mesas ?? []
-    if (hayFiltro) return lista
     const porNumero = new Map(lista.map(m => [m.numero, m]))
     const alto = Math.max(totalMesas ?? 0, ...lista.map(m => m.numero), 0)
     return Array.from({ length: alto }, (_, i) => porNumero.get(i + 1) ?? { numero: i + 1, libre: true })
-  }, [mesas, hayFiltro, totalMesas])
+  }, [mesas, totalMesas])
+  const celdas = hayFiltro ? (mesas ?? []) : salonCompleto
+
+  // El plano no quita mesas al filtrar: apaga las que no coinciden.
+  const coinciden = hayFiltro ? new Set(filtradas.map(m => m.numero)) : null
 
   // Cambiar `intento` vuelve a correr el efecto: cierra el canal muerto y abre uno nuevo.
   function reconectar() {
@@ -442,7 +446,7 @@ export default function Host() {
             ))}
           </div>
           <div className="flex rounded-lg border border-lavanda/20 overflow-hidden">
-            {[['rejilla', 'Rejilla'], ['lista', 'Lista']].map(([v, t]) => (
+            {[['rejilla', 'Rejilla'], ['plano', 'Plano'], ['lista', 'Lista']].map(([v, t]) => (
               <button
                 key={v} onClick={() => setVista(v)}
                 className={`px-3 py-1.5 text-xs font-bold transition-colors ${
@@ -582,6 +586,13 @@ export default function Host() {
               )
             })}
           </RejillaMesas>
+        )}
+
+        {mesas && filtradas.length > 0 && vista === 'plano' && (
+          <PlanoSalon
+            salon={salonCompleto} coincide={coinciden} ahora={ahora} tocable={fuente === 'viva'}
+            onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
+          />
         )}
 
         {mesas && filtradas.length > 0 && vista === 'lista' && (
