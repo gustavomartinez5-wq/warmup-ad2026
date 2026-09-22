@@ -35,12 +35,39 @@ día completo.
    equipo, tocar una mesa y darle a Guardar; y con dos `/host` abiertos a la vez, ver que el
    cambio aparece en el otro sin recargar.
 3. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
-   P&G, Vitro, Redwood), Index como Regal Rexnord, y si Clarios trae a alguien en Bloque 1.
+   P&G, Vitro, Redwood, SEG), Index como Regal Rexnord, y el correo «.con» de EATON.
 4. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
 5. ~~Los dos agentes de host en Sonnet.~~ Hecho el 21-sep, dentro de la simulación del día
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Mapa compactado con el Excel del equipo · 22-sep-2026
+
+Datos del Excel del equipo del 22-sep (`… 28 de septiembre (4).xlsx`), hojas Reclutadores y
+Expertos Portafolio. Libro con Excel COM (respaldo «antes de compactar mapa 22-sep») y base por
+SQL: no hay credenciales del equipo para correr el importador.
+
+| Cambio | Decisión de Gustavo |
+|---|---|
+| BBVA solo en Bloque 1 | Sale de B2 |
+| Definity: dos personas aparecen solo en Expertos Portafolio | Siguen en sus mesas; revisan portafolio sin mesa extra |
+| Redwood: su reclutadora en los dos bloques y una persona por definir en los dos | Se usa lo del Excel, porque aún están por definir |
+| SEG anotó 2 personas y dio 1 nombre | Entra «Por definir» en B2 |
+| Clarios | Contacto actualizado a la reclutadora de Bloque 2 |
+| Mapa | Compactado: primero las 11 empresas de todo el día (1–22, mismo número en los dos bloques), luego las de un bloque, cada una en mesas seguidas. B1 1–70, B2 1–57, portafolio 73–75 |
+
+| Prueba | Resultado |
+|---|---|
+| Tablero del libro | 65 empresas · 73 en B1 · 60 en B2 · 73 mesas · 798 de capacidad · 13 por confirmar |
+| Libro contra base (md5 por bloque) | Idénticos |
+| SQL | Sin mesas repetidas, ninguna empresa partida, las de todo el día con el mismo número |
+| `hornear-mapa.mjs --verificar` | Al día: 73 y 60 |
+| `/mesa` a 375 px | Mesas nuevas, sin scroll lateral |
+| `npm run build` | Limpio |
+
+Primer intento: `Range.Sort` de COM ordenó columnas en vez de filas. Se restauró el respaldo y se
+rehízo sin ordenar la hoja.
 
 ### Plano del salón en /host · 22-sep-2026
 

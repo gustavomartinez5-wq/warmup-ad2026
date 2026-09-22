@@ -192,8 +192,13 @@ número dio un sobrecupo de seis que no existía.
 ## Verificación
 
 La prueba dura: después de importar, las cifras de la app tienen que dar **igual que el
-Tablero del Excel**. Al corte del 17-sep-2026, con los expertos de portafolio: 60 empresas,
-73 reclutadores en Bloque 1, 57 en Bloque 2, 74 mesas apartadas de 75, 780 atenciones.
+Tablero del Excel**. Al corte del 22-sep-2026, con el mapa compactado y los expertos de
+portafolio: 65 empresas, 73 reclutadores en Bloque 1, 60 en Bloque 2, 73 mesas apartadas de 75,
+798 atenciones, 13 nombres por confirmar.
+
+**El mapa va compactado desde el 22-sep.** Primero las empresas de todo el día (1–22), con el
+mismo número en los dos bloques; luego las de un solo bloque, cada una en mesas seguidas.
+Bloque 1 ocupa 1–70 y Bloque 2 1–57; portafolio sigue en 73–75. Libres: B1 71–72, B2 58–72.
 
 ## La fila del día del evento
 
