@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../../lib/mapaFijo'
 import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../../lib/cifras'
+import { MESAS_EN_PLANO, nombreCorto, tienePalabraLarga } from '../../lib/plano'
+import PlanoSalon from '../../components/PlanoSalon'
 
 /**
  * El salón en papel. Es el último respaldo: si se cae Supabase, Vercel, el wifi
@@ -87,15 +90,114 @@ function Hoja({ bloque, ultima }) {
   )
 }
 
+/** Cuántas siglas caben en una mesa del papel antes de que la letra deje de leerse. */
+const SIGLAS_EN_LA_MESA = 12
+
+/**
+ * El salón dibujado, en papel. Va horizontal y en una hoja por bloque, con el
+ * mismo acomodo del mapa oficial. Se imprime como alternativa a las listas: la
+ * lista dice quién está en cada mesa; el plano dice dónde queda esa mesa.
+ */
+function HojaPlano({ bloque, ultima }) {
+  const mesas = mesasFijas(bloque)
+  const porNumero = new Map(mesas.map(m => [m.numero, m]))
+  const portafolio = mesas.filter(m => m.giro === GIRO_PORTAFOLIO).map(m => m.numero)
+
+  const celda = numero => {
+    const m = porNumero.get(numero)
+    if (!m) {
+      return (
+        <div className="h-full min-h-[108px] rounded border border-dashed border-marino/25 px-1 py-1
+                        text-marino/35 text-[10px] font-bold cifra">
+          {numero}
+        </div>
+      )
+    }
+    const carreras = m.carreras ?? []
+    const dentro = carreras.slice(0, SIGLAS_EN_LA_MESA)
+    const resto = carreras.length - dentro.length
+    return (
+      <div className={`h-full min-h-[108px] rounded border px-[3px] py-1 flex flex-col gap-0.5 min-w-0
+                       ${m.giro === GIRO_PORTAFOLIO
+                         ? 'border-marino border-dashed bg-marino/5' : 'border-marino/70'}`}>
+        <span className="text-[10px] font-extrabold cifra leading-none">{numero}</span>
+        {/* En el papel la mesa es más angosta que en pantalla: la palabra larga
+            baja a 8 px para no partirse a media palabra. */}
+        <span className={`${tienePalabraLarga(nombreCorto(m.empresa))
+                            ? 'text-[8px] tracking-tighter' : 'text-[9px]'}
+                          leading-tight font-semibold break-words`}>
+          {nombreCorto(m.empresa)}
+        </span>
+        {carreras.length > 0 && (
+          <span className="text-[7px] leading-[1.25] text-marino/70 break-words">
+            {dentro.join(' ')}{resto > 0 ? ` +${resto}` : ''}
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="hoja hoja-plano bg-white text-marino rounded-2xl px-6 py-5"
+      style={ultima ? undefined : { breakAfter: 'page' }}
+    >
+      <div className="flex items-baseline justify-between gap-4 border-b-2 border-marino pb-2 mb-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-tec">CVDP</p>
+          <h2 className="text-xl font-extrabold leading-tight">
+            Warm Up AD2026 · {etiquetaBloque(bloque)} · el salón
+          </h2>
+        </div>
+        <p className="text-[11px] text-marino/60 shrink-0">
+          {mesas.length} mesas · datos del {fechaDelMapa()}
+        </p>
+      </div>
+
+      <PlanoSalon
+        orientacion="horizontal" tono="papel"
+        excedentes={mesas.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
+        celda={celda}
+      />
+
+      <p className="text-[10px] text-marino/70 mt-3">
+        La mesa 1 queda abajo a la derecha, junto al acceso. Debajo del nombre van las carreras que
+        busca la empresa.
+        {portafolio.length > 0 && (
+          <> Revisión de portafolio (EAAD), con contorno punteado:{' '}
+            <span className="cifra">{portafolio.join(', ')}</span>.</>
+        )}
+      </p>
+    </div>
+  )
+}
+
 export default function Impreso() {
+  const [que, setQue] = useState('listas')
+  const plano = que === 'plano'
+
   return (
     <section className="space-y-5">
       <div className="no-imprimir">
         <h2 className="text-xl font-extrabold">El salón en papel</h2>
         <p className="text-sm text-lavanda/60 mt-0.5 max-w-prose">
-          El respaldo de hasta abajo, para cuando no hay app ni señal. Dos hojas: quién está en
-          cada mesa y a qué mesa mandar cada carrera. Imprime una por host y una de repuesto.
+          El respaldo de hasta abajo, para cuando no hay app ni señal. Las listas dicen quién está
+          en cada mesa y a qué mesa mandar cada carrera; el plano dice dónde queda esa mesa.
+          Imprime una por host y una de repuesto.
         </p>
+      </div>
+
+      <div className="no-imprimir flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
+        {[['listas', 'Listas'], ['plano', 'Plano']].map(([v, t]) => (
+          <button
+            key={v} onClick={() => setQue(v)}
+            className={`px-3.5 py-2 text-xs font-bold transition-colors ${
+              que === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
+            }`}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
       <div className="no-imprimir rounded-xl border border-ambar/40 bg-ambar/10 px-4 py-3">
@@ -110,13 +212,15 @@ export default function Impreso() {
           onClick={() => window.print()}
           className="rounded-xl bg-tec hover:bg-tec-claro px-5 py-3 font-bold text-sm transition-colors"
         >
-          Imprimir las dos hojas
+          {plano ? 'Imprimir el plano de los dos bloques' : 'Imprimir las dos hojas'}
         </button>
       </div>
 
       <div className="space-y-5">
         {BLOQUES.map((b, i) => (
-          <Hoja key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1} />
+          plano
+            ? <HojaPlano key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1} />
+            : <Hoja key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1} />
         ))}
       </div>
     </section>

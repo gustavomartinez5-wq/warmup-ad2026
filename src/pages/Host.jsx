@@ -3,8 +3,9 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { supabase, edicionCompleta } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
 import { bloquePorReloj, comoReloj } from '../lib/reloj'
-import { BLOQUES, etiquetaBloque } from '../lib/cifras'
+import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import { ESTADOS, textoEstado, pintar, ordenarParaLista, contarPorEstado } from '../lib/estadoVivo'
+import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../lib/plano'
 import { catalogoDeCarreras } from '../lib/carreras'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import { plano, contiene } from '../lib/texto'
@@ -42,6 +43,51 @@ function Pastilla({ valor, texto, tono }) {
     <span className={`shrink-0 rounded-full border ${color} px-2.5 py-1 text-xs font-semibold`}>
       <span className="cifra">{valor}</span> {texto}
     </span>
+  )
+}
+
+/* ── La mesa dentro del plano ─────────────────────────────────────────────── */
+
+function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco }) {
+  const apagado = apagada ? 'opacity-25' : ''
+
+  if (mesa.libre) {
+    return (
+      <button
+        disabled={!tocable} onClick={() => onHueco(mesa.numero)}
+        aria-label={`Mesa ${mesa.numero}, libre`}
+        className={`w-full h-full min-h-[58px] rounded-md border border-dashed border-lavanda/25 px-1 py-1
+                    text-lavanda/35 text-[11px] font-bold cifra flex items-start justify-start
+                    transition-transform active:scale-95 disabled:active:scale-100 ${apagado}`}
+      >
+        {mesa.numero}
+      </button>
+    )
+  }
+
+  const p = pintar(mesa, ahora)
+  const nombre = nombreCorto(mesa.empresa)
+  const portafolio = mesa.giro === GIRO_PORTAFOLIO
+    ? 'outline-2 outline-dashed outline-offset-1 outline-lavanda' : ''
+  return (
+    <button
+      onClick={() => onAbrir(mesa.numero)}
+      aria-label={`Mesa ${mesa.numero}, ${mesa.empresa}, ${textoEstado(mesa.estado)}`}
+      title={`${mesa.numero} · ${mesa.empresa}`}
+      className={`w-full h-full min-h-[58px] rounded-md border ${angosta ? 'px-0.5' : 'px-1'} py-1
+                  text-left flex flex-col justify-between min-w-0 transition-transform active:scale-95
+                  ${p.celda} ${portafolio} ${apagado}`}
+    >
+      <span className="flex items-baseline justify-between gap-0.5 min-w-0">
+        <span className="text-[11px] font-extrabold cifra">{mesa.numero}</span>
+        {mesa.estado === 'ocupado' && (
+          <span className="text-[10px] font-bold cifra">{comoReloj(p.segundos)}</span>
+        )}
+      </span>
+      <span className={`${letraDelNombre(nombre, angosta)} leading-tight line-clamp-3 break-words font-medium`}>
+        {nombre}
+      </span>
+    </button>
   )
 }
 
@@ -404,7 +450,9 @@ export default function Host() {
         />
       )}
 
-      <header className="px-4 pt-5 pb-3 border-b border-lavanda/15 sticky top-0 z-20
+      {/* Con el celular acostado quedan 390 px de alto: un encabezado fijo se
+          come la pantalla y el salón no se alcanza a ver. Ahí se va con el scroll. */}
+      <header className="px-4 pt-5 pb-3 border-b border-lavanda/15 sticky [@media(max-height:560px)]:static top-0 z-20
                          bg-marino/85 backdrop-blur space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -590,8 +638,15 @@ export default function Host() {
 
         {mesas && filtradas.length > 0 && vista === 'plano' && (
           <PlanoSalon
-            salon={salonCompleto} coincide={coinciden} ahora={ahora} tocable={fuente === 'viva'}
-            onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
+            excedentes={salonCompleto.filter(m => !m.libre && m.numero > MESAS_EN_PLANO).map(m => m.numero)}
+            celda={(numero, { angosta }) => (
+              <MesaEnPlano
+                mesa={salonCompleto.find(m => m.numero === numero) ?? { numero, libre: true }}
+                apagada={coinciden ? !coinciden.has(numero) : false}
+                angosta={angosta} ahora={ahora} tocable={fuente === 'viva'}
+                onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
+              />
+            )}
           />
         )}
 

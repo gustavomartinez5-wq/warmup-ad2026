@@ -49,7 +49,8 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
 - **La forma del salón vive en `src/lib/plano.js` y dice lo mismo que el mapa oficial**
   (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento.html`, en el vault): 15 columnas de 5,
   zigzag desde la mesa 1 abajo a la derecha, acceso frente a las mesas 31 a 40. Es lo que pinta la
-  vista Plano de `/host`. Si el salón cambia, se corrigen los dos.
+  vista Plano de `/host` y de `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
+  salón cambia, se corrigen los dos.
 - **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
   `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
   cuando la base no contesta y lo que sale en la hoja impresa; si se queda atrás, el día del

@@ -1,9 +1,33 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useDatos } from '../../lib/datos'
-import { mapaDeMesas, ESTADO_MESA, BLOQUES, calcularCifras, faltan } from '../../lib/cifras'
+import { mapaDeMesas, ESTADO_MESA, BLOQUES, calcularCifras, faltan, GIRO_PORTAFOLIO } from '../../lib/cifras'
+import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../../lib/plano'
 import Cargando from '../../components/Cargando'
 import RejillaMesas from '../../components/RejillaMesas'
+import PlanoSalon from '../../components/PlanoSalon'
+
+/** La misma mesa en la rejilla y en el plano: número, empresa y el color de su estado. */
+function Mesa({ mesa, angosta = false, onAbrir }) {
+  const { clase } = ESTADO_MESA[mesa.estado]
+  const nombre = nombreCorto(mesa.reclutador?.empresa ?? '')
+  const portafolio = mesa.reclutador?.giro === GIRO_PORTAFOLIO
+    ? 'outline-2 outline-dashed outline-offset-1 outline-lavanda' : ''
+  return (
+    <button
+      onClick={() => onAbrir(mesa)}
+      title={nombre ? `${mesa.numero} · ${nombre}` : `Mesa ${mesa.numero}`}
+      className={`w-full h-full rounded-lg border ${angosta ? 'px-0.5' : 'px-2'} py-2 text-left
+                  min-h-[58px] flex flex-col justify-between min-w-0
+                  transition-transform active:scale-95 ${clase} ${portafolio}`}
+    >
+      <span className="text-[11px] font-bold cifra opacity-70">{mesa.numero}</span>
+      <span className={`${letraDelNombre(nombre, angosta)} leading-tight line-clamp-3 break-words`}>
+        {nombre}
+      </span>
+    </button>
+  )
+}
 
 function Leyenda({ mapa }) {
   const cuenta = e => mapa.filter(m => m.estado === e).length
@@ -152,6 +176,7 @@ function Detalle({ mesa, bloque, onCerrar, onConseguida, guardando }) {
 export default function Mesas() {
   const datos = useDatos()
   const [bloque, setBloque] = useState('b1')
+  const [vista, setVista]   = useState('rejilla')
   const [detalle, setDetalle] = useState(null)
   const [guardando, setGuardando] = useState(false)
 
@@ -159,7 +184,11 @@ export default function Mesas() {
 
   const { edicion, empresas, reclutadores, recargar } = datos
   const porId = new Map(empresas.map(e => [e.id, e]))
-  const conEmpresa = reclutadores.map(r => ({ ...r, empresa: porId.get(r.empresa_id)?.nombre ?? '—' }))
+  const conEmpresa = reclutadores.map(r => ({
+    ...r,
+    empresa: porId.get(r.empresa_id)?.nombre ?? '—',
+    giro:    porId.get(r.empresa_id)?.giro ?? null,
+  }))
 
   const mapa = mapaDeMesas({ edicion, reclutadores: conEmpresa, bloque })
   const c = calcularCifras({ edicion, empresas, reclutadores: conEmpresa })
@@ -215,28 +244,39 @@ export default function Mesas() {
         ))}
       </div>
 
+      <div className="flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
+        {[['rejilla', 'Rejilla'], ['plano', 'Plano']].map(([v, t]) => (
+          <button
+            key={v} onClick={() => setVista(v)}
+            className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+              vista === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
       <Leyenda mapa={mapa} />
 
-      {mapa.length === 0 ? (
+      {mapa.length === 0 && (
         <p className="text-sm text-lavanda/50 py-8 text-center">Sin mesas todavía.</p>
-      ) : (
+      )}
+
+      {mapa.length > 0 && vista === 'rejilla' && (
         <RejillaMesas total={mapa.length}>
-          {mapa.map(m => {
-            const { clase } = ESTADO_MESA[m.estado]
-            return (
-              <button
-                key={m.numero} onClick={() => setDetalle(m)}
-                className={`rounded-lg border px-2 py-2 text-left min-h-[58px] flex flex-col
-                            justify-between transition-transform active:scale-95 ${clase}`}
-              >
-                <span className="text-[11px] font-bold cifra opacity-70">{m.numero}</span>
-                <span className="text-[11px] leading-tight line-clamp-2 break-words">
-                  {m.reclutador?.empresa ?? ''}
-                </span>
-              </button>
-            )
-          })}
+          {mapa.map(m => <Mesa key={m.numero} mesa={m} onAbrir={setDetalle} />)}
         </RejillaMesas>
+      )}
+
+      {mapa.length > 0 && vista === 'plano' && (
+        <PlanoSalon
+          excedentes={mapa.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
+          celda={(numero, { angosta }) => {
+            const m = mapa.find(x => x.numero === numero) ?? { numero, estado: 'libre', reclutador: null }
+            return <Mesa mesa={m} angosta={angosta} onAbrir={setDetalle} />
+          }}
+        />
       )}
     </section>
   )

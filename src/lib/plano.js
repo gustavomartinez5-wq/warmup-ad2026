@@ -35,3 +35,23 @@ export function posicion(numero) {
 
 /** Entre esta columna y la siguiente hay pasillo (true) o solo las sillas del par (false). */
 export const pasilloDespuesDe = columna => columna % 2 === 0
+
+/**
+ * En la zona de portafolio el contorno punteado ya dice qué es, y «Portafolio · »
+ * se comería el espacio: las tres mesas se leerían igual.
+ */
+export const nombreCorto = empresa => (empresa ?? '').replace(/^Portafolio · /, '')
+
+const anchoDePalabra = w => [...w].reduce((n, c) => n + (c !== c.toLowerCase() ? 1.35 : 1), 0)
+
+/**
+ * Una palabra larga («Management», «COPARMEX») no cabe en la mesa angosta y se
+ * partiría a media palabra. Esa sola baja un punto. La mayúscula ocupa más.
+ */
+export const tienePalabraLarga = nombre =>
+  Math.max(...String(nombre).split(/\s+/).map(anchoDePalabra)) > 9
+
+export function letraDelNombre(nombre, angosta) {
+  if (!angosta) return 'text-[11px] tracking-tight'
+  return tienePalabraLarga(nombre) ? 'text-[9px] tracking-tighter' : 'text-[10px] tracking-tight'
+}

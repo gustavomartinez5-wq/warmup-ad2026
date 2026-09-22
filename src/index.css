@@ -51,6 +51,9 @@ body {
 @media print {
   /* La regla borra el relleno de la hoja, así que el margen lo pone la página. */
   @page { margin: 12mm; }
+  /* El plano del salón va acostado; las listas siguen de pie. */
+  @page plano { size: letter landscape; margin: 8mm; }
+  .hoja-plano { page: plano; }
   body { background: #fff !important; }
   header, .no-imprimir { display: none !important; }
   main { padding: 0 !important; max-width: none !important; }

@@ -62,7 +62,20 @@ en `src/lib/plano.js` y la pinta `src/components/PlanoSalon.jsx`.
 | `npm run build` | Limpio |
 
 Se verificó en una página local temporal con el mapa fijo y estados de mentira, porque `/host` pide
-sesión. Falta que Gustavo lo vea en `/host` real. Si convence, se replica en admin.
+sesión.
+
+**El mismo día, tres cosas más.** El encabezado de `/host` deja de ir fijo cuando la pantalla mide
+menos de 560 px de alto: con el celular acostado se comía la pantalla. `/admin/mesas` gana el
+selector Rejilla · Plano, con sus propios colores de estado. Y `/admin/impreso` gana un selector
+Listas · Plano: la hoja del plano va acostada, una por bloque, con número, empresa y las carreras
+dentro de cada mesa (las primeras doce y `+n`). `PlanoSalon` ya solo acomoda; cada pantalla pinta
+su mesa y la pasa en `celda`.
+
+| Prueba | Resultado |
+|---|---|
+| Hoja del plano a PDF, carta acostada | Una hoja por bloque, sin cortar columnas |
+| Nombres en el papel y en pantalla | Ninguno partido a media palabra |
+| `npm run build` | Limpio |
 
 ### Management Solutions y GPvivienda · 22-sep-2026
 
