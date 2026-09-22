@@ -66,9 +66,9 @@ export const TOLERANCIA_MIN = 5
 
 /**
  * Consejos que rotan mientras la persona espera, como en la pantalla de carga de
- * un videojuego. Salen de los decks cerrados del CVDP —CV estratégico y
- * Estrategias de búsqueda de empleo—, no se inventan. Si cambia un deck, se
- * revisan aquí.
+ * un videojuego. Salen de los decks cerrados del CVDP —CV estratégico,
+ * Estrategias de búsqueda de empleo y, los de portafolio, la Guía de Empleo de
+ * Industrias Creativas—, no se inventan. Si cambia un deck, se revisan aquí.
  */
 export const CONSEJOS = {
   cv: [
@@ -87,6 +87,12 @@ export const CONSEJOS = {
     'Prepara por qué esta vacante: qué te interesa de esta empresa y de este puesto.',
     'Cuando te pregunten si tienes dudas, ten tus tres preguntas listas.',
     'Al día siguiente, manda un correo breve de agradecimiento.',
+  ],
+  portafolio: [
+    'Describe cada proyecto con lo que hiciste: «Diseñé la identidad visual completa de una marca: logotipo, paleta y manual».',
+    'Tu portafolio en Behance, Issuu o Instagram también es material para postular.',
+    'Revisa qué herramientas pide la vacante —Figma, Adobe Suite, Revit, AutoCAD— y que se vean en tu portafolio.',
+    'Cuantifica tus prácticas aunque sea poco: piezas o planos producidos, campañas apoyadas, alcance generado.',
   ],
   general: [
     'El rechazo es información, no una evaluación de tu valor.',
@@ -128,7 +134,7 @@ export async function miTurno(id) {
 }
 
 /**
- * Ceder el turno: la persona avisa que se tiene que ir. Queda como «No llegó».
+ * Ceder el turno: la persona avisa que se tiene que ir. Queda como «Cedió su turno».
  * Devuelve `true` si lo cedió, `false` si el turno ya estaba cerrado.
  */
 export async function cederTurno(id) {

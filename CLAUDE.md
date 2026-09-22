@@ -163,7 +163,8 @@ urbanismo saldría mandado a la mesa de animación.
 
 Las cinco llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
 Es lo que saca la zona completa con el filtro de giro de `/host` y lo que hace que la hoja
-impresa las nombre aparte. Las últimas tres mesas del salón —73, 74 y 75— son esa zona.
+impresa las nombre aparte. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
+Bloque 1 solo la 74 y la 75, y la 73 queda libre para cualquier empresa (decidido el 22-sep).
 
 **Tipografía: Inter, no Neue Haas.** Neue Haas está licenciada y el repo es público. Inter es
 neo-grotesca como ella y se carga de Google Fonts. Es la única desviación consciente del
@@ -200,7 +201,18 @@ espera con el mismo número. Por eso «Tu turno ya pasó» no tiene botón grand
 
 **El celular nunca manda a una mesa.** Cecilia puede apartarle mesa en `/fila`, pero eso es dato
 del equipo: la persona siempre ve el módulo. El texto vive en `INDICACION_MODULO`,
-en `src/lib/fila.js`.
+en `src/lib/fila.js`. Si la mesa apartada deja de servir —la empresa no llegó, se liberó, alguien
+más la ocupó o cambió de empresa—, el renglón de `/fila` lo avisa en ámbar. El cambio de empresa
+solo se nota mientras Cecilia no recargue la página: la empresa apartada vive en memoria, porque
+`turnos` no la guarda.
+
+**Cecilia toca «Pasó» al entregar al estudiante al host de salón**, en el módulo, no al terminar
+la sesión (decidido el 22-sep). Es cuando su celular cambia a «Listo».
+
+**Una mesa ocupada no se mueve.** Mover, intercambiar y recorrer borran el estado en vivo de los
+números que tocan (`limpia_estado`, migración 08): una sesión en curso pierde su reloj y el
+reclutador ve «Tu mesa cambió» a media entrevista. Es regla de operación, no candado: el host
+espera a que termine la sesión (decidido el 22-sep).
 
 **El celular no dice cuántos van delante.** Solo su número, la hora en que lo sacó y «Puedes
 tomar asiento, en un momento más te avisaremos tu turno». «Eres el siguiente» podía quedarse
@@ -209,8 +221,9 @@ devolviendo `adelante`; la pantalla no lo pinta.
 
 **La espera da señales de vida sin prometer nada.** Un punto «En vivo» que late y un consejo de
 búsqueda de empleo que cambia cada 12 segundos. Los consejos están en `CONSEJOS` de
-`src/lib/fila.js` y **salen de los decks cerrados del CVDP** —CV estratégico y Estrategias de
-búsqueda de empleo—; no se inventan. Si cambia un deck, se revisan ahí.
+`src/lib/fila.js` y **salen de los decks cerrados del CVDP** —CV estratégico, Estrategias de
+búsqueda de empleo y, los de portafolio, la Guía de Empleo de Industrias Creativas—; no se
+inventan. Si cambia un deck, se revisan ahí.
 
 **Ceder el turno es un estado aparte: «Cedió su turno».** El botón «¿Tienes que irte? No te
 preocupes, cede tu turno» pide confirmar en la pantalla y llama a `ceder_turno`, que escribe

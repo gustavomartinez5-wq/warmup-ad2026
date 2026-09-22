@@ -130,7 +130,7 @@ function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
 
 /* ── Un renglón de la fila ────────────────────────────────────────────────── */
 
-function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
+function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar, mesaCaida }) {
   const espera = segundosDesde(turno.creado_en, ahora)
   const activo = turno.estado === 'espera' || turno.estado === 'llamado'
 
@@ -177,6 +177,14 @@ function Renglon({ turno, ahora, onLlamar, onEstado, onBorrar }) {
               </>
             )}
           </p>
+          {/* La mesa que se le apartó dejó de servir: la empresa no llegó, se
+              liberó, alguien más la ocupó o ahora es de otra empresa. */}
+          {turno.estado === 'llamado' && mesaCaida && (
+            <p className="text-[11px] font-semibold text-ambar mt-0.5">
+              La mesa <span className="cifra">{turno.mesa_numero}</span> ya no está disponible.
+              Llámalo sin mesa o elige otra.
+            </p>
+          )}
           {turno.estado === 'llamado' && pasoTolerancia && (
             <p className="text-[11px] text-ambar/90 mt-0.5">
               Ya pasaron los {TOLERANCIA_MIN} minutos para llegar
@@ -233,6 +241,11 @@ export default function Fila() {
   const [edicion, setEdicion] = useState(null)
   const [turnos, setTurnos]   = useState(null)
   const [mesas, setMesas]     = useState([])
+  const [mesasListas, setMesasListas] = useState(false)   // sin esto, una lista vacía parecería «todas cayeron»
+  const [refresco, setRefresco] = useState(0)
+  // La empresa de cada mesa al momento de apartarla, para notar si cambió.
+  // Vive en memoria: si se recarga la página se pierde, y queda la revisión por estado.
+  const empresaApartada = useRef(new Map())
   const [error, setError]     = useState(null)
   const [enlace, setEnlace]   = useState('conectando')
   const [intento, setIntento] = useState(0)
@@ -277,14 +290,43 @@ export default function Fila() {
     return () => { desmontado.current = true; supabase.removeChannel(canal) }
   }, [traer, intento])
 
-  // Las mesas del bloque, para la hoja de llamado. Se refrescan al abrirla.
+  // Las mesas del bloque, para la hoja de llamado y para revisar las apartadas.
+  // Se refrescan al abrir la hoja y cuando el salón cambia.
   useEffect(() => {
     let vivo = true
     mesasDelBloque(bloque)
-      .then(d => { if (vivo) setMesas(d) })
+      .then(d => { if (vivo) { setMesas(d); setMesasListas(true) } })
       .catch(() => { /* la hoja lo dice: sin mesas que ofrecer, queda el host */ })
     return () => { vivo = false }
-  }, [bloque, llamando])
+  }, [bloque, llamando, refresco])
+
+  /**
+   * Si una mesa apartada deja de servir, Cecilia se entera aquí y no de voz.
+   * Escucha lo mismo que /host: los estados de las mesas y el aviso de que el
+   * salón cambió de forma.
+   */
+  useEffect(() => {
+    const subir = () => setRefresco(n => n + 1)
+    const estados = supabase.channel(`fila-mesas-${bloque}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'mesas_estado' }, subir)
+      .subscribe()
+    const salon = supabase.channel(`salon-${bloque}`)
+      .on('broadcast', { event: 'cambio' }, subir)
+      .subscribe()
+    return () => { supabase.removeChannel(estados); supabase.removeChannel(salon) }
+  }, [bloque])
+
+  // ¿La mesa apartada de este turno ya no sirve? Solo se juzga con la lista viva
+  // del mismo bloque en que se apartó.
+  function mesaCaida(t) {
+    if (t.estado !== 'llamado' || t.destino !== 'mesa' || !mesasListas) return false
+    if (t.bloque && t.bloque !== bloque) return false
+    const m = mesas.find(x => x.numero === t.mesa_numero)
+    if (!m) return true
+    const antes = empresaApartada.current.get(t.id)
+    if (antes && antes !== m.empresa) return true
+    return m.estado === 'no_llego' || m.estado === 'ocupado' || m.estado === 'break'
+  }
 
   // Un solo reloj para toda la pantalla.
   useEffect(() => {
@@ -302,6 +344,12 @@ export default function Fila() {
     // y vuelve a sonar. Sin esto, «llamar otra vez» no hace ruido.
     if (turno.estado === 'llamado') {
       await supabase.from('turnos').update({ estado: 'espera' }).eq('id', turno.id)
+    }
+    if (destino === 'mesa') {
+      const m = mesas.find(x => x.numero === mesaNumero)
+      if (m) empresaApartada.current.set(turno.id, m.empresa)
+    } else {
+      empresaApartada.current.delete(turno.id)
     }
     const { error: err } = await supabase.from('turnos').update({
       estado:      'llamado',
@@ -453,7 +501,7 @@ export default function Fila() {
         ) : (
           <ul className="space-y-2">
             {visibles.map(t => (
-              <Renglon key={t.id} turno={t} ahora={ahora}
+              <Renglon key={t.id} turno={t} ahora={ahora} mesaCaida={mesaCaida(t)}
                 onLlamar={setLlamando} onEstado={cambiarEstado} onBorrar={borrar} />
             ))}
           </ul>

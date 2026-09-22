@@ -3,8 +3,8 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **21 de septiembre de 2026**, con los ajustes al salón que salieron de la
-simulación de Antigravity.
+Última actualización: **22 de septiembre de 2026**, con lo que se aplicó de la simulación del
+día completo.
 
 ---
 
@@ -37,9 +37,48 @@ simulación de Antigravity.
 3. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
    P&G, Vitro, Redwood), Index como Regal Rexnord, y si Clarios trae a alguien en Bloque 1.
 4. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
-5. **Los dos agentes de host en Sonnet**, para la parte de comprensión.
+5. ~~Los dos agentes de host en Sonnet.~~ Hecho el 21-sep, dentro de la simulación del día
+   completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Lo que se aplicó de la simulación del día completo · 22-sep-2026
+
+Gustavo marcó el reporte.
+- En pantalla:
+  - Aviso en `/fila` si la mesa apartada deja de servir.
+  - «Tu mesa cambió» con un botón por mesa.
+  - Línea de los 20 minutos en `/mesa`.
+  - «Si llega, toca Disponible.» en `/host`.
+  - Consejos de portafolio de la Guía de Industrias Creativas.
+  - «Para volver, escanea el QR de la entrada.»
+- Reglas escritas en el `CLAUDE.md`: no se mueve una mesa ocupada; «Pasó» al entregar al estudiante
+  al host; la 73 de Bloque 1 es libre. Esto último corrige la entrada del 17-sep, que decía que la
+  zona de portafolio eran las tres últimas mesas en los dos bloques.
+
+Verificado a 390 px con datos simulados.
+
+### Simulación del día completo con Sonnet · 21-sep-2026
+
+Plan: guion (A) → siete agentes Sonnet con imprevistos sorteados para el host (B) → reporte con
+casillas (C). Nada se aplica; Gustavo marca.
+
+- **A ✅** Guion en el vault: `Ediciones/WarmUp AD26/WarmUp AD26 - Guion de pantallas del día.md`,
+  sacado del render a 390 px con datos de mentira.
+- **B · lanzada.** Corrida `wf_bed6e9b1-28b`, 7 agentes Sonnet (E1, E2, E3, Cecilia, H1, R1, R2).
+  Si se corta, se retoma con `resumeFromRunId`. El sorteo se hizo con `secrets` de Python sobre el
+  mapa de Bloque 1, porque el Workflow no permite `Math.random`:
+  - No llegaron: Tecnológico de Monterrey (61) y Growth & Profit Consulting (16).
+  - Goldco pasa de la 48 a la 68, que tiene KATCON.
+  - Johnson Controls pasa de la 52 a la 73, que está libre.
+  - Mesas de los reclutadores: R1 en la 50 (Caterpillar) y R2 en la 2 (Management Solutions),
+    con el intercambio 2 ↔ 3.
+- **B ✅** Los siete terminaron sin error, en 4 min.
+- **C ✅** Reporte en el vault: `Ediciones/WarmUp AD26/WarmUp AD26 - Simulación del día completo.md`,
+  con el `.json` al lado. Nueve hallazgos con casillas. **Nada aplicado:** Gustavo marca. Los dos más
+  serios, confirmados en el código:
+  - Mover una mesa con una sesión en curso borra su reloj: `limpia_estado` en la migración 08.
+  - `/fila` no se entera si la mesa que Cecilia apartó deja de estar disponible.
 
 ### Ajustes al salón por la simulación de Antigravity · 21-sep-2026
 

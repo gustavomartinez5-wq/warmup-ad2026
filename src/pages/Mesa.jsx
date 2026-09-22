@@ -23,6 +23,10 @@ const BOTONES = [
   { clave: 'break',      texto: 'Break',      fondo: 'bg-ambar hover:bg-ambar/80' },
 ]
 
+// «1 y 3», «52, 53 y 55»: los números como se dicen.
+const enLista = ns => ns.length === 1 ? String(ns[0])
+  : `${ns.slice(0, -1).join(', ')} y ${ns[ns.length - 1]}`
+
 function Encabezado({ children }) {
   return (
     <div className="px-5 pt-6 pb-4">
@@ -35,12 +39,12 @@ function Encabezado({ children }) {
 
 /* ── Elegir mesa ──────────────────────────────────────────────────────────── */
 
-function Elegir({ bloque, onBloque, onElegir, buscaInicial = '' }) {
+function Elegir({ bloque, onBloque, onElegir }) {
   // Arranca con el mapa horneado: la lista se ve completa desde el primer
   // instante, y si la base no contesta al menos se puede encontrar la mesa.
   const [mesas, setMesas] = useState(() => mesasFijas(bloque))
   const [fria, setFria]   = useState(true)
-  const [busca, setBusca] = useState(buscaInicial)
+  const [busca, setBusca] = useState('')
 
   useEffect(() => {
     let vivo = true
@@ -134,7 +138,7 @@ function Elegir({ bloque, onBloque, onElegir, buscaInicial = '' }) {
 
 /* ── Mi mesa ──────────────────────────────────────────────────────────────── */
 
-function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA, onVerEmpresa }) {
+function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA }) {
   // Sembrada del mapa horneado: aunque la base no conteste, el reclutador
   // confirma que está parado en la mesa correcta. Si el mapa ya dice otra
   // empresa en ese número, no se siembra: sería enseñarle una mesa ajena.
@@ -260,8 +264,8 @@ function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA, onVe
               {cambio.suyas.length === 1
                 ? <>{empresa} está en la mesa <span className="cifra">{unica}</span>.</>
                 : cambio.suyas.length > 1
-                  ? <>{empresa} tiene <span className="cifra">{cambio.suyas.length}</span> mesas en
-                      este bloque.</>
+                  ? <>{empresa} está en las mesas {enLista(cambio.suyas)}. Pregúntale a tu equipo
+                      cuál es la tuya.</>
                   : <>{empresa} no aparece en {enBloque}. Pregunta a un host.</>}
             </p>
           </div>
@@ -272,12 +276,17 @@ function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA, onVe
               Ir a la mesa <span className="cifra">{unica}</span>
             </button>
           )}
+          {/* Un botón por mesa: con la lista, la reclutadora no sabía cuál tocar. */}
           {cambio.suyas.length > 1 && (
-            <button onClick={() => onVerEmpresa(empresa)}
-              className="w-full rounded-2xl bg-teal hover:bg-teal-hondo py-4 font-extrabold text-base
-                         transition-colors">
-              Ver las mesas de {empresa}
-            </button>
+            <div className="grid grid-cols-2 gap-2.5">
+              {cambio.suyas.map(n => (
+                <button key={n} onClick={() => onIrA(n)}
+                  className="rounded-2xl bg-teal hover:bg-teal-hondo py-4 font-extrabold text-base
+                             transition-colors">
+                  Ir a la <span className="cifra">{n}</span>
+                </button>
+              ))}
+            </div>
           )}
           <button onClick={onCambiarMesa}
             className="w-full rounded-xl border border-lavanda/25 text-lavanda/75 hover:text-white
@@ -389,6 +398,7 @@ function MiMesa({ numero, bloque, empresa, onEmpresa, onCambiarMesa, onIrA, onVe
             <li>Toca Ocupado cuando se siente. El tiempo arranca solo.</li>
             <li>Cada sesión dura 20 minutos. El reloj se pone ámbar a los 18.</li>
             <li>Al terminar, Disponible otra vez. Break si te levantas un momento.</li>
+            <li>Si ya pasaron los 20 minutos, cierra con calma y toca Disponible.</li>
           </ul>
         </div>
 
@@ -409,7 +419,6 @@ export default function Mesa() {
   const [bloque, setBloque]   = useState(guardada?.bloque ?? bloquePorReloj())
   const [numero, setNumero]   = useState(guardada?.numero ?? null)
   const [empresa, setEmpresa] = useState(guardada?.empresa ?? null)
-  const [buscaInicial, setBuscaInicial] = useState('')
 
   function elegir(n, emp) {
     setNumero(n); setEmpresa(emp ?? null)
@@ -423,7 +432,7 @@ export default function Mesa() {
   }, [numero, bloque])
 
   function cambiarMesa() {
-    setNumero(null); setEmpresa(null); setBuscaInicial('')
+    setNumero(null); setEmpresa(null)
     olvidarMesa()
     setBloque(bloquePorReloj())
   }
@@ -434,13 +443,8 @@ export default function Mesa() {
     recordarMesa(n, bloque, empresa)
   }
 
-  function verEmpresa(emp) {
-    setNumero(null); setEmpresa(null); setBuscaInicial(emp)
-    olvidarMesa()
-  }
-
   return numero === null
-    ? <Elegir bloque={bloque} onBloque={setBloque} onElegir={elegir} buscaInicial={buscaInicial} />
+    ? <Elegir bloque={bloque} onBloque={setBloque} onElegir={elegir} />
     : <MiMesa key={`${bloque}-${numero}`} numero={numero} bloque={bloque} empresa={empresa}
-        onEmpresa={aprenderEmpresa} onCambiarMesa={cambiarMesa} onIrA={irA} onVerEmpresa={verEmpresa} />
+        onEmpresa={aprenderEmpresa} onCambiarMesa={cambiarMesa} onIrA={irA} />
 }

@@ -76,6 +76,11 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }
             <p className="text-[11px] uppercase tracking-widest text-lavanda/45">
               {textoEstado(mesa.estado)}
             </p>
+            {/* No llegó no es definitivo: si la empresa aparece tarde, se deshace aquí
+                o desde su propio teléfono. Sin esto el host no sabía cómo regresarla. */}
+            {mesa.estado === 'no_llego' && (
+              <p className="text-xs text-lavanda/60 mt-1.5">Si llega, toca Disponible.</p>
+            )}
             {mesa.estado === 'ocupado' && (
               <>
                 <p className={`text-5xl font-extrabold cifra mt-1 ${p.alerta ? 'text-rojo' : 'text-white'}

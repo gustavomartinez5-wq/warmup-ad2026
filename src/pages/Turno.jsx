@@ -279,7 +279,8 @@ function MiTurno({ id, onOtroTurno }) {
         <div className="flex-1 flex flex-col justify-center px-5 pb-10 text-center gap-4">
           <p className="text-2xl font-extrabold">Cediste tu turno</p>
           <p className="text-sm text-lavanda/65 leading-relaxed">
-            Gracias por avisar. Si regresas más tarde, saca un turno nuevo.
+            Gracias por avisar. Si regresas más tarde, saca un turno nuevo. Para volver, escanea el QR de la
+            entrada.
           </p>
           <button onClick={onOtroTurno}
             className="w-full rounded-xl bg-tec hover:bg-tec-claro py-3.5 font-bold text-sm transition-colors mt-2">
