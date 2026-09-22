@@ -76,8 +76,8 @@ Redwood y EATON 22-sep»):
 | Libro contra base (md5) | Idénticos: 129 reclutadores, 64 empresas |
 | `hornear-mapa.mjs --verificar` | Al día: 71 y 58 |
 
-La hoja «Expertos Portafolio» pone a tres personas de Areya en B2 que no están en el libro (ahí
-Areya solo tiene una persona, en B2-52). No se les dio mesa: revisan en la de su empresa.
+La hoja «Expertos Portafolio» pone a tres personas de Areya en B2. Gustavo confirmó el 22-sep que
+de Areya viene solo una, la que ya está en B2-52. No cambia nada.
 
 ### Lo que se aplicó de la simulación del día completo · 22-sep-2026
 
