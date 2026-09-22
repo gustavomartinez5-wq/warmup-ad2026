@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-22T16:44:02.652Z",
+  "generado_en": "2026-09-22T19:58:20.540Z",
   "bloques": {
     "b1": [
       {
@@ -3286,6 +3286,15 @@
           "IM",
           "IMA",
           "IMT"
+        ]
+      },
+      {
+        "numero": 55,
+        "empresa": "Sustainability Engineering Group",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC"
         ]
       },
       {

@@ -101,7 +101,8 @@ mapa (empresa, siglas) as (
   ('BECK',                     array['IC','ARQ']),
   -- Se sumaron el 22-sep-2026
   ('GPvivienda',               array['ARQ','IC','LDI']),
-  ('EATON',                    array['IIS','BIE','IM','IMA','IMT','BME'])
+  ('EATON',                    array['IIS','BIE','IM','IMA','IMT','BME']),
+  ('Sustainability Engineering Group', array['IC','ARQ'])
 
   ) as v(empresa, siglas)
 ),

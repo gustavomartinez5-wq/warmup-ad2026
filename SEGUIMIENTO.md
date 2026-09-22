@@ -111,6 +111,10 @@ Redwood y EATON 22-sep»):
 | Libro contra base (md5) | Idénticos: 129 reclutadores, 64 empresas |
 | `hornear-mapa.mjs --verificar` | Al día: 71 y 58 |
 
+**Un alta más, en la tarde.** Sustainability Engineering Group (registro 67): Arquitectura y
+construcción, IC y ARQ, una persona en B2-55, junto a EATON. Anotó 2 personas y dio 1 nombre, así
+que queda un pendiente abierto. Libro y base idénticos: 65 empresas, 71 en B1 y 59 en B2.
+
 La hoja «Expertos Portafolio» pone a tres personas de Areya en B2. Gustavo confirmó el 22-sep que
 de Areya viene solo una, la que ya está en B2-52. No cambia nada.
 
