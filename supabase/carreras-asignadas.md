@@ -42,6 +42,7 @@ Para corregir una: ficha de la empresa en la app, o editar
 | **Index Nuevo León** | Diversas carreras | 47 | ARQ BGB BIE BME IAL IBT IC IDM IDS IE IFI IID IIS IM IMA IMD IMT INA IQ IQA IRS ISD ITC ITD LAD LAE LAF LBC LC LCPF LDE LDI LDO LEC LED LEI LEM LIN LIT LLE LNB LPE LPS LRI LTM LTP LUB |
 | **Johnson Controls** | Mecatrónica, Mecánica, Eléctrica, Electrónica, Automatización, Industrial, Energía | 11 | BIE BME IDS IE IFI IIS IM IMA IMT IRS ISD |
 | **KATCON** | Ingeniería Automotriz, Mecánica, Industrial, Diseño Industrial, Sistemas | 11 | BIE BME IE IIS IM IMA IMT IRS ISD ITC LDI |
+| **Linde** | Química, Industrial, Bioquímicos, Administración de Empresas, Ciencia de Datos, Industriales | 9 | BIE IBT IDM IIS IQ IQA LAE LBC LDE |
 | **Logrand** | Carreras administrativas | 9 | BGB LAE LAF LCPF LDE LDO LEM LIN LIT |
 | **London Consulting Group** | Ingenierías | 22 | BIE BME IAL IBT IC IDM IDS IE IFI IID IIS IM IMA IMD IMT INA IQ IQA IRS ISD ITC ITD |
 | **Management Solutions** | Negocios y relaciones internacionales, Contaduría, Estrategia y transformación de negocios, Economía, Finanzas, Inteligencia de negocios, Ing. Industrial y de Sistemas, Ing. Química, Ing. en Transformación Digital, Mecatrónica, Sistemas digitales y robótica, Ciencia de Datos y Matemáticas, Física Industrial, Tecnologías Computacionales, Innovación | 21 | BGB BIE BME IDM IFI IID IIS IMT IQ IQA IRS ISD ITC ITD LAE LAF LCPF LEC LIN LIT LRI |
