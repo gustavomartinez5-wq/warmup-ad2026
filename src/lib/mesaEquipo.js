@@ -138,12 +138,16 @@ export const liberarMesa = filaId =>
   llamar('liberar_mesa', { p_fila: filaId })
 
 /**
- * El bloque completo en un orden nuevo: las empresas se renumeran desde la 1, cada
- * una en mesas seguidas. Portafolio no entra. Devuelve cuántas empresas cambiaron
- * de número. Ver `supabase/migrations/12_reordenar_salon.sql`.
+ * Varias mesas sueltas a la vez, como quedaron en el Mapa: cada fila con su número
+ * nuevo. Una empresa puede quedar partida; es decisión del equipo. Devuelve cuántas
+ * mesas cambiaron. Ver `supabase/migrations/13_acomodar_mesas.sql`.
  */
-export const reordenarSalon = (bloque, empresaIds) =>
-  llamar('reordenar_salon', { p_bloque: bloque, p_empresas: empresaIds })
+export const acomodarMesas = (bloque, cambios) =>
+  llamar('acomodar_mesas', {
+    p_bloque: bloque,
+    p_filas: cambios.map(c => c.fila),
+    p_numeros: cambios.map(c => c.numero),
+  })
 
 /**
  * Da de alta una empresa que no venía en el Excel. El mínimo que pide la base

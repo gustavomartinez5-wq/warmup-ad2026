@@ -19,10 +19,10 @@ export default function RejillaMesas({ total, children }) {
   useEffect(() => {
     const el = contenedor.current
     if (!el) return
-    const observador = new ResizeObserver(([entrada]) => {
-      const ancho = entrada.contentRect.width
-      setColumnas(Math.max(2, Math.floor((ancho + HUECO) / (MIN_CELDA + HUECO))))
-    })
+    const medir = ancho => setColumnas(Math.max(2, Math.floor((ancho + HUECO) / (MIN_CELDA + HUECO))))
+    // Se mide de una vez: si se espera al observador, el primer cuadro sale con 4 columnas.
+    medir(el.clientWidth)
+    const observador = new ResizeObserver(([entrada]) => medir(entrada.contentRect.width))
     observador.observe(el)
     return () => observador.disconnect()
   }, [])

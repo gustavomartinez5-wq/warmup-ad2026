@@ -8,7 +8,24 @@ import RejillaMesas from '../../components/RejillaMesas'
 import PlanoSalon from '../../components/PlanoSalon'
 
 // La librería de arrastre solo viaja cuando alguien entra a editar el acomodo.
-const AcomodoEnRejilla = lazy(() => import('../../components/AcomodoEnRejilla'))
+const AcomodoEnMapa = lazy(() => import('../../components/AcomodoEnMapa'))
+
+/** Las dos vistas. «Empresas y Expertos» es para buscar y verificar; «Mapa» es el salón. */
+const VISTAS = [['rejilla', 'Empresas y Expertos'], ['plano', 'Mapa']]
+
+/**
+ * «Empresas y Expertos» va en orden A–Z por empresa, para encontrar y verificar rápido.
+ * Cada mesa conserva su número; aquí no se cambia nada. Las libres y las que faltan
+ * van al final, por número. Se ordena por el nombre que se ve en la celda: portafolio
+ * sale como «Diseño», no como «Portafolio · Diseño».
+ */
+function enOrdenAlfabetico(mapa) {
+  const visto = m => nombreCorto(m.reclutador.empresa)
+  const ocupadas = mapa.filter(m => m.reclutador)
+    .sort((a, b) => visto(a).localeCompare(visto(b), 'es', { sensitivity: 'base' })
+                    || a.numero - b.numero)
+  return [...ocupadas, ...mapa.filter(m => !m.reclutador)]
+}
 
 /** La misma mesa en la rejilla y en el plano: número, empresa y el color de su estado. */
 function Mesa({ mesa, angosta = false, onAbrir }) {
@@ -259,41 +276,43 @@ export default function Mesas() {
         </div>
       )}
 
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
+          {VISTAS.map(([v, t]) => (
+            <button
+              key={v} onClick={() => setVista(v)} disabled={editando && vista !== v}
+              className={`px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-35 ${
+                vista === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        {!editando && vista === 'plano' && (
+          <button
+            onClick={() => { setAviso(null); setEditando(true) }}
+            className="px-3 py-1.5 rounded-lg border border-cian/50 text-xs font-bold text-cian
+                       hover:bg-cian/10 transition-colors"
+          >
+            Editar acomodo
+          </button>
+        )}
+      </div>
+
       {editando ? (
         <Suspense fallback={<Cargando />}>
-          <AcomodoEnRejilla
-            filas={reclutadores} empresas={empresas} bloque={bloque} totalCeldas={mapa.length}
+          <AcomodoEnMapa
+            edicion={edicion} filas={conEmpresa} bloque={bloque}
             onSalir={() => setEditando(false)}
             onGuardado={async n => {
               await recargar()
               setEditando(false)
-              setAviso(`Acomodo guardado: ${n === 1 ? 'una empresa cambió' : `${n} empresas cambiaron`} de número.`)
+              setAviso(`Acomodo guardado: ${n === 1 ? 'una mesa cambió' : `${n} mesas cambiaron`} de lugar.`)
             }}
           />
         </Suspense>
       ) : (<>
-      <div className="flex flex-wrap items-center gap-2">
-      <div className="flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
-        {[['rejilla', 'Rejilla'], ['plano', 'Plano']].map(([v, t]) => (
-          <button
-            key={v} onClick={() => setVista(v)}
-            className={`px-3 py-1.5 text-xs font-bold transition-colors ${
-              vista === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-        <button
-          onClick={() => { setVista('rejilla'); setAviso(null); setEditando(true) }}
-          className="px-3 py-1.5 rounded-lg border border-cian/50 text-xs font-bold text-cian
-                     hover:bg-cian/10 transition-colors"
-        >
-          Editar acomodo
-        </button>
-      </div>
-
       <Leyenda mapa={mapa} />
 
       {mapa.length === 0 && (
@@ -302,7 +321,7 @@ export default function Mesas() {
 
       {mapa.length > 0 && vista === 'rejilla' && (
         <RejillaMesas total={mapa.length}>
-          {mapa.map(m => <Mesa key={m.numero} mesa={m} onAbrir={setDetalle} />)}
+          {enOrdenAlfabetico(mapa).map(m => <Mesa key={m.numero} mesa={m} onAbrir={setDetalle} />)}
         </RejillaMesas>
       )}
 

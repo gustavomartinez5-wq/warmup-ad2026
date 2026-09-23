@@ -18,9 +18,10 @@ import { datosDelSalon } from '../lib/mesaEquipo'
 
 /**
  * La vista del equipo el día del evento. Para los tres hosts y los becarios,
- * en celular. Dos formas de ver lo mismo:
+ * en celular. Tres formas de ver lo mismo:
  *
- *   Rejilla — el salón como está acomodado, para ubicar la mesa 43 de un vistazo.
+ *   Empresas y Expertos — la rejilla por número, para ubicar la mesa 43 de un vistazo.
+ *   Mapa    — las mesas donde están en el piso.
  *   Lista   — ordenada por estado, disponibles arriba, para cuando traes a un
  *             estudiante al lado y necesitas a dónde mandarlo ya.
  *
@@ -494,7 +495,7 @@ export default function Host() {
             ))}
           </div>
           <div className="flex rounded-lg border border-lavanda/20 overflow-hidden">
-            {[['rejilla', 'Rejilla'], ['plano', 'Plano'], ['lista', 'Lista']].map(([v, t]) => (
+            {[['rejilla', 'Empresas y Expertos'], ['plano', 'Mapa'], ['lista', 'Lista']].map(([v, t]) => (
               <button
                 key={v} onClick={() => setVista(v)}
                 className={`px-3 py-1.5 text-xs font-bold transition-colors ${

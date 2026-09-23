@@ -23,8 +23,9 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
-00. **Un guardado real con «Editar acomodo» en `/admin/mesas`, con la cuenta del equipo.** La función ya se probó
-    por SQL con la identidad del equipo; falta el camino completo desde el navegador.
+00. **Un guardado real con «Editar acomodo» en el Mapa de `/admin/mesas`, con la cuenta del
+    equipo.** `acomodar_mesas` ya se probó por SQL con la identidad del equipo; falta el camino
+    completo desde el navegador. Después, hornear el mapa.
 
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
@@ -43,6 +44,44 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Acomodo mesa por mesa sobre el Mapa · 22-sep-2026
+
+El editor por empresa completa no era lo que hacía falta. Gustavo quiere mover mesas sueltas en el
+plano: por ejemplo, dejar una mesa de una empresa sola en otro lugar. Además, su primer guardado
+con la versión anterior no llegó a la base: no hubo llamada a la función en los registros de
+Supabase, así que se quedó en el recuadro de confirmar.
+
+| Decisión de Gustavo | Qué quedó |
+|---|---|
+| Mesa por mesa, solo en el plano | «Editar acomodo» aparece solo en «Mapa» |
+| Soltar encima intercambia | La 56 sobre la 54: la 54 pasa a la 56. Sobre una libre, se mueve |
+| Guardar todo junto al final, directo | «Guardar acomodo · N mesas», sin recuadro de confirmar |
+| Portafolio se mueve | Igual que cualquier mesa |
+| Rejilla → «Empresas y Expertos», Plano → «Mapa» | En admin y en `/host`. En admin, A–Z y solo para ver |
+
+Piezas:
+- Migración 13 con `acomodar_mesas`.
+- `AcomodoEnMapa.jsx`, que se carga aparte al entrar a editar (48 kB).
+- Salen `AcomodoEnRejilla.jsx`, `src/lib/acomodo.js`, `@dnd-kit/sortable` y `@dnd-kit/utilities`.
+- `RejillaMesas` mide su ancho al montarse; antes el primer cuadro salía con 4 columnas.
+
+| Prueba | Resultado |
+|---|---|
+| `acomodar_mesas` con 56↔54 y 10→68 (se deshizo) | 3 mesas; la 10 queda libre; bitácora `acomodar` con empresa, de y a |
+| Choque con una mesa quieta · fuera del salón · otro bloque · número repetido | Rechaza las cuatro |
+| Mesa en sesión | Rechaza y dice cuál |
+| Permisos | `anon` no la puede ejecutar |
+| Salón y bitácora al terminar las pruebas | Intactos |
+| Mapa a 1400 px: 56 sobre 54 | Intercambiadas, con contorno cian y «antes» |
+| Una mesa de Johnson a la libre 68 | Johnson queda en 43–45 y 68; la 42 libre |
+| Portafolio 75 → 70, y «Deshacer último» | Se mueve y vuelve; el botón baja de 4 a 3 mesas |
+| Mapa a 390 px, plano girado, toque largo | Intercambia; sin scroll lateral |
+| «Empresas y Expertos» | A–Z por el nombre visible; sin botón de editar |
+| `/host` a 390 px | El selector de tres cabe en un renglón |
+| `npm run build` | Limpio |
+
+Se probó montando la página real con datos del mapa horneado, porque `/admin` pide sesión.
 
 ### Acomodo de mesas arrastrando · 22-sep-2026
 

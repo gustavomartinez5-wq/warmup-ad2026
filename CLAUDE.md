@@ -24,14 +24,14 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
 - **Ninguna pantalla se da por hecha sin verla renderizada a 390 px.** Los desbordes no
   existen en el código, solo al pintarse.
 - **Las mesas viven en la app desde el 22-sep, no en el Excel.** Se acomodan con «Editar acomodo» en
-  `/admin/mesas` y todo movimiento queda en `cambios_salon` (`/admin/cambios`). La importación del Excel está
+  el Mapa de `/admin/mesas` y todo movimiento queda en `cambios_salon` (`/admin/cambios`). La importación del Excel está
   apagada: borraba y reinsertaba `reclutadores` con la columna Mesa del libro y se llevaba el
   acomodo. No se vuelve a prender sin resolver eso.
 - **Una mesa nunca se mueve con `update` desde el navegador.** `reclutadores_mesa_unica` es un
   índice único parcial y no se puede diferir: dos `update` seguidos truenan o dejan el salón a
   medias. Van por las funciones de la migración 08 —`mover_mesa`, `intercambiar_mesas`,
   `recorrer_mesas`, `liberar_mesa`, `agregar_mesa`, `cambiar_empresa_de_mesa`— y por
-  `reordenar_salon` de la migración 12, que renumera el bloque completo. Hacen el baile completo
+  `acomodar_mesas` de la migración 13, que guarda varias mesas sueltas a la vez. Hacen el baile completo
   en una transacción y anotan en la bitácora.
 - **El QR de las mesas es uno solo, y el teléfono recuerda número y empresa.** Si el equipo mueve,
   intercambia o libera la mesa, `/mesa` lo nota porque en su número ya no está su empresa, y
@@ -51,7 +51,7 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
 - **La forma del salón vive en `src/lib/plano.js` y dice lo mismo que el mapa oficial**
   (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento.html`, en el vault): 15 columnas de 5,
   zigzag desde la mesa 1 abajo a la derecha, acceso frente a las mesas 31 a 40. Es lo que pinta la
-  vista Plano de `/host` y de `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
+  vista Mapa de `/host` y de `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
   salón cambia, se corrigen los dos.
 - **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
   `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
@@ -75,12 +75,11 @@ src/
 │   ├── supabase.js      cliente + edicionActiva()
 │   ├── mapaFijo.js      lo que se ve cuando la base no contesta
 │   ├── mesaEquipo.js    editar el salón: las funciones de mesa y la bitácora
-│   ├── acomodo.js       fichas por empresa y su numeración, para el acomodo
 │   ├── fila.js          la fila: servicios, estados, consejos y las tres funciones sin sesión
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
-│                        CarrerasPicker, RejillaMesas, Enlace, AcomodoEnRejilla
+│                        CarrerasPicker, RejillaMesas, Enlace, AcomodoEnMapa
 └── pages/
     ├── Entrar.jsx       login del equipo
     ├── Mesa.jsx         pantalla del reclutador, sin login
@@ -197,20 +196,27 @@ número dio un sobrecupo de seis que no existía.
 
 ## El acomodo del salón
 
-**Cada bloque se acomoda por su cuenta.** Desde la tarde del 22-sep la base va en orden
-alfabético por bloque: una empresa de todo el día puede tener números distintos en B1 y B2.
-Cada empresa ocupa mesas seguidas. Portafolio se queda en 73–75 y no entra al acomodo.
+**Cada bloque se acomoda por su cuenta.** El 22-sep la base quedó en orden alfabético por
+bloque: una empresa de todo el día puede tener números distintos en B1 y B2.
 
-**En `/admin/mesas`, «Editar acomodo» vuelve arrastrable la misma rejilla**, como los íconos de
-un celular. Se arrastra una mesa y se mueve su empresa completa; al pasar sobre otras, el salón se
-reacomoda en vivo y las que cambian de número se marcan en cian. Nada se guarda hasta «Guardar
-acomodo», que manda el orden completo a `reordenar_salon` y avisa por `salon-<bloque>`. Soltar
-sobre una mesa libre manda la empresa al final. En el celular se deja el dedo un momento sobre la
-mesa para levantarla. Mientras se edita, el otro bloque queda bloqueado. `/admin/acomodo`
-redirige ahí.
+**Las vistas se llaman «Empresas y Expertos» y «Mapa»**, en `/admin/mesas` y en `/host` (antes
+Rejilla y Plano; las claves internas siguen siendo `rejilla` y `plano`). En admin, «Empresas y
+Expertos» solo se ve y va en orden A–Z por el nombre que muestra la celda, cada mesa con su
+número. En `/host` sigue por número.
 
-`reordenar_salon` rechaza el acomodo si falta o sobra una empresa, si no cabe antes de
-portafolio, o si cambiaría el número de una mesa en sesión.
+**«Editar acomodo» vive solo en el Mapa y es mesa por mesa**, como los íconos de un celular.
+Soltar una mesa sobre otra las intercambia (la 56 en la 54 → la 54 pasa a la 56); soltar sobre
+una libre la mueve ahí. Una empresa puede quedar partida: es decisión del equipo. Portafolio se
+mueve igual. Las que cambiaron llevan contorno cian y «antes N». Nada se guarda hasta «Guardar
+acomodo · N mesas», que guarda directo, sin recuadro de confirmar: la primera versión lo tenía y
+un guardado se quedó ahí sin llegar a la base. Hay «Deshacer último» y «Deshacer todo». Mientras
+se edita se bloquean el otro bloque y el cambio de vista. En el celular se deja el dedo un
+momento sobre la mesa para levantarla.
+
+`acomodar_mesas` (migración 13) recibe solo las filas que cambian y su número nuevo. Rechaza
+números fuera del salón o repetidos, filas de otro bloque, choques con una mesa que no se movió
+y cambios en una mesa en sesión. `reordenar_salon` (migración 12, por empresa completa) se queda
+en la base sin pantalla que la use; `/admin/acomodo` redirige a `/admin/mesas`.
 
 **Después de acomodar se hornea el mapa fijo.** `/admin/impreso` ya lee de la base y cae al mapa
 horneado solo si no contesta; pero `/host` y `/mesa` usan el horneado cuando la base falla.
@@ -218,8 +224,8 @@ horneado solo si no contesta; pero `/host` y `/mesa` usan el horneado cuando la 
 ## Verificación
 
 La prueba dura ya no es contra el Tablero del Excel: la base manda. Se revisa por SQL que no
-haya números repetidos por bloque, que cada empresa esté en mesas seguidas, que portafolio esté
-en 73–75, y `hornear-mapa.mjs --verificar`. Al corte del 22-sep-2026 por la noche, con las bajas
+haya números repetidos por bloque ni números fuera del salón, y `hornear-mapa.mjs --verificar`.
+Desde el 22-sep por la noche una empresa ya puede estar partida y portafolio puede moverse. Al corte del 22-sep-2026 por la noche, con las bajas
 de Definity y Redwood: 70 lugares en Bloque 1 (1–67 y 73–75) y 60 en Bloque 2 (1–57 y 73–75).
 Libres: B1 68–72, B2 58–72.
 
