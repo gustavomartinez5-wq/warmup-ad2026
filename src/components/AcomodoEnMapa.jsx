@@ -28,6 +28,40 @@ import PlanoSalon from './PlanoSalon'
 /** El borrador: qué número tiene cada fila del bloque. */
 const numerosDe = filas => new Map(filas.map(f => [f.id, f.mesa_numero]))
 
+const porNombre = (a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' })
+
+/**
+ * El salón como quedó el 22-sep: las empresas en orden A–Z, cada una en mesas
+ * seguidas desde la 1, y portafolio en las últimas mesas del salón (73–75), en el
+ * orden que ya traían. Es el mismo orden que usa la base (comprobado contra B2).
+ * Dentro de una empresa, sus mesas van en el orden en que estaban.
+ *
+ * Devuelve null si no cabe: más mesas que el salón antes de la zona de portafolio.
+ */
+function ordenAlfabetico(filas, original, totalMesas) {
+  const numeroOriginal = f => original.get(f.id) ?? Infinity
+  const esPortafolio = f => f.giro === GIRO_PORTAFOLIO
+
+  const porEmpresa = new Map()
+  for (const f of filas.filter(f => !esPortafolio(f))) {
+    if (!porEmpresa.has(f.empresa)) porEmpresa.set(f.empresa, [])
+    porEmpresa.get(f.empresa).push(f)
+  }
+  const portafolio = filas.filter(esPortafolio).sort((a, b) => numeroOriginal(a) - numeroOriginal(b))
+  const inicioPortafolio = totalMesas - portafolio.length + 1
+
+  const nuevo = new Map()
+  let siguiente = 1
+  for (const empresa of [...porEmpresa.keys()].sort(porNombre)) {
+    for (const f of porEmpresa.get(empresa).sort((a, b) => numeroOriginal(a) - numeroOriginal(b))) {
+      nuevo.set(f.id, siguiente++)
+    }
+  }
+  if (siguiente > inicioPortafolio) return null
+  portafolio.forEach((f, i) => nuevo.set(f.id, inicioPortafolio + i))
+  return nuevo
+}
+
 function Celda({ mesa, antes, angosta, arrastrando }) {
   const { numero, reclutador: r, estado } = mesa
   const drag = useDraggable({ id: `m${numero}`, data: { numero }, disabled: !r })
@@ -119,6 +153,17 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
     setBorrador(nuevo)
   }
 
+  function alfabetico() {
+    const nuevo = ordenAlfabetico(delBloque, original, edicion.total_mesas)
+    if (!nuevo) {
+      setError('No cabe en orden alfabético: hay más mesas que el salón antes de la zona de portafolio.')
+      return
+    }
+    setError(null)
+    setHistorial(h => [...h, borrador])
+    setBorrador(nuevo)
+  }
+
   function deshacerUltimo() {
     if (!historial.length) return
     setBorrador(historial.at(-1))
@@ -159,6 +204,9 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
             {guardando ? 'Guardando…'
               : n === 0 ? 'Guardar acomodo'
                 : `Guardar acomodo · ${n === 1 ? '1 mesa' : `${n} mesas`}`}
+          </button>
+          <button className={suave} onClick={alfabetico} disabled={guardando}>
+            Orden alfabético
           </button>
           <button className={suave} onClick={deshacerUltimo} disabled={guardando || !historial.length}>
             Deshacer último

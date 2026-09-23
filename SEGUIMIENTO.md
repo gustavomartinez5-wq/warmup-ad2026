@@ -23,10 +23,6 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
-00. **Un guardado real con «Editar acomodo» en el Mapa de `/admin/mesas`, con la cuenta del
-    equipo.** `acomodar_mesas` ya se probó por SQL con la identidad del equipo; falta el camino
-    completo desde el navegador. Después, hornear el mapa.
-
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
@@ -44,6 +40,21 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Orden alfabético en el editor del Mapa · 22-sep-2026
+
+Gustavo guardó su primer acomodo real en B1 a las 21:03: dos guardados, 10 mesas, con `acomodar`
+en la bitácora. Con eso queda probado el camino completo desde el navegador. El mapa se horneó al
+día (70 y 60).
+
+Pidió un botón para regresar al estado original. «Orden alfabético» en el editor deja el
+borrador así:
+- empresas A–Z en mesas seguidas desde la 1;
+- portafolio en las últimas mesas del salón, en el orden que traía.
+
+Se guarda como cualquier cambio. El orden de `localeCompare('es', base)` da exactamente el de la
+base (comprobado con B2, que sigue alfabético). En local, después de 4 movimientos, el botón
+regresó el Mapa idéntico al del 22-sep.
 
 ### Acomodo mesa por mesa sobre el Mapa · 22-sep-2026
 

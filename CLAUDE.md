@@ -209,7 +209,10 @@ Soltar una mesa sobre otra las intercambia (la 56 en la 54 → la 54 pasa a la 5
 una libre la mueve ahí. Una empresa puede quedar partida: es decisión del equipo. Portafolio se
 mueve igual. Las que cambiaron llevan contorno cian y «antes N». Nada se guarda hasta «Guardar
 acomodo · N mesas», que guarda directo, sin recuadro de confirmar: la primera versión lo tenía y
-un guardado se quedó ahí sin llegar a la base. Hay «Deshacer último» y «Deshacer todo». Mientras
+un guardado se quedó ahí sin llegar a la base. Hay «Deshacer último» y «Deshacer todo».
+«Orden alfabético» regresa el borrador al acomodo del 22-sep: empresas A–Z en mesas seguidas
+desde la 1 y portafolio en las últimas mesas del salón, en el orden que traía. Se guarda igual
+que cualquier cambio. Mientras
 se edita se bloquean el otro bloque y el cambio de vista. En el celular se deja el dedo un
 momento sobre la mesa para levantarla.
 
