@@ -79,15 +79,14 @@ src/
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
-│                        CarrerasPicker, RejillaMesas, Enlace, AcomodoEnMapa
+│                        CarrerasPicker, Enlace, AcomodoEnMapa, FichaEmpresa
 └── pages/
     ├── Entrar.jsx       login del equipo
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Turno.jsx        pantalla del estudiante que espera, sin login
     ├── Fila.jsx         control de la fila, para el host de lista de espera
     ├── Host.jsx         vista del equipo el día del evento
-    └── admin/           Tablero, Mesas, Empresas, Reclutadores, Cupos,
-                          Pendientes, Cambios, Importar (apagado), Qr, Impreso
+    └── admin/           Tablero, Mesas, Reclutadores, Pendientes, Cambios, Qr, Impreso
 ```
 
 ## Rutas
@@ -119,7 +118,7 @@ la importación sea directa y que Gustavo reconozca lo que ve.
 | `reclutadores` | Una fila por persona por bloque, con su mesa |
 | `mesas_estado` | El estado en vivo. Solo el día del evento |
 | `pendientes` | Los pendientes del Tablero del Excel |
-| `cupos` | Seis franjas. El registro de estudiantes se teclea, no se captura aquí |
+| `cupos` | Sin pantalla desde el 22-sep: los cupos se llevan en un Excel aparte. La tabla se queda |
 | `equipo` | Qué cuentas tienen acceso. Se maneja por SQL, no desde la app |
 | `cambios_salon` | La bitácora del día: quién movió qué y cuándo. La escriben las funciones |
 | `turnos` | La fila del día del evento. Folio, servicio y estado. Sin datos de persona |
@@ -199,10 +198,16 @@ número dio un sobrecupo de seis que no existía.
 **Cada bloque se acomoda por su cuenta.** El 22-sep la base quedó en orden alfabético por
 bloque: una empresa de todo el día puede tener números distintos en B1 y B2.
 
-**Las vistas se llaman «Empresas y Expertos» y «Mapa»**, en `/admin/mesas` y en `/host` (antes
-Rejilla y Plano; las claves internas siguen siendo `rejilla` y `plano`). En admin, «Empresas y
-Expertos» solo se ve y va en orden A–Z por el nombre que muestra la celda, cada mesa con su
-número. En `/host` sigue por número.
+**El salón se ve en el Mapa.** La rejilla («Empresas y Expertos») salió el 22-sep. `/admin/mesas`
+solo tiene el Mapa y `/host` tiene Mapa y Lista, y abre en el Mapa.
+
+**El admin tiene 7 pestañas:** Tablero, Mapa de mesas, Reclutadores, Pendientes, Cambios del día,
+QR y Hoja de papel. Empresas, Cupos e Importar salieron el 22-sep, y sus rutas llevan al Mapa.
+
+**La ficha de cada empresa se abre tocando su mesa en el Mapa de admin** (`FichaEmpresa`). Ahí se
+editan el contacto (representante, celular, correo) y las carreras. La bitácora anota que cambió el
+contacto, sin los valores. Los nombres de reclutadores se cambian en Reclutadores. Una mesa libre
+abre el detalle de siempre, por «Ya la conseguí».
 
 **«Editar acomodo» vive en el Mapa, de `/admin/mesas` y de `/host`, y es mesa por mesa**, como
 los íconos de un celular. Es el mismo componente (`AcomodoEnMapa`).

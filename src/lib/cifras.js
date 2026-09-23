@@ -71,35 +71,6 @@ function capacidadTotal(edicion, porBloque) {
 }
 
 /**
- * Las seis franjas con su cupo, igual que la hoja Cupos.
- * El registro de estudiantes no se captura en la app: se teclea el número.
- */
-export function calcularCupos({ edicion, reclutadores, registros = [] }) {
-  const porHora  = edicion?.atenciones_por_hora ?? 2
-  const propCv   = Number(edicion?.prop_cv ?? 0.6)
-  const activos  = vivos(reclutadores)
-
-  return registros.map(fila => {
-    const cuantos  = activos.filter(r => r.bloque === fila.bloque).length
-    const capacidad = cuantos * porHora
-    const cupoCv    = Math.round(capacidad * propCv)
-    const usados    = (fila.registro_cv ?? 0) + (fila.registro_entrevista ?? 0)
-    const ocupado   = capacidad ? usados / capacidad : 0
-
-    return {
-      ...fila,
-      reclutadores:     cuantos,
-      capacidad,
-      cupoCv,
-      cupoEntrevista:   capacidad - cupoCv,
-      disponible:       Math.max(0, capacidad - usados),
-      porcentajeOcupado: ocupado,
-      semaforo:         ocupado >= 0.95 ? 'lleno' : ocupado >= 0.7 ? 'por_cerrar' : 'abierto',
-    }
-  })
-}
-
-/**
  * El estado de apartado de cada mesa en un bloque. No es el estado en vivo del
  * día del evento: es si la mesa está tomada, tomada sin nombre, libre o excedente.
  */

@@ -12,15 +12,10 @@ import Fila from './pages/Fila'
 
 import Tablero from './pages/admin/Tablero'
 import Mesas from './pages/admin/Mesas'
-import Empresas from './pages/admin/Empresas'
 import Reclutadores from './pages/admin/Reclutadores'
-import Cupos from './pages/admin/Cupos'
 import Pendientes from './pages/admin/Pendientes'
 import Cambios from './pages/admin/Cambios'
 import Cargando from './components/Cargando'
-
-// La importación está apagada desde el 22-sep; queda la ruta con el aviso.
-const Importar = lazy(() => import('./pages/admin/Importar'))
 
 // La librería de QR tampoco tiene por qué viajar en el paquete principal.
 const Qr = lazy(() => import('./pages/admin/Qr'))
@@ -44,14 +39,15 @@ export default function App() {
           <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
-            {/* El acomodo vive en el Mapa de mesas, con «Editar acomodo». */}
-            <Route path="acomodo" element={<Navigate to="/admin/mesas" replace />} />
-            <Route path="empresas" element={<Empresas />} />
             <Route path="reclutadores" element={<Reclutadores />} />
-            <Route path="cupos" element={<Cupos />} />
             <Route path="pendientes" element={<Pendientes />} />
             <Route path="cambios" element={<Cambios />} />
-            <Route path="importar" element={<Suspense fallback={<Cargando />}><Importar /></Suspense>} />
+            {/* Pantallas que salieron el 22-sep. El acomodo y la ficha de cada empresa
+                viven en el Mapa de mesas; los cupos se llevan en un Excel aparte; la
+                importación se apagó. Una liga guardada cae en el Mapa. */}
+            {['acomodo', 'empresas', 'cupos', 'importar'].map(r => (
+              <Route key={r} path={r} element={<Navigate to="/admin/mesas" replace />} />
+            ))}
             <Route path="qr" element={<Suspense fallback={<Cargando />}><Qr /></Suspense>} />
             <Route path="impreso" element={<Impreso />} />
           </Route>

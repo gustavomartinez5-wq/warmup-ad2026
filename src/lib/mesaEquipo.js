@@ -189,6 +189,22 @@ export async function guardarCarreras(empresaId, siglas, { edicionId, empresa } 
 }
 
 /**
+ * El contacto de una empresa: representante, celular y correo. Se escribe directo
+ * a la tabla porque no mueve mesas. En la bitácora queda solo que cambió y de qué
+ * empresa, nunca los valores: son datos de personas de fuera del Tec.
+ */
+export async function guardarContacto(empresaId, contacto, { edicionId, empresa } = {}) {
+  const limpio = v => (v ?? '').trim() || null
+  const { error } = await supabase.from('empresas').update({
+    representante: limpio(contacto.representante),
+    celular:       limpio(contacto.celular),
+    correo:        limpio(contacto.correo),
+  }).eq('id', empresaId)
+  if (error) throw new Error(error.message)
+  if (edicionId) await anotar(edicionId, 'contacto', { empresa })
+}
+
+/**
  * La bitácora del día. Las funciones de Postgres anotan solas; esto es para lo
  * que todavía se escribe desde el navegador —empresas y carreras—, que no mueve
  * mesas y no necesita transacción.

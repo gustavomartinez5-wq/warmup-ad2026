@@ -9,7 +9,6 @@ import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../lib/plano'
 import { catalogoDeCarreras } from '../lib/carreras'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import { plano, contiene } from '../lib/texto'
-import RejillaMesas from '../components/RejillaMesas'
 import PlanoSalon from '../components/PlanoSalon'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
@@ -21,10 +20,9 @@ const AcomodoEnMapa = lazy(() => import('../components/AcomodoEnMapa'))
 
 /**
  * La vista del equipo el día del evento. Para los tres hosts y los becarios,
- * en celular. Tres formas de ver lo mismo:
+ * en celular. Dos formas de ver lo mismo:
  *
- *   Empresas y Expertos — la rejilla por número, para ubicar la mesa 43 de un vistazo.
- *   Mapa    — las mesas donde están en el piso.
+ *   Mapa    — las mesas donde están en el piso, para ubicar la mesa 43 de un vistazo.
  *   Lista   — ordenada por estado, disponibles arriba, para cuando traes a un
  *             estudiante al lado y necesitas a dónde mandarlo ya.
  *
@@ -202,7 +200,7 @@ export default function Host() {
   const [params] = useSearchParams()
   const desdeFila = params.get('desde') === 'fila'
   const [bloque, setBloque]   = useState(bloquePorReloj)
-  const [vista, setVista]     = useState('rejilla')
+  const [vista, setVista]     = useState('plano')
   const [mesas, setMesas]     = useState(() => mesasFijas(bloquePorReloj()))
   const [fuente, setFuente]   = useState('fija')   // fija · viva · vieja
   const [error, setError]     = useState(null)
@@ -214,7 +212,7 @@ export default function Host() {
   const [marcando, setMarcando] = useState(null)
   const [catalogo, setCatalogo] = useState([])
   const [editando, setEditando] = useState(null)   // número de mesa que se está editando
-  const [huecoTocado, setHuecoTocado] = useState(null)   // la mesa libre que se tocó en la rejilla
+  const [huecoTocado, setHuecoTocado] = useState(null)   // la mesa libre que se tocó en el Mapa
   const [totalMesas, setTotalMesas] = useState(null)
   const [salon, setSalon]       = useState(null)   // empresas y filas; solo para el equipo
   const [trayendoSalon, setTrayendoSalon] = useState(false)
@@ -384,10 +382,8 @@ export default function Host() {
   const hayFiltro = Boolean(q || carrera || giro)
 
   /**
-   * Sin filtro, la rejilla es el salón completo: cada número en su lugar, y la
-   * mesa libre como hueco punteado. Antes solo salían las asignadas, así que al
-   * liberar una todas las de después se recorrían un lugar y el hueco no se
-   * veía. Con filtro se quedan solo las que coinciden: ahí los huecos estorban.
+   * El salón completo para el Mapa: cada número en su lugar, y la mesa libre como
+   * hueco punteado donde se puede asignar una empresa.
    */
   const salonCompleto = useMemo(() => {
     const lista = mesas ?? []
@@ -395,7 +391,6 @@ export default function Host() {
     const alto = Math.max(totalMesas ?? 0, ...lista.map(m => m.numero), 0)
     return Array.from({ length: alto }, (_, i) => porNumero.get(i + 1) ?? { numero: i + 1, libre: true })
   }, [mesas, totalMesas])
-  const celdas = hayFiltro ? (mesas ?? []) : salonCompleto
 
   // El plano no quita mesas al filtrar: apaga las que no coinciden.
   const coinciden = hayFiltro ? new Set(filtradas.map(m => m.numero)) : null
@@ -519,7 +514,7 @@ export default function Host() {
             ))}
           </div>
           <div className="flex rounded-lg border border-lavanda/20 overflow-hidden">
-            {[['rejilla', 'Empresas y Expertos'], ['plano', 'Mapa'], ['lista', 'Lista']].map(([v, t]) => (
+            {[['plano', 'Mapa'], ['lista', 'Lista']].map(([v, t]) => (
               <button
                 key={v} onClick={() => setVista(v)} disabled={acomodando && vista !== v}
                 className={`px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-35 ${
@@ -626,7 +621,7 @@ export default function Host() {
         {carreras.length === 0 && mesas?.length > 0 && (
           <p className="text-[11px] text-ambar/90 leading-snug">
             Ninguna empresa tiene carreras etiquetadas todavía. Se hace en{' '}
-            <Link to="/admin/empresas" className="underline">Empresas</Link>.
+            <Link to="/admin/mesas" className="underline">el Mapa de mesas</Link>, tocando la mesa.
           </p>
         )}
         </>)}
@@ -640,47 +635,6 @@ export default function Host() {
           <p className="text-sm text-lavanda/50 py-10 text-center">
             {hayFiltro ? 'Ninguna mesa coincide con eso.' : 'Sin mesas en este bloque.'}
           </p>
-        )}
-
-        {mesas && filtradas.length > 0 && vista === 'rejilla' && (
-          <RejillaMesas total={hayFiltro ? filtradas.length : celdas.length}>
-            {(hayFiltro ? filtradas : celdas).map(m => {
-              if (m.libre) {
-                // Con la base viva se puede asignar ahí mismo; sin ella, solo se ve.
-                const tocable = fuente === 'viva'
-                return (
-                  <button
-                    key={m.numero} disabled={!tocable}
-                    onClick={() => abrirEdicion('nueva', m.numero)}
-                    className="rounded-lg border border-dashed border-lavanda/25 bg-transparent px-2 py-2
-                               text-left min-h-[62px] flex flex-col justify-between text-lavanda/40
-                               transition-transform active:scale-95 disabled:active:scale-100"
-                  >
-                    <span className="text-[11px] font-bold cifra">{m.numero}</span>
-                    <span className="text-[11px] leading-tight">Libre</span>
-                  </button>
-                )
-              }
-              const p = pintar(m, ahora)
-              return (
-                <button
-                  key={m.numero} onClick={() => setAbierta(m.numero)}
-                  className={`rounded-lg border px-2 py-2 text-left min-h-[62px] flex flex-col justify-between
-                              transition-transform active:scale-95 ${p.celda}`}
-                >
-                  <span className="flex items-baseline justify-between gap-1">
-                    <span className="text-[11px] font-bold cifra opacity-75">{m.numero}</span>
-                    {m.estado === 'ocupado' && (
-                      <span className="text-[11px] font-bold cifra">{comoReloj(p.segundos)}</span>
-                    )}
-                  </span>
-                  <span className="text-[11px] leading-tight line-clamp-2 break-words font-medium">
-                    {m.empresa}
-                  </span>
-                </button>
-              )
-            })}
-          </RejillaMesas>
         )}
 
         {acomodando && (!salon

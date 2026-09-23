@@ -48,7 +48,8 @@ export default function Tablero() {
         <div className="rounded-2xl border border-ambar/50 bg-ambar/10 px-5 py-4">
           <p className="text-sm font-semibold">Todavía no hay datos</p>
           <p className="text-sm text-lavanda/75 mt-1">
-            Sube el libro de control en <Link to="/admin/importar" className="text-cian underline">Importar Excel</Link>.
+            La base no tiene empresas en esta edición. Las altas se hacen en el{' '}
+            <Link to="/admin/mesas" className="text-cian underline">Mapa de mesas</Link>.
           </p>
         </div>
       )}

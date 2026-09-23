@@ -41,6 +41,38 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### El admin adelgaza · 22-sep-2026
+
+Con el Mapa editable, varias pantallas repetían lo mismo. Gustavo decidió qué se queda.
+
+| Qué | Qué pasó |
+|---|---|
+| «Empresas y Expertos» (la rejilla) | Sale de admin y de `/host`. `/host` queda con Mapa y Lista y abre en Mapa |
+| Cupos | Sale: se lleva en un Excel aparte. La tabla `cupos` se queda en la base sin pantalla |
+| Empresas | Sale. Su ficha se abre tocando la mesa en el Mapa de admin (`FichaEmpresa`) |
+| Importar Excel | Sale del todo. El lector se queda para `verificar-importacion.mjs` |
+| Tablero, Reclutadores, Pendientes, Cambios, QR, Hoja de papel | Se quedan |
+
+Las rutas `/admin/empresas`, `/admin/cupos`, `/admin/importar` y `/admin/acomodo` llevan al Mapa.
+
+En la ficha se editan el **contacto** (nuevo: antes no se editaba en ningún lado) y las carreras,
+con un solo «Guardar». `guardarContacto` en `mesaEquipo.js` anota en la bitácora que cambió el
+contacto, sin los valores. Las carreras usan `guardarCarreras`, que sí revisa si falla. La ficha
+vieja no lo revisaba.
+
+| Prueba | Resultado |
+|---|---|
+| `update` de contacto con la cuenta del equipo (se deshizo) | 1 fila; `anon` rechazado; contacto intacto al final |
+| Mapa de admin a 390 px | Sin selector de vistas; «Editar acomodo» visible |
+| Tocar una mesa con empresa | Abre la ficha: contacto editable, reclutadores, lo que escribió, carreras |
+| El botón de la ficha | «Sin cambios» hasta que algo cambia; luego «Guardar» |
+| Tocar una mesa libre | Abre el detalle («Nadie apartó esta mesa») |
+| `/host` a 390 px | «Mapa · Lista» en el mismo renglón que el bloque; abre en Mapa |
+| grep de lo borrado | Sin referencias sueltas |
+| `npm run build` | Limpio |
+
+Falta que Gustavo guarde un contacto real desde la ficha.
+
 ### «Editar acomodo» también en /host · 22-sep-2026
 
 Mismo editor del Mapa de admin, en el Mapa de `/host`. Decisiones de Gustavo: las mesas en sesión

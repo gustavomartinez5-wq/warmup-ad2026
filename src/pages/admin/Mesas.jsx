@@ -4,30 +4,13 @@ import { useDatos } from '../../lib/datos'
 import { mapaDeMesas, ESTADO_MESA, BLOQUES, calcularCifras, faltan, GIRO_PORTAFOLIO } from '../../lib/cifras'
 import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../../lib/plano'
 import Cargando from '../../components/Cargando'
-import RejillaMesas from '../../components/RejillaMesas'
+import FichaEmpresa from '../../components/FichaEmpresa'
 import PlanoSalon from '../../components/PlanoSalon'
 
 // La librería de arrastre solo viaja cuando alguien entra a editar el acomodo.
 const AcomodoEnMapa = lazy(() => import('../../components/AcomodoEnMapa'))
 
-/** Las dos vistas. «Empresas y Expertos» es para buscar y verificar; «Mapa» es el salón. */
-const VISTAS = [['rejilla', 'Empresas y Expertos'], ['plano', 'Mapa']]
-
-/**
- * «Empresas y Expertos» va en orden A–Z por empresa, para encontrar y verificar rápido.
- * Cada mesa conserva su número; aquí no se cambia nada. Las libres y las que faltan
- * van al final, por número. Se ordena por el nombre que se ve en la celda: portafolio
- * sale como «Diseño», no como «Portafolio · Diseño».
- */
-function enOrdenAlfabetico(mapa) {
-  const visto = m => nombreCorto(m.reclutador.empresa)
-  const ocupadas = mapa.filter(m => m.reclutador)
-    .sort((a, b) => visto(a).localeCompare(visto(b), 'es', { sensitivity: 'base' })
-                    || a.numero - b.numero)
-  return [...ocupadas, ...mapa.filter(m => !m.reclutador)]
-}
-
-/** La misma mesa en la rejilla y en el plano: número, empresa y el color de su estado. */
+/** Una mesa del Mapa: número, empresa y el color de su estado. */
 function Mesa({ mesa, angosta = false, onAbrir }) {
   const { clase } = ESTADO_MESA[mesa.estado]
   const nombre = nombreCorto(mesa.reclutador?.empresa ?? '')
@@ -196,7 +179,6 @@ function Detalle({ mesa, bloque, onCerrar, onConseguida, guardando }) {
 export default function Mesas() {
   const datos = useDatos()
   const [bloque, setBloque] = useState('b1')
-  const [vista, setVista]   = useState('rejilla')
   const [detalle, setDetalle] = useState(null)
   const [guardando, setGuardando] = useState(false)
   const [editando, setEditando] = useState(false)
@@ -204,7 +186,7 @@ export default function Mesas() {
 
   if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
-  const { edicion, empresas, reclutadores, recargar } = datos
+  const { edicion, empresas, reclutadores, carreras, recargar } = datos
   const porId = new Map(empresas.map(e => [e.id, e]))
   const conEmpresa = reclutadores.map(r => ({
     ...r,
@@ -228,7 +210,17 @@ export default function Mesas() {
 
   return (
     <section className="space-y-4">
-      {detalle && (
+      {/* Una mesa con empresa abre su ficha: contacto y carreras. Una libre o una que
+          el salón todavía no tiene abre el detalle, por «Ya la conseguí». */}
+      {detalle?.reclutador && porId.get(detalle.reclutador.empresa_id) && (
+        <FichaEmpresa
+          empresa={porId.get(detalle.reclutador.empresa_id)}
+          mesa={{ numero: detalle.numero, bloque, estatus: detalle.reclutador.estatus }}
+          reclutadores={reclutadores} carreras={carreras} edicionId={edicion.id}
+          onCerrar={() => setDetalle(null)} onGuardado={recargar}
+        />
+      )}
+      {detalle && !detalle.reclutador && (
         <Detalle
           mesa={detalle} bloque={bloque} guardando={guardando}
           onCerrar={() => setDetalle(null)} onConseguida={conseguida}
@@ -277,19 +269,7 @@ export default function Mesas() {
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
-          {VISTAS.map(([v, t]) => (
-            <button
-              key={v} onClick={() => setVista(v)} disabled={editando && vista !== v}
-              className={`px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-35 ${
-                vista === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        {!editando && vista === 'plano' && (
+        {!editando && (
           <button
             onClick={() => { setAviso(null); setEditando(true) }}
             className="px-3 py-1.5 rounded-lg border border-cian/50 text-xs font-bold text-cian
@@ -319,13 +299,7 @@ export default function Mesas() {
         <p className="text-sm text-lavanda/50 py-8 text-center">Sin mesas todavía.</p>
       )}
 
-      {mapa.length > 0 && vista === 'rejilla' && (
-        <RejillaMesas total={mapa.length}>
-          {enOrdenAlfabetico(mapa).map(m => <Mesa key={m.numero} mesa={m} onAbrir={setDetalle} />)}
-        </RejillaMesas>
-      )}
-
-      {mapa.length > 0 && vista === 'plano' && (
+      {mapa.length > 0 && (
         <PlanoSalon
           excedentes={mapa.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
           celda={(numero, { angosta }) => {
