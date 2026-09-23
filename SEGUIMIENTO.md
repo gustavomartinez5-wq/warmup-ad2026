@@ -41,6 +41,14 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### 61 empresas, no 67 · 23-sep-2026
+
+El Tablero decía 67 «Empresas registradas» porque contaba las seis fichas de portafolio
+(`Portafolio · …`) como empresas. Ahora cuenta 61 y abajo dice «más 6 expertos de portafolio».
+El cambio está en `calcularCifras`, que resta las de `GIRO_PORTAFOLIO`. Se revisó por SQL que no
+hay empresas repetidas en la base: 67 filas, 61 nombres de empresa y 6 de portafolio. Se vio
+renderizado a 390 px con datos simulados.
+
 ### El admin adelgaza · 22-sep-2026
 
 Con el Mapa editable, varias pantallas repetían lo mismo. Gustavo decidió qué se queda.

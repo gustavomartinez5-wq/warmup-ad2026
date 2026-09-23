@@ -56,7 +56,11 @@ export default function Tablero() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Cifra valor={dias > 0 ? dias : 0} etiqueta="Días para el evento" />
-        <Cifra valor={c.empresas} etiqueta="Empresas registradas" />
+        <Cifra
+          valor={c.empresas}
+          etiqueta="Empresas registradas"
+          nota={c.expertos > 0 ? `más ${c.expertos} expertos de portafolio` : undefined}
+        />
         <Cifra valor={c.reclutadoresB1} etiqueta="Reclutadores Bloque 1" nota="10:00 a 13:00 h" />
         <Cifra valor={c.reclutadoresB2} etiqueta="Reclutadores Bloque 2" nota="14:00 a 17:00 h" />
       </div>

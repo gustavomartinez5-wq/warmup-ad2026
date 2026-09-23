@@ -170,8 +170,9 @@ pegadas a la empresa y no a la mesa**: con una sola empresa de cinco mesas, el e
 urbanismo saldría mandado a la mesa de animación.
 
 Las seis llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
-Es lo que saca la zona completa con el filtro de giro de `/host` y lo que hace que la hoja
-impresa las nombre aparte. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
+Es lo que saca la zona completa con el filtro de giro de `/host`, lo que hace que la hoja
+impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 61 empresas
+más 6 expertos, no 67 empresas. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
 Bloque 1 también son 73, 74 y 75: la 73, que se había dejado libre el 22-sep, la ocupa la experta
 de Steelcase desde ese mismo día.
 

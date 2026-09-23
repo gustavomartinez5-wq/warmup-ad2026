@@ -39,8 +39,13 @@ export function calcularCifras({ edicion, empresas, reclutadores }) {
   const mesaMasAlta = mesasUsadas.size ? Math.max(...mesasUsadas) : 0
   const total = edicion?.total_mesas ?? 0
 
+  // Los expertos de portafolio entran como una empresa cada uno, pero no son
+  // empresas que vienen: contarlos daba 67 donde son 61.
+  const expertos = empresas.filter(e => e.giro === GIRO_PORTAFOLIO).length
+
   return {
-    empresas:        empresas.length,
+    empresas:        empresas.length - expertos,
+    expertos,
     reclutadoresB1:  porBloque.b1.length,
     reclutadoresB2:  porBloque.b2.length,
 
