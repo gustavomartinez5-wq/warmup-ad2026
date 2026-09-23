@@ -204,7 +204,8 @@ Rejilla y Plano; las claves internas siguen siendo `rejilla` y `plano`). En admi
 Expertos» solo se ve y va en orden A–Z por el nombre que muestra la celda, cada mesa con su
 número. En `/host` sigue por número.
 
-**«Editar acomodo» vive solo en el Mapa y es mesa por mesa**, como los íconos de un celular.
+**«Editar acomodo» vive en el Mapa, de `/admin/mesas` y de `/host`, y es mesa por mesa**, como
+los íconos de un celular. Es el mismo componente (`AcomodoEnMapa`).
 Soltar una mesa sobre otra las intercambia (la 56 en la 54 → la 54 pasa a la 56); soltar sobre
 una libre la mueve ahí. Una empresa puede quedar partida: es decisión del equipo. Portafolio se
 mueve igual. Las que cambiaron llevan contorno cian y «antes N». Nada se guarda hasta «Guardar
@@ -215,6 +216,12 @@ desde la 1 y portafolio en las últimas mesas del salón, en el orden que traía
 que cualquier cambio. Mientras
 se edita se bloquean el otro bloque y el cambio de vista. En el celular se deja el dedo un
 momento sobre la mesa para levantarla.
+
+**En `/host` el editor usa los colores del estado en vivo y las mesas en sesión quedan fijas**:
+llevan candado, no se arrastran y no se les suelta otra encima. «Orden alfabético» no se aplica
+si movería una mesa en sesión y dice cuál. El estado en vivo es del número, así que el color va
+con el número donde estaba la mesa. Soltar solo cuenta sobre la mesa que está bajo el dedo: con el
+respaldo de «la más cercana», soltar sobre una mesa en sesión la intercambiaba con la vecina.
 
 `acomodar_mesas` (migración 13) recibe solo las filas que cambian y su número nuevo. Rechaza
 números fuera del salón o repetidos, filas de otro bloque, choques con una mesa que no se movió

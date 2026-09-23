@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { supabase, edicionCompleta } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
@@ -15,6 +15,9 @@ import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
 import EditarMesa from '../components/EditarMesa'
 import { datosDelSalon } from '../lib/mesaEquipo'
+
+// La librería de arrastre solo viaja cuando alguien entra a «Editar acomodo».
+const AcomodoEnMapa = lazy(() => import('../components/AcomodoEnMapa'))
 
 /**
  * La vista del equipo el día del evento. Para los tres hosts y los becarios,
@@ -218,6 +221,8 @@ export default function Host() {
   const [enlace, setEnlace] = useState('conectando')
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const [aviso, setAviso]   = useState(null)  // «otro host movió una mesa»
+  const [acomodando, setAcomodando] = useState(false)   // «Editar acomodo» sobre el Mapa
+  const [guardadoAcomodo, setGuardadoAcomodo] = useState(null)
   const desmontado = useRef(false)
   const canalSalon = useRef(null)
   const salonPedido = useRef(false)
@@ -419,6 +424,25 @@ export default function Host() {
     setMarcando(null)
   }
 
+  /**
+   * Para «Editar acomodo»: las filas del bloque con su empresa y giro. No se pide
+   * el nombre del reclutador; el color sale del estado en vivo, no del nombre.
+   */
+  const filasParaAcomodo = useMemo(() => {
+    if (!salon) return []
+    const porId = new Map(salon.empresas.map(e => [e.id, e]))
+    return salon.filas
+      .filter(f => f.bloque === bloque)
+      .map(f => ({
+        ...f,
+        empresa: porId.get(f.empresa_id)?.nombre ?? '—',
+        giro: porId.get(f.empresa_id)?.giro ?? null,
+        nombre: '—',
+        estatus: 'confirmado',
+      }))
+  }, [salon, bloque])
+  const vivoPorNumero = new Map((mesas ?? []).map(m => [m.numero, m]))
+
   const mesaAbierta = filtradas.find(m => m.numero === abierta)
     ?? (mesas ?? []).find(m => m.numero === abierta)
   const enAlta = editando === 'nueva'
@@ -485,8 +509,8 @@ export default function Host() {
           <div className="flex rounded-lg border border-lavanda/20 overflow-hidden">
             {BLOQUES.map(b => (
               <button
-                key={b.clave} onClick={() => setBloque(b.clave)}
-                className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+                key={b.clave} onClick={() => setBloque(b.clave)} disabled={acomodando && bloque !== b.clave}
+                className={`px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-35 ${
                   bloque === b.clave ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
                 }`}
               >
@@ -497,8 +521,8 @@ export default function Host() {
           <div className="flex rounded-lg border border-lavanda/20 overflow-hidden">
             {[['rejilla', 'Empresas y Expertos'], ['plano', 'Mapa'], ['lista', 'Lista']].map(([v, t]) => (
               <button
-                key={v} onClick={() => setVista(v)}
-                className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+                key={v} onClick={() => setVista(v)} disabled={acomodando && vista !== v}
+                className={`px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-35 ${
                   vista === v ? 'bg-tec text-white' : 'text-lavanda/55 hover:text-white'
                 }`}
               >
@@ -506,13 +530,23 @@ export default function Host() {
               </button>
             ))}
           </div>
-          {fuente === 'viva' && (
-            <button
-              onClick={() => abrirEdicion('nueva')}
-              className="ml-auto text-xs font-semibold text-cian hover:text-white transition-colors"
-            >
-              + Agregar mesa
-            </button>
+          {fuente === 'viva' && !acomodando && (
+            <div className="ml-auto flex items-center gap-3">
+              {vista === 'plano' && (
+                <button
+                  onClick={() => { setGuardadoAcomodo(null); setAcomodando(true); if (!salon) traerSalon() }}
+                  className="text-xs font-semibold text-cian hover:text-white transition-colors"
+                >
+                  Editar acomodo
+                </button>
+              )}
+              <button
+                onClick={() => abrirEdicion('nueva')}
+                className="text-xs font-semibold text-cian hover:text-white transition-colors"
+              >
+                + Agregar mesa
+              </button>
+            </div>
           )}
         </div>
 
@@ -550,8 +584,19 @@ export default function Host() {
           </p>
         )}
 
+        {guardadoAcomodo && (
+          <p className="text-[11px] leading-snug rounded-lg border border-teal/50 bg-teal/15 px-2.5 py-2">
+            {guardadoAcomodo}{' '}
+            <button onClick={() => setGuardadoAcomodo(null)} className="underline underline-offset-2 font-semibold">
+              Entendido
+            </button>
+          </p>
+        )}
+
         {/* En celular no caben los tres en un renglón: el buscador manda y los
-            filtros van debajo, a la mitad cada uno. */}
+            filtros van debajo, a la mitad cada uno. Al acomodar se esconden: un
+            filtro apaga mesas y estorba al arrastrar. */}
+        {!acomodando && (<>
         <div className="space-y-2">
           <input
             value={busca} onChange={e => setBusca(e.target.value)}
@@ -584,6 +629,7 @@ export default function Host() {
             <Link to="/admin/empresas" className="underline">Empresas</Link>.
           </p>
         )}
+        </>)}
       </header>
 
       <main className="flex-1 px-4 py-4">
@@ -637,7 +683,29 @@ export default function Host() {
           </RejillaMesas>
         )}
 
-        {mesas && filtradas.length > 0 && vista === 'plano' && (
+        {acomodando && (!salon
+          ? <Cargando texto="Trayendo el salón…" />
+          : (
+            <Suspense fallback={<Cargando />}>
+              <AcomodoEnMapa
+                edicion={{ total_mesas: salon.totalMesas }}
+                bloque={bloque}
+                filas={filasParaAcomodo}
+                // El estado en vivo es del número donde estaba la mesa.
+                pintar={(f, n) => pintar(vivoPorNumero.get(n) ?? { numero: n, estado: 'disponible' }, ahora).celda}
+                fija={(f, n) => vivoPorNumero.get(n)?.estado === 'ocupado'}
+                avisar={() => canalSalon.current?.send({ type: 'broadcast', event: 'cambio', payload: {} })}
+                onSalir={() => setAcomodando(false)}
+                onGuardado={async n => {
+                  await Promise.all([traer(), traerSalon()])
+                  setAcomodando(false)
+                  setGuardadoAcomodo(`Acomodo guardado: ${n === 1 ? 'una mesa cambió' : `${n} mesas cambiaron`} de lugar.`)
+                }}
+              />
+            </Suspense>
+          ))}
+
+        {!acomodando && mesas && filtradas.length > 0 && vista === 'plano' && (
           <PlanoSalon
             excedentes={salonCompleto.filter(m => !m.libre && m.numero > MESAS_EN_PLANO).map(m => m.numero)}
             celda={(numero, { angosta }) => (

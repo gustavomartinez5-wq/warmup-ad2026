@@ -41,6 +41,29 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### «Editar acomodo» también en /host · 22-sep-2026
+
+Mismo editor del Mapa de admin, en el Mapa de `/host`. Decisiones de Gustavo: las mesas en sesión
+se ven y no se mueven, y los colores son los del estado en vivo.
+
+- `AcomodoEnMapa` recibe tres opciones: `pintar` (color en vivo), `fija` (mesa en sesión) y
+  `avisar` (el canal que `/host` ya tiene abierto, para no abrir otro).
+- En `/host`, «Editar acomodo» sale junto a «+ Agregar mesa», solo en «Mapa» y con la base viva.
+  Mientras se edita se esconden buscador y filtros, y se bloquean bloque y vista.
+- Las filas salen de `datosDelSalon()`, sin nombres de reclutadores.
+
+| Prueba (página local con estados de mentira) | Resultado |
+|---|---|
+| Mesa en sesión | Candado, no se levanta, no acepta que se suelte otra encima |
+| Mesa en break | Se mueve normal |
+| Soltar sobre una ocupada | Antes la intercambiaba con la vecina; corregido |
+| «Orden alfabético» con la 57 en sesión | No se aplica: «Espera a que terminen: 57» |
+| 390 px, toque largo | Intercambia; sin scroll lateral |
+| `/host` sin editar | El botón sale solo en «Mapa» y cabe a 390 px |
+| `npm run build` | Limpio |
+
+Falta que Gustavo pruebe desde `/host` con su cuenta.
+
 ### Orden alfabético en el editor del Mapa · 22-sep-2026
 
 Gustavo guardó su primer acomodo real en B1 a las 21:03: dos guardados, 10 mesas, con `acomodar`

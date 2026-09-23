@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  DndContext, DragOverlay, pointerWithin, closestCenter,
+  DndContext, DragOverlay, pointerWithin,
   MouseSensor, TouchSensor, useSensor, useSensors, useDraggable, useDroppable,
 } from '@dnd-kit/core'
 import { supabase } from '../lib/supabase'
@@ -23,6 +23,14 @@ import PlanoSalon from './PlanoSalon'
  *
  * Se carga aparte, al entrar a editar: la librería de arrastre no tiene por qué
  * viajar en el paquete de las pantallas del evento.
+ *
+ * Lo usan dos pantallas. `/admin/mesas` lo usa tal cual. `/host` le pasa tres cosas:
+ *   pintar(fila, numeroOriginal) — el color del estado en vivo, que es del número
+ *                                  donde estaba la mesa, no de la empresa;
+ *   fija(fila, numeroOriginal)   — true si esa mesa está en sesión: no se arrastra ni
+ *                                  se le suelta otra encima (la base también lo exige);
+ *   avisar()                     — el aviso por `salon-<bloque>` sale por el canal
+ *                                  que `/host` ya tiene abierto, no por uno nuevo.
  */
 
 /** El borrador: qué número tiene cada fila del bloque. */
@@ -62,10 +70,10 @@ function ordenAlfabetico(filas, original, totalMesas) {
   return nuevo
 }
 
-function Celda({ mesa, antes, angosta, arrastrando }) {
+function Celda({ mesa, antes, angosta, arrastrando, color, fija }) {
   const { numero, reclutador: r, estado } = mesa
-  const drag = useDraggable({ id: `m${numero}`, data: { numero }, disabled: !r })
-  const drop = useDroppable({ id: `m${numero}`, data: { numero } })
+  const drag = useDraggable({ id: `m${numero}`, data: { numero }, disabled: !r || fija })
+  const drop = useDroppable({ id: `m${numero}`, data: { numero }, disabled: fija })
   const ref = el => { drag.setNodeRef(el); drop.setNodeRef(el) }
 
   const nombre = nombreCorto(r?.empresa ?? '')
@@ -77,18 +85,20 @@ function Celda({ mesa, antes, angosta, arrastrando }) {
   return (
     <div
       ref={ref}
-      {...(r ? drag.listeners : {})}
-      {...(r ? drag.attributes : {})}
-      title={nombre ? `${numero} · ${nombre}` : `Mesa ${numero}`}
+      {...(r && !fija ? drag.listeners : {})}
+      {...(r && !fija ? drag.attributes : {})}
+      title={nombre ? `${numero} · ${nombre}${fija ? ' · en sesión' : ''}` : `Mesa ${numero}`}
       className={`w-full h-full rounded-lg border ${angosta ? 'px-0.5' : 'px-2'} py-2 text-left
                   min-h-[58px] flex flex-col justify-between min-w-0 select-none
-                  ${ESTADO_MESA[estado].clase} ${portafolio}
-                  ${r ? 'cursor-grab touch-manipulation' : ''}
+                  ${color ?? ESTADO_MESA[estado].clase} ${portafolio}
+                  ${r && !fija ? 'cursor-grab touch-manipulation' : ''}
                   ${movida && !levantada ? 'ring-2 ring-cian' : ''}
                   ${drop.isOver && !levantada ? 'ring-2 ring-white scale-[1.04]' : ''}
                   ${levantada ? 'opacity-30 border-dashed' : ''}`}
     >
-      <span className="text-[11px] font-bold cifra opacity-70">{numero}</span>
+      <span className="text-[11px] font-bold cifra opacity-70">
+        {numero}{fija && <span aria-label="en sesión, no se mueve"> 🔒</span>}
+      </span>
       <span className={`${letraDelNombre(nombre, angosta)} leading-tight line-clamp-3 break-words`}>
         {nombre}
       </span>
@@ -99,7 +109,7 @@ function Celda({ mesa, antes, angosta, arrastrando }) {
   )
 }
 
-export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSalir }) {
+export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSalir, pintar, fija, avisar }) {
   // Las filas del bloque tal como están en la base; el borrador parte de aquí.
   const delBloque = filas.filter(f => f.bloque === bloque)
   const [original] = useState(() => numerosDe(delBloque))
@@ -110,12 +120,16 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
   const [error, setError]         = useState(null)
   const canal = useRef(null)
 
-  // Suscrito para que el aviso salga por el socket, igual que en /host.
+  // Suscrito para que el aviso salga por el socket, igual que en /host. Si la pantalla
+  // ya tiene el canal abierto (/host), avisa por ahí y aquí no se abre otro.
   useEffect(() => {
+    if (avisar) return
     const c = supabase.channel(`salon-${bloque}`).subscribe()
     canal.current = c
     return () => { canal.current = null; supabase.removeChannel(c) }
-  }, [bloque])
+  }, [bloque, avisar])
+
+  const esFija = f => Boolean(fija?.(f, original.get(f.id)))
 
   const sensores = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -143,8 +157,9 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
     const a  = over.data.current.numero
     if (de === a) return
     const quien = filaEn.get(de)
-    if (!quien) return
+    if (!quien || esFija(quien)) return
     const otra = filaEn.get(a)
+    if (otra && esFija(otra)) return
 
     const nuevo = new Map(borrador)
     nuevo.set(quien.id, a)
@@ -157,6 +172,14 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
     const nuevo = ordenAlfabetico(delBloque, original, edicion.total_mesas)
     if (!nuevo) {
       setError('No cabe en orden alfabético: hay más mesas que el salón antes de la zona de portafolio.')
+      return
+    }
+    // Una mesa en sesión no cambia de número: si el orden la movería, no se aplica.
+    const enSesion = delBloque
+      .filter(f => esFija(f) && nuevo.get(f.id) !== borrador.get(f.id))
+      .map(f => original.get(f.id)).sort((a, b) => a - b)
+    if (enSesion.length) {
+      setError(`Hay mesas en sesión que cambiarían de número. Espera a que terminen: ${enSesion.join(', ')}.`)
       return
     }
     setError(null)
@@ -174,7 +197,8 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
     setGuardando(true); setError(null)
     try {
       const n = await acomodarMesas(bloque, cambios)
-      canal.current?.send({ type: 'broadcast', event: 'cambio', payload: {} })
+      if (avisar) avisar()
+      else canal.current?.send({ type: 'broadcast', event: 'cambio', payload: {} })
       await onGuardado(n)
     } catch (e) {
       setError(e.message ?? String(e))
@@ -225,10 +249,9 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
 
       <DndContext
         sensors={guardando ? [] : sensores}
-        collisionDetection={args => {
-          const bajoElPuntero = pointerWithin(args)
-          return bajoElPuntero.length ? bajoElPuntero : closestCenter(args)
-        }}
+        // Solo cuenta la mesa que está bajo el dedo. Sin respaldo de «la más cercana»:
+        // al soltar sobre una mesa en sesión (que no recibe) se intercambiaba con la vecina.
+        collisionDetection={pointerWithin}
         onDragStart={({ active }) => setArrastrando(active.data.current.numero)}
         onDragEnd={alSoltar}
         onDragCancel={() => setArrastrando(null)}
@@ -239,7 +262,11 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
             const mesa = porNumero.get(numero) ?? { numero, estado: 'libre', reclutador: null }
             const f = mesa.reclutador
             const antes = f && original.get(f.id) !== numero ? original.get(f.id) : null
-            return <Celda mesa={mesa} antes={antes} angosta={angosta} arrastrando={arrastrando} />
+            return (
+              <Celda mesa={mesa} antes={antes} angosta={angosta} arrastrando={arrastrando}
+                     color={f && pintar ? pintar(f, original.get(f.id)) : undefined}
+                     fija={Boolean(f && esFija(f))} />
+            )
           }}
         />
         <DragOverlay dropAnimation={null}>
