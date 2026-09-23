@@ -23,8 +23,8 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   fuera de la tabla de reclutadores.
 - **Ninguna pantalla se da por hecha sin verla renderizada a 390 px.** Los desbordes no
   existen en el código, solo al pintarse.
-- **Las mesas viven en la app desde el 22-sep, no en el Excel.** Se acomodan en `/admin/acomodo`
-  y todo movimiento queda en `cambios_salon` (`/admin/cambios`). La importación del Excel está
+- **Las mesas viven en la app desde el 22-sep, no en el Excel.** Se acomodan con «Editar acomodo» en
+  `/admin/mesas` y todo movimiento queda en `cambios_salon` (`/admin/cambios`). La importación del Excel está
   apagada: borraba y reinsertaba `reclutadores` con la columna Mesa del libro y se llevaba el
   acomodo. No se vuelve a prender sin resolver eso.
 - **Una mesa nunca se mueve con `update` desde el navegador.** `reclutadores_mesa_unica` es un
@@ -61,7 +61,7 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
 ## Stack
 
 Vite + React 19 + Tailwind 4 + react-router 7 + `@supabase/supabase-js`. SheetJS para leer el
-`.xlsx`. `@dnd-kit` para arrastrar en el acomodo; se carga solo en esa pantalla. Sitio estático
+`.xlsx`. `@dnd-kit` para arrastrar en el acomodo; se carga solo al entrar a editarlo. Sitio estático
 en Vercel, sin servidor propio: no hay nada que renderizar en servidor y es una cosa menos que
 pueda fallar el día del evento.
 
@@ -80,14 +80,14 @@ src/
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
-│                        CarrerasPicker, RejillaMesas, Enlace, CuadriculaAcomodo
+│                        CarrerasPicker, RejillaMesas, Enlace, AcomodoEnRejilla
 └── pages/
     ├── Entrar.jsx       login del equipo
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Turno.jsx        pantalla del estudiante que espera, sin login
     ├── Fila.jsx         control de la fila, para el host de lista de espera
     ├── Host.jsx         vista del equipo el día del evento
-    └── admin/           Tablero, Mesas, Acomodo, Empresas, Reclutadores, Cupos,
+    └── admin/           Tablero, Mesas, Empresas, Reclutadores, Cupos,
                           Pendientes, Cambios, Importar (apagado), Qr, Impreso
 ```
 
@@ -201,10 +201,13 @@ número dio un sobrecupo de seis que no existía.
 alfabético por bloque: una empresa de todo el día puede tener números distintos en B1 y B2.
 Cada empresa ocupa mesas seguidas. Portafolio se queda en 73–75 y no entra al acomodo.
 
-**En `/admin/acomodo` se arrastra la empresa completa**, como los íconos de un celular. Al soltar
-se ven los números nuevos y lo que tenía antes; nada se guarda hasta «Guardar acomodo», que
-manda el orden completo a `reordenar_salon` y avisa por `salon-<bloque>`. En el celular se deja
-el dedo un momento sobre la ficha para levantarla.
+**En `/admin/mesas`, «Editar acomodo» vuelve arrastrable la misma rejilla**, como los íconos de
+un celular. Se arrastra una mesa y se mueve su empresa completa; al pasar sobre otras, el salón se
+reacomoda en vivo y las que cambian de número se marcan en cian. Nada se guarda hasta «Guardar
+acomodo», que manda el orden completo a `reordenar_salon` y avisa por `salon-<bloque>`. Soltar
+sobre una mesa libre manda la empresa al final. En el celular se deja el dedo un momento sobre la
+mesa para levantarla. Mientras se edita, el otro bloque queda bloqueado. `/admin/acomodo`
+redirige ahí.
 
 `reordenar_salon` rechaza el acomodo si falta o sobra una empresa, si no cabe antes de
 portafolio, o si cambiaría el número de una mesa en sesión.

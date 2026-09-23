@@ -20,20 +20,26 @@ export function fichasDelBloque({ filas, empresas, bloque }) {
   for (const f of filas) {
     if (f.bloque !== bloque) continue
     const g = grupos.get(f.empresa_id) ?? []
-    g.push(f.mesa_numero)
+    g.push(f)
     grupos.set(f.empresa_id, g)
   }
 
-  const fichas = [...grupos].map(([id, mesas]) => {
+  // Dentro de la empresa, sus filas van en el orden que ya traían: es el mismo
+  // criterio de `reordenar_salon`, así que la fila que se ve en cada número es
+  // la que la base va a poner ahí.
+  const porMesa = (a, b) => (a.mesa_numero ?? Infinity) - (b.mesa_numero ?? Infinity)
+  const fichas = [...grupos].map(([id, suyas]) => {
     const e = porId.get(id)
-    const numeros = mesas.filter(n => n != null).sort((a, b) => a - b)
+    const ordenadas = [...suyas].sort(porMesa)
+    const numeros = ordenadas.map(f => f.mesa_numero).filter(n => n != null)
     return {
       id,
       nombre: e?.nombre ?? '—',
       giro: e?.giro ?? null,
-      mesas: mesas.length,
+      mesas: ordenadas.length,
       desde: numeros[0] ?? Infinity,
       numeros,
+      filas: ordenadas,
     }
   })
 

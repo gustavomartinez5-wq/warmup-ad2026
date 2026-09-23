@@ -22,9 +22,6 @@ import Cargando from './components/Cargando'
 // La importación está apagada desde el 22-sep; queda la ruta con el aviso.
 const Importar = lazy(() => import('./pages/admin/Importar'))
 
-// La librería de arrastre solo la usa el acomodo, antes del evento.
-const Acomodo = lazy(() => import('./pages/admin/Acomodo'))
-
 // La librería de QR tampoco tiene por qué viajar en el paquete principal.
 const Qr = lazy(() => import('./pages/admin/Qr'))
 
@@ -47,7 +44,8 @@ export default function App() {
           <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
-            <Route path="acomodo" element={<Suspense fallback={<Cargando />}><Acomodo /></Suspense>} />
+            {/* El acomodo vive en el Mapa de mesas, con «Editar acomodo». */}
+            <Route path="acomodo" element={<Navigate to="/admin/mesas" replace />} />
             <Route path="empresas" element={<Empresas />} />
             <Route path="reclutadores" element={<Reclutadores />} />
             <Route path="cupos" element={<Cupos />} />

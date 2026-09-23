@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useDatos } from '../../lib/datos'
 import { mapaDeMesas, ESTADO_MESA, BLOQUES, calcularCifras, faltan, GIRO_PORTAFOLIO } from '../../lib/cifras'
@@ -6,6 +6,9 @@ import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../../lib/plano'
 import Cargando from '../../components/Cargando'
 import RejillaMesas from '../../components/RejillaMesas'
 import PlanoSalon from '../../components/PlanoSalon'
+
+// La librería de arrastre solo viaja cuando alguien entra a editar el acomodo.
+const AcomodoEnRejilla = lazy(() => import('../../components/AcomodoEnRejilla'))
 
 /** La misma mesa en la rejilla y en el plano: número, empresa y el color de su estado. */
 function Mesa({ mesa, angosta = false, onAbrir }) {
@@ -179,6 +182,8 @@ export default function Mesas() {
   const [vista, setVista]   = useState('rejilla')
   const [detalle, setDetalle] = useState(null)
   const [guardando, setGuardando] = useState(false)
+  const [editando, setEditando] = useState(false)
+  const [aviso, setAviso]     = useState(null)
 
   if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
@@ -231,8 +236,8 @@ export default function Mesas() {
       <div className="flex gap-1 border-b border-lavanda/15">
         {BLOQUES.map(b => (
           <button
-            key={b.clave} onClick={() => setBloque(b.clave)}
-            className={`px-3.5 py-2.5 text-[13px] font-semibold border-b-2 transition-colors ${
+            key={b.clave} onClick={() => setBloque(b.clave)} disabled={editando && bloque !== b.clave}
+            className={`px-3.5 py-2.5 text-[13px] font-semibold border-b-2 transition-colors disabled:opacity-35 ${
               bloque === b.clave ? 'border-cian text-white' : 'border-transparent text-lavanda/55 hover:text-lavanda'
             }`}
           >
@@ -244,6 +249,30 @@ export default function Mesas() {
         ))}
       </div>
 
+      {aviso && (
+        <div className="rounded-xl border border-teal/50 bg-teal/15 px-4 py-3 text-sm">
+          <p>{aviso}</p>
+          <p className="text-xs text-lavanda/70 mt-1">
+            El mapa de respaldo quedó atrás: hay que hornearlo antes del evento
+            (<code className="text-[11px]">node scripts/hornear-mapa.mjs</code>).
+          </p>
+        </div>
+      )}
+
+      {editando ? (
+        <Suspense fallback={<Cargando />}>
+          <AcomodoEnRejilla
+            filas={reclutadores} empresas={empresas} bloque={bloque} totalCeldas={mapa.length}
+            onSalir={() => setEditando(false)}
+            onGuardado={async n => {
+              await recargar()
+              setEditando(false)
+              setAviso(`Acomodo guardado: ${n === 1 ? 'una empresa cambió' : `${n} empresas cambiaron`} de número.`)
+            }}
+          />
+        </Suspense>
+      ) : (<>
+      <div className="flex flex-wrap items-center gap-2">
       <div className="flex rounded-lg border border-lavanda/20 overflow-hidden w-fit">
         {[['rejilla', 'Rejilla'], ['plano', 'Plano']].map(([v, t]) => (
           <button
@@ -255,6 +284,14 @@ export default function Mesas() {
             {t}
           </button>
         ))}
+      </div>
+        <button
+          onClick={() => { setVista('rejilla'); setAviso(null); setEditando(true) }}
+          className="px-3 py-1.5 rounded-lg border border-cian/50 text-xs font-bold text-cian
+                     hover:bg-cian/10 transition-colors"
+        >
+          Editar acomodo
+        </button>
       </div>
 
       <Leyenda mapa={mapa} />
@@ -278,6 +315,7 @@ export default function Mesas() {
           }}
         />
       )}
+      </>)}
     </section>
   )
 }

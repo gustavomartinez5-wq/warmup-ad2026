@@ -37,7 +37,7 @@ const aplicar = process.argv.includes('--aplicar')
 // Apagado desde el 22-sep: las mesas se acomodan en la app y aplicar el libro
 // reescribiría todas. Leer y comparar sigue funcionando.
 if (aplicar) {
-  console.error('--aplicar está apagado: las mesas viven en la app desde el 22-sep (/admin/acomodo).')
+  console.error('--aplicar está apagado: las mesas viven en la app desde el 22-sep («Editar acomodo» en /admin/mesas).')
   process.exit(1)
 }
 

@@ -23,7 +23,7 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
-00. **Un guardado real desde `/admin/acomodo` con la cuenta del equipo.** La función ya se probó
+00. **Un guardado real con «Editar acomodo» en `/admin/mesas`, con la cuenta del equipo.** La función ya se probó
     por SQL con la identidad del equipo; falta el camino completo desde el navegador.
 
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
@@ -58,8 +58,10 @@ por bloque. Gustavo pidió acomodarlas arrastrando empresas, como los íconos de
 
 Piezas:
 - Migración 12 con `reordenar_salon`.
-- `src/lib/acomodo.js` y `CuadriculaAcomodo.jsx`.
-- `/admin/acomodo`, que se carga aparte (56 kB).
+- `src/lib/acomodo.js` y `AcomodoEnRejilla.jsx`.
+- «Editar acomodo» en `/admin/mesas`: la misma rejilla se vuelve arrastrable. Se carga aparte
+  (49 kB) al entrar a editar. Primero fue una pantalla aparte, `/admin/acomodo`; Gustavo lo quería
+  sobre el Mapa de mesas y esa ruta ahora redirige ahí.
 - `/admin/impreso` ahora lee de la base y usa el mapa horneado de respaldo.
 
 Bajas avisadas el 22-sep:
@@ -93,8 +95,10 @@ Redwood en la base quedó resuelto.
 | Bitácora | 6 «liberar» y 2 «reordenar» |
 | `hornear-mapa.mjs --verificar` | Al día: 70 y 60 |
 
-Se probó en una página local temporal con el mapa horneado, porque `/admin` pide sesión. Falta que
-Gustavo haga un guardado real desde `/admin/acomodo`.
+Se probó en una página local temporal con el mapa horneado, porque `/admin` pide sesión. La versión
+sobre el Mapa de mesas se probó igual, montando la página real con datos del mapa: el botón abre el
+modo, el otro bloque se bloquea, una empresa de seis mesas va al final al soltarla en una libre, y
+a 390 px el toque largo mueve la empresa sin scroll lateral. Falta que Gustavo haga un guardado real.
 
 ### Mapa compactado con el Excel del equipo · 22-sep-2026
 
