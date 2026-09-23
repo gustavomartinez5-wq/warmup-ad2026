@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-23T21:15:14.799Z",
+  "generado_en": "2026-09-23T21:31:09.483Z",
   "bloques": {
     "b1": [
       {
@@ -2447,7 +2447,7 @@
         ]
       },
       {
-        "numero": 19,
+        "numero": 18,
         "empresa": "Danfoss",
         "giro": "Manufactura",
         "carreras": [
@@ -2476,6 +2476,25 @@
         ]
       },
       {
+        "numero": 19,
+        "empresa": "Definity",
+        "giro": "Tecnología y software",
+        "carreras": [
+          "BIE",
+          "IDM",
+          "IIS",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LDI",
+          "LEM",
+          "LIT"
+        ]
+      },
+      {
         "numero": 20,
         "empresa": "Definity",
         "giro": "Tecnología y software",
@@ -2496,25 +2515,6 @@
       },
       {
         "numero": 21,
-        "empresa": "Definity",
-        "giro": "Tecnología y software",
-        "carreras": [
-          "BIE",
-          "IDM",
-          "IIS",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAD",
-          "LAE",
-          "LDI",
-          "LEM",
-          "LIT"
-        ]
-      },
-      {
-        "numero": 22,
         "empresa": "EATON",
         "giro": "Manufactura",
         "carreras": [
@@ -2524,6 +2524,20 @@
           "IM",
           "IMA",
           "IMT"
+        ]
+      },
+      {
+        "numero": 22,
+        "empresa": "EY",
+        "giro": "Consultoría",
+        "carreras": [
+          "IDM",
+          "ITC",
+          "ITD",
+          "LAF",
+          "LCPF",
+          "LEC",
+          "LED"
         ]
       },
       {
@@ -2542,16 +2556,23 @@
       },
       {
         "numero": 24,
-        "empresa": "EY",
-        "giro": "Consultoría",
+        "empresa": "Farmacias del Ahorro",
+        "giro": "Salud y farmacéutica",
         "carreras": [
+          "BGB",
+          "BIE",
           "IDM",
+          "IID",
+          "IIS",
+          "ISD",
           "ITC",
           "ITD",
+          "LAE",
           "LAF",
-          "LCPF",
-          "LEC",
-          "LED"
+          "LDE",
+          "LEM",
+          "LIN",
+          "LIT"
         ]
       },
       {
@@ -2577,23 +2598,34 @@
       },
       {
         "numero": 26,
-        "empresa": "Farmacias del Ahorro",
-        "giro": "Salud y farmacéutica",
+        "empresa": "Fastenal",
+        "giro": "Cadena de suministro",
         "carreras": [
-          "BGB",
           "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
           "IDM",
+          "IDS",
+          "IE",
+          "IFI",
           "IID",
           "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
           "ISD",
           "ITC",
           "ITD",
           "LAE",
           "LAF",
-          "LDE",
-          "LEM",
-          "LIN",
-          "LIT"
+          "LCPF"
         ]
       },
       {
@@ -2630,9 +2662,21 @@
       },
       {
         "numero": 28,
-        "empresa": "Fastenal",
-        "giro": "Cadena de suministro",
+        "empresa": "GPvivienda",
+        "giro": "Arquitectura y construcción",
         "carreras": [
+          "ARQ",
+          "IC",
+          "LDI"
+        ]
+      },
+      {
+        "numero": 29,
+        "empresa": "Heineken México",
+        "giro": "Alimentos",
+        "carreras": [
+          "ARQ",
+          "BGB",
           "BIE",
           "BME",
           "IAL",
@@ -2655,19 +2699,29 @@
           "ISD",
           "ITC",
           "ITD",
+          "LAD",
           "LAE",
           "LAF",
-          "LCPF"
-        ]
-      },
-      {
-        "numero": 29,
-        "empresa": "GPvivienda",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI"
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
         ]
       },
       {
@@ -2779,7 +2833,7 @@
         ]
       },
       {
-        "numero": 34,
+        "numero": 32,
         "empresa": "Index Nuevo León",
         "giro": "Manufactura",
         "carreras": [
@@ -2833,7 +2887,7 @@
         ]
       },
       {
-        "numero": 35,
+        "numero": 33,
         "empresa": "Index Nuevo León",
         "giro": "Manufactura",
         "carreras": [
@@ -2884,6 +2938,38 @@
           "LTM",
           "LTP",
           "LUB"
+        ]
+      },
+      {
+        "numero": 34,
+        "empresa": "Linde",
+        "giro": "Químico",
+        "carreras": [
+          "BIE",
+          "IBT",
+          "IDM",
+          "IIS",
+          "IQ",
+          "IQA",
+          "LAE",
+          "LBC",
+          "LDE"
+        ]
+      },
+      {
+        "numero": 35,
+        "empresa": "Linde",
+        "giro": "Químico",
+        "carreras": [
+          "BIE",
+          "IBT",
+          "IDM",
+          "IIS",
+          "IQ",
+          "IQA",
+          "LAE",
+          "LBC",
+          "LDE"
         ]
       },
       {
@@ -2904,38 +2990,6 @@
       },
       {
         "numero": 37,
-        "empresa": "Linde",
-        "giro": "Químico",
-        "carreras": [
-          "BIE",
-          "IBT",
-          "IDM",
-          "IIS",
-          "IQ",
-          "IQA",
-          "LAE",
-          "LBC",
-          "LDE"
-        ]
-      },
-      {
-        "numero": 38,
-        "empresa": "Linde",
-        "giro": "Químico",
-        "carreras": [
-          "BIE",
-          "IBT",
-          "IDM",
-          "IIS",
-          "IQ",
-          "IQA",
-          "LAE",
-          "LBC",
-          "LDE"
-        ]
-      },
-      {
-        "numero": 39,
         "empresa": "Logrand",
         "giro": "Entretenimiento",
         "carreras": [
@@ -2951,61 +3005,7 @@
         ]
       },
       {
-        "numero": 40,
-        "empresa": "Heineken México",
-        "giro": "Alimentos",
-        "carreras": [
-          "ARQ",
-          "BGB",
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAD",
-          "LAE",
-          "LAF",
-          "LBC",
-          "LC",
-          "LCPF",
-          "LDE",
-          "LDI",
-          "LDO",
-          "LEC",
-          "LED",
-          "LEI",
-          "LEM",
-          "LIN",
-          "LIT",
-          "LLE",
-          "LNB",
-          "LPE",
-          "LPS",
-          "LRI",
-          "LTM",
-          "LTP",
-          "LUB"
-        ]
-      },
-      {
-        "numero": 41,
+        "numero": 38,
         "empresa": "OXXO",
         "giro": "Consumo y retail",
         "carreras": [
@@ -3021,7 +3021,7 @@
         ]
       },
       {
-        "numero": 42,
+        "numero": 39,
         "empresa": "P&G",
         "giro": "Consumo y retail",
         "carreras": [
@@ -3059,7 +3059,7 @@
         ]
       },
       {
-        "numero": 43,
+        "numero": 40,
         "empresa": "P&G",
         "giro": "Consumo y retail",
         "carreras": [
@@ -3097,7 +3097,7 @@
         ]
       },
       {
-        "numero": 44,
+        "numero": 41,
         "empresa": "PwC",
         "giro": "Consultoría",
         "carreras": [
@@ -3109,7 +3109,7 @@
         ]
       },
       {
-        "numero": 45,
+        "numero": 42,
         "empresa": "Ragasa",
         "giro": "Alimentos",
         "carreras": [
@@ -3138,7 +3138,7 @@
         ]
       },
       {
-        "numero": 46,
+        "numero": 43,
         "empresa": "Redwood Logistics",
         "giro": "Logística y transporte",
         "carreras": [
@@ -3154,7 +3154,7 @@
         ]
       },
       {
-        "numero": 47,
+        "numero": 44,
         "empresa": "SLB",
         "giro": "Tecnología y software",
         "carreras": [
@@ -3167,44 +3167,44 @@
           "IMA",
           "IMT",
           "INA"
+        ]
+      },
+      {
+        "numero": 45,
+        "empresa": "SLB",
+        "giro": "Tecnología y software",
+        "carreras": [
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "INA"
+        ]
+      },
+      {
+        "numero": 46,
+        "empresa": "Sustainability Engineering Group",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC"
+        ]
+      },
+      {
+        "numero": 47,
+        "empresa": "Sustainability Engineering Group",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "IC"
         ]
       },
       {
         "numero": 48,
-        "empresa": "SLB",
-        "giro": "Tecnología y software",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IE",
-          "IFI",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "INA"
-        ]
-      },
-      {
-        "numero": 49,
-        "empresa": "Sustainability Engineering Group",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC"
-        ]
-      },
-      {
-        "numero": 50,
-        "empresa": "Sustainability Engineering Group",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC"
-        ]
-      },
-      {
-        "numero": 51,
         "empresa": "Tecnológico de Monterrey",
         "giro": "Educativo",
         "carreras": [
@@ -3222,7 +3222,7 @@
         ]
       },
       {
-        "numero": 52,
+        "numero": 49,
         "empresa": "Unitivida",
         "giro": "Seguros",
         "carreras": [
@@ -3236,32 +3236,167 @@
           "LEM",
           "LIN",
           "LIT"
+        ]
+      },
+      {
+        "numero": 50,
+        "empresa": "Unitivida",
+        "giro": "Seguros",
+        "carreras": [
+          "BGB",
+          "LAE",
+          "LAF",
+          "LCPF",
+          "LDE",
+          "LDO",
+          "LEC",
+          "LEM",
+          "LIN",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 51,
+        "empresa": "Viakable",
+        "giro": "Energía y medio ambiente",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 52,
+        "empresa": "Viakable",
+        "giro": "Energía y medio ambiente",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LBC",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEC",
+          "LED",
+          "LEI",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LLE",
+          "LNB",
+          "LPE",
+          "LPS",
+          "LRI",
+          "LTM",
+          "LTP",
+          "LUB"
         ]
       },
       {
         "numero": 53,
-        "empresa": "Unitivida",
-        "giro": "Seguros",
+        "empresa": "Whirlpool",
+        "giro": "Manufactura",
         "carreras": [
-          "BGB",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LDO",
-          "LEC",
-          "LEM",
-          "LIN",
-          "LIT"
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD"
         ]
       },
       {
         "numero": 54,
-        "empresa": "Viakable",
-        "giro": "Energía y medio ambiente",
+        "empresa": "Whirlpool",
+        "giro": "Manufactura",
         "carreras": [
-          "ARQ",
-          "BGB",
           "BIE",
           "BME",
           "IAL",
@@ -3283,146 +3418,11 @@
           "IRS",
           "ISD",
           "ITC",
-          "ITD",
-          "LAD",
-          "LAE",
-          "LAF",
-          "LBC",
-          "LC",
-          "LCPF",
-          "LDE",
-          "LDI",
-          "LDO",
-          "LEC",
-          "LED",
-          "LEI",
-          "LEM",
-          "LIN",
-          "LIT",
-          "LLE",
-          "LNB",
-          "LPE",
-          "LPS",
-          "LRI",
-          "LTM",
-          "LTP",
-          "LUB"
+          "ITD"
         ]
       },
       {
         "numero": 55,
-        "empresa": "Viakable",
-        "giro": "Energía y medio ambiente",
-        "carreras": [
-          "ARQ",
-          "BGB",
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAD",
-          "LAE",
-          "LAF",
-          "LBC",
-          "LC",
-          "LCPF",
-          "LDE",
-          "LDI",
-          "LDO",
-          "LEC",
-          "LED",
-          "LEI",
-          "LEM",
-          "LIN",
-          "LIT",
-          "LLE",
-          "LNB",
-          "LPE",
-          "LPS",
-          "LRI",
-          "LTM",
-          "LTP",
-          "LUB"
-        ]
-      },
-      {
-        "numero": 56,
-        "empresa": "Whirlpool",
-        "giro": "Manufactura",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD"
-        ]
-      },
-      {
-        "numero": 57,
-        "empresa": "Whirlpool",
-        "giro": "Manufactura",
-        "carreras": [
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD"
-        ]
-      },
-      {
-        "numero": 58,
         "empresa": "Management Solutions",
         "giro": "Consultoría",
         "carreras": [

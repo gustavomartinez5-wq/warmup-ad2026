@@ -34,7 +34,7 @@ dónde quedamos.
    equipo, tocar una mesa y darle a Guardar; y con dos `/host` abiertos a la vez, ver que el
    cambio aparece en el otro sin recargar.
 3. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
-   P&G, Vitro, SEG), Index como Regal Rexnord, y el correo «.con» de EATON.
+   P&G, Vitro, SEG) y el correo «.con» de EATON. Index ya se resolvió: vienen como Index.
 4. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
 5. ~~Los dos agentes de host en Sonnet.~~ Hecho el 21-sep, dentro de la simulación del día
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
@@ -47,14 +47,17 @@ Gustavo revisó los correos de confirmación. Se aplicó a la base con las funci
 
 | Empresa | Qué quedó |
 |---|---|
-| Index | Adrián García y Cinthia Requenes son soporte, sin mesa: salen B1-36, B1-37, B2-32 y B2-33. Nombres completos; «José Ramón Gentherm» pasa a José Ramón Colmenero. Sigue abierto si vienen como Regal Rexnord |
-| Growth & Profit | Sale Umberto Gutierrez. Van Fernanda Perales y Alberto Ríos, solo B1: 28 y 29 |
-| COPARMEX | Las dos en B1: Johanna Soto pasa de B2-18 a B1-13 |
+| Index | Dos personas de soporte en los dos bloques, sin mesa: 4 mesas en B1 y 2 en B2. Vienen como Index, no como Regal Rexnord. Nombres completados en la base |
+| Growth & Profit | Cambian las personas; van dos, solo B1: 28 y 29 |
+| COPARMEX | Las dos personas en B1: la de B2-18 pasa a B1-13 |
 | Clarios, Benavides, OmniSource, Tec, Areya | Confirmaron; pendiente resuelto |
 
 B1 se recorrió para que cada empresa quede junta y en el mismo orden: 13–35 subieron uno, luego
-29–36. Quedan B1 72 mesas (libres 54, 71, 72) y B2 58 (libres 18, 32, 33 y 59–72). El mapa se
-horneó al día; el commit y el push quedaron pendientes.
+29–36. B2 se compactó del 1 al 55 en el mismo orden, y la tercera mesa de Heineken (40) se juntó
+con las otras dos. Quedan B1 72 mesas (libres 54, 71, 72) y B2 58 (libres 56–72). Mapa horneado.
+
+Una primera versión de esta entrada llevaba nombres de reclutadores y se subió al repo público.
+Se quitaron aquí; siguen en el historial de git (commit `c1f3ec5`).
 
 ### 61 empresas, no 67 · 23-sep-2026
 
