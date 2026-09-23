@@ -41,6 +41,21 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### Confirmaciones por correo · 23-sep-2026
+
+Gustavo revisó los correos de confirmación. Se aplicó a la base con las funciones de la app.
+
+| Empresa | Qué quedó |
+|---|---|
+| Index | Adrián García y Cinthia Requenes son soporte, sin mesa: salen B1-36, B1-37, B2-32 y B2-33. Nombres completos; «José Ramón Gentherm» pasa a José Ramón Colmenero. Sigue abierto si vienen como Regal Rexnord |
+| Growth & Profit | Sale Umberto Gutierrez. Van Fernanda Perales y Alberto Ríos, solo B1: 28 y 29 |
+| COPARMEX | Las dos en B1: Johanna Soto pasa de B2-18 a B1-13 |
+| Clarios, Benavides, OmniSource, Tec, Areya | Confirmaron; pendiente resuelto |
+
+B1 se recorrió para que cada empresa quede junta y en el mismo orden: 13–35 subieron uno, luego
+29–36. Quedan B1 72 mesas (libres 54, 71, 72) y B2 58 (libres 18, 32, 33 y 59–72). El mapa se
+horneó al día; el commit y el push quedaron pendientes.
+
 ### 61 empresas, no 67 · 23-sep-2026
 
 El Tablero decía 67 «Empresas registradas» porque contaba las seis fichas de portafolio
