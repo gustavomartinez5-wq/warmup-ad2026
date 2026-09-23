@@ -19,9 +19,11 @@ import Pendientes from './pages/admin/Pendientes'
 import Cambios from './pages/admin/Cambios'
 import Cargando from './components/Cargando'
 
-// SheetJS pesa medio megabyte. Se carga solo al abrir la importación, para que las
-// pantallas del día del evento arranquen ligeras en un celular.
+// La importación está apagada desde el 22-sep; queda la ruta con el aviso.
 const Importar = lazy(() => import('./pages/admin/Importar'))
+
+// La librería de arrastre solo la usa el acomodo, antes del evento.
+const Acomodo = lazy(() => import('./pages/admin/Acomodo'))
 
 // La librería de QR tampoco tiene por qué viajar en el paquete principal.
 const Qr = lazy(() => import('./pages/admin/Qr'))
@@ -45,6 +47,7 @@ export default function App() {
           <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
+            <Route path="acomodo" element={<Suspense fallback={<Cargando />}><Acomodo /></Suspense>} />
             <Route path="empresas" element={<Empresas />} />
             <Route path="reclutadores" element={<Reclutadores />} />
             <Route path="cupos" element={<Cupos />} />

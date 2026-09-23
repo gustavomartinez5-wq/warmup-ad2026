@@ -34,6 +34,13 @@ const ruta = rutaArg ??
   join(homedir(), 'Downloads', 'WarmUp AD26 - Control de Mesas y Cupos.xlsx')
 const aplicar = process.argv.includes('--aplicar')
 
+// Apagado desde el 22-sep: las mesas se acomodan en la app y aplicar el libro
+// reescribiría todas. Leer y comparar sigue funcionando.
+if (aplicar) {
+  console.error('--aplicar está apagado: las mesas viven en la app desde el 22-sep (/admin/acomodo).')
+  process.exit(1)
+}
+
 const correo = process.env.WARMUP_CORREO
 const clave  = process.env.WARMUP_CLAVE
 if (!correo || !clave) {

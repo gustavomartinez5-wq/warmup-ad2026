@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../../lib/mapaFijo'
+import { mesasDelBloque } from '../../lib/mesaPublica'
 import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../../lib/cifras'
 import { MESAS_EN_PLANO, nombreCorto, tienePalabraLarga } from '../../lib/plano'
 import PlanoSalon from '../../components/PlanoSalon'
@@ -9,13 +10,13 @@ import PlanoSalon from '../../components/PlanoSalon'
  * o la pila del celular, esta hoja sigue diciendo quién está en cada mesa y a
  * dónde mandar a un estudiante de cada carrera.
  *
- * Sale del mismo `mapa-fijo.json` que usan las pantallas cuando la base no
- * contesta, así que el papel y el celular no se pueden desfasar entre ellos.
+ * Sale de la base, con el acomodo del momento: desde el 22-sep las mesas se
+ * acomodan en la app y el mapa horneado puede ir atrás. Si la base no contesta,
+ * cae al `mapa-fijo.json` y lo dice con su fecha.
  * Se imprime una por host, más una de repuesto.
  */
 
-function Hoja({ bloque, ultima }) {
-  const mesas = mesasFijas(bloque)
+function Hoja({ bloque, ultima, mesas, fecha }) {
   const nombres = new Map(carrerasFijas().map(c => [c.siglas, c.nombre]))
 
   // Qué mesas atienden cada carrera. Es la vuelta que se da un host cuando
@@ -49,7 +50,7 @@ function Hoja({ bloque, ultima }) {
           </h2>
         </div>
         <p className="text-[11px] text-marino/60 shrink-0">
-          {mesas.length} mesas · datos del {fechaDelMapa()}
+          {mesas.length} mesas · datos del {fecha}
         </p>
       </div>
 
@@ -98,8 +99,7 @@ const SIGLAS_EN_LA_MESA = 12
  * mismo acomodo del mapa oficial. Se imprime como alternativa a las listas: la
  * lista dice quién está en cada mesa; el plano dice dónde queda esa mesa.
  */
-function HojaPlano({ bloque, ultima }) {
-  const mesas = mesasFijas(bloque)
+function HojaPlano({ bloque, ultima, mesas, fecha }) {
   const porNumero = new Map(mesas.map(m => [m.numero, m]))
   const portafolio = mesas.filter(m => m.giro === GIRO_PORTAFOLIO).map(m => m.numero)
 
@@ -150,7 +150,7 @@ function HojaPlano({ bloque, ultima }) {
           </h2>
         </div>
         <p className="text-[11px] text-marino/60 shrink-0">
-          {mesas.length} mesas · datos del {fechaDelMapa()}
+          {mesas.length} mesas · datos del {fecha}
         </p>
       </div>
 
@@ -175,6 +175,30 @@ function HojaPlano({ bloque, ultima }) {
 export default function Impreso() {
   const [que, setQue] = useState('listas')
   const plano = que === 'plano'
+  // null mientras pregunta; 'fijo' si la base no contestó.
+  const [vivo, setVivo] = useState(null)
+
+  useEffect(() => {
+    let vigente = true
+    Promise.all(BLOQUES.map(b => mesasDelBloque(b.clave)))
+      .then(listas => {
+        if (!vigente) return
+        const porBloque = Object.fromEntries(BLOQUES.map((b, i) => [
+          b.clave,
+          [...listas[i]].sort((x, y) => x.numero - y.numero),
+        ]))
+        setVivo(porBloque)
+      })
+      .catch(() => { if (vigente) setVivo('fijo') })
+    return () => { vigente = false }
+  }, [])
+
+  const deLaBase = vivo && vivo !== 'fijo'
+  const hoy = new Date()
+  const fecha = deLaBase
+    ? `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}`
+    : fechaDelMapa()
+  const mesasDe = bloque => deLaBase ? vivo[bloque] : mesasFijas(bloque)
 
   return (
     <section className="space-y-5">
@@ -200,12 +224,22 @@ export default function Impreso() {
         ))}
       </div>
 
-      <div className="no-imprimir rounded-xl border border-ambar/40 bg-ambar/10 px-4 py-3">
-        <p className="text-xs text-ambar leading-relaxed">
-          Estos datos son del {fechaDelMapa()}. Si se movió alguna mesa después, regenera el mapa
-          con <code className="font-mono">node scripts/hornear-mapa.mjs</code> antes de imprimir.
+      {vivo === null && (
+        <p className="no-imprimir text-xs text-lavanda/60">Trayendo el acomodo de la base…</p>
+      )}
+      {deLaBase && (
+        <p className="no-imprimir text-xs text-lavanda/60">
+          Datos de la base, con el acomodo de este momento.
         </p>
-      </div>
+      )}
+      {vivo === 'fijo' && (
+        <div className="no-imprimir rounded-xl border border-ambar/40 bg-ambar/10 px-4 py-3">
+          <p className="text-xs text-ambar leading-relaxed">
+            La base no contestó. Estos datos son del mapa de respaldo del {fechaDelMapa()}; si se
+            acomodó algo después, no sale aquí.
+          </p>
+        </div>
+      )}
 
       <div className="no-imprimir">
         <button
@@ -219,8 +253,10 @@ export default function Impreso() {
       <div className="space-y-5">
         {BLOQUES.map((b, i) => (
           plano
-            ? <HojaPlano key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1} />
-            : <Hoja key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1} />
+            ? <HojaPlano key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1}
+                         mesas={mesasDe(b.clave)} fecha={fecha} />
+            : <Hoja key={b.clave} bloque={b.clave} ultima={i === BLOQUES.length - 1}
+                    mesas={mesasDe(b.clave)} fecha={fecha} />
         ))}
       </div>
     </section>

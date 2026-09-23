@@ -5,12 +5,12 @@ import { ProveedorDatos } from '../lib/datos'
 const SECCIONES = [
   { a: '/admin',              t: 'Tablero',      fin: true },
   { a: '/admin/mesas',        t: 'Mapa de mesas' },
+  { a: '/admin/acomodo',      t: 'Acomodo' },
   { a: '/admin/empresas',     t: 'Empresas' },
   { a: '/admin/reclutadores', t: 'Reclutadores' },
   { a: '/admin/cupos',        t: 'Cupos' },
   { a: '/admin/pendientes',   t: 'Pendientes' },
   { a: '/admin/cambios',      t: 'Cambios del día' },
-  { a: '/admin/importar',     t: 'Importar Excel' },
   { a: '/admin/qr',           t: 'QR' },
   { a: '/admin/impreso',      t: 'Hoja de papel' },
 ]

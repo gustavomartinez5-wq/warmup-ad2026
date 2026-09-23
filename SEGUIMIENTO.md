@@ -3,8 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **22 de septiembre de 2026**, con lo que se aplicó de la simulación del
-día completo.
+Última actualización: **22 de septiembre de 2026**, con el acomodo de mesas arrastrando.
 
 ---
 
@@ -24,6 +23,9 @@ día completo.
 
 **Lo que falta, en orden:**
 
+00. **Un guardado real desde `/admin/acomodo` con la cuenta del equipo.** La función ya se probó
+    por SQL con la identidad del equipo; falta el camino completo desde el navegador.
+
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
@@ -35,12 +37,64 @@ día completo.
    equipo, tocar una mesa y darle a Guardar; y con dos `/host` abiertos a la vez, ver que el
    cambio aparece en el otro sin recargar.
 3. **Pendientes que quedan con las empresas:** nombres faltantes (Caterpillar, HEB, Heineken,
-   P&G, Vitro, Redwood, SEG), Index como Regal Rexnord, y el correo «.con» de EATON.
+   P&G, Vitro, SEG), Index como Regal Rexnord, y el correo «.con» de EATON.
 4. **Correr el preflight en seco** una vez antes del 28. Está en `PREFLIGHT.md`.
 5. ~~Los dos agentes de host en Sonnet.~~ Hecho el 21-sep, dentro de la simulación del día
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Acomodo de mesas arrastrando · 22-sep-2026
+
+Desde la tarde del 22-sep, las mesas viven en la app y no en el Excel: van en orden alfabético
+por bloque. Gustavo pidió acomodarlas arrastrando empresas, como los íconos de un celular.
+
+| Decisión de Gustavo | Qué quedó |
+|---|---|
+| Se arrastra la empresa completa | Una ficha por empresa. Sus mesas van seguidas y se renumeran solas |
+| Cada bloque por su cuenta | Selector B1 · B2. El número no se amarra entre bloques |
+| Importador apagado | `/admin/importar` solo muestra el aviso. `verificar-importacion.mjs --aplicar` sale con error |
+| El Excel no se toca | Las bajas de Definity y Redwood van solo a la base |
+
+Piezas:
+- Migración 12 con `reordenar_salon`.
+- `src/lib/acomodo.js` y `CuadriculaAcomodo.jsx`.
+- `/admin/acomodo`, que se carga aparte (56 kB).
+- `/admin/impreso` ahora lee de la base y usa el mapa horneado de respaldo.
+
+Bajas avisadas el 22-sep:
+- **Definity:** queda una persona en B1 y dos en B2. Las dos personas que iban a los dos bloques
+  no asisten.
+- **Redwood:** su reclutadora confirma los dos bloques. Sale la segunda persona «Por definir».
+
+Se aplicaron con las funciones de la app, en una transacción: `liberar_mesa` para las seis filas y
+`reordenar_salon` para cada bloque, respetando el orden alfabético. Quedó Definity en B1-16 y B2-20
+y 21, y Redwood en B1-53 y B2-46. Cambiaron de número 27 empresas en B1 y 22 en B2. El pendiente de
+Redwood en la base quedó resuelto.
+
+| Cifra | B1 | B2 |
+|---|---|---|
+| Lugares | 70 (1–67 y 73–75) | 60 (1–57 y 73–75) |
+| Libres | 68–72 | 58–72 |
+
+| Prueba | Resultado |
+|---|---|
+| Arrastre con mouse a 390 px | Definity pasa de 12–14 a 1–3. Las demás se recorren y marcan «antes» |
+| Presión larga con toque simulado | Levanta y mueve la ficha. Un deslizamiento corto hace scroll y no mueve nada |
+| Teclado (Espacio, flecha, Espacio) | Mueve la ficha |
+| 390 px | El documento mide 390 px, sin scroll lateral |
+| 1280 px | Cinco columnas con nombres completos. Portafolio va aparte con las mesas libres |
+| `npm run build` | Limpio. El paquete principal no creció |
+| `reordenar_salon` con el mismo orden | 0 cambios, nada en la bitácora |
+| Falta una empresa · empresa repetida | Rechaza las dos |
+| Mesa en sesión que cambiaría de número | Rechaza y dice cuál (probado en un bloque que se deshace) |
+| Permisos | `anon` no la puede ejecutar; `authenticated` sí |
+| Después de las bajas | Sin repetidos, sin huecos, ninguna empresa partida, orden alfabético intacto |
+| Bitácora | 6 «liberar» y 2 «reordenar» |
+| `hornear-mapa.mjs --verificar` | Al día: 70 y 60 |
+
+Se probó en una página local temporal con el mapa horneado, porque `/admin` pide sesión. Falta que
+Gustavo haga un guardado real desde `/admin/acomodo`.
 
 ### Mapa compactado con el Excel del equipo · 22-sep-2026
 

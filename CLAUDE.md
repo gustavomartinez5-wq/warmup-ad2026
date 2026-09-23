@@ -23,14 +23,16 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   fuera de la tabla de reclutadores.
 - **Ninguna pantalla se da por hecha sin verla renderizada a 390 px.** Los desbordes no
   existen en el código, solo al pintarse.
-- **El Excel manda hasta el día del evento; el 28 manda la app.** Lo que se mueva el 28 desde
-  la app queda en `cambios_salon` y se ve en `/admin/cambios`. Hay que pasarlo al libro: una
-  reimportación borra y reinserta `reclutadores` y se lleva lo que se arregló en el salón.
+- **Las mesas viven en la app desde el 22-sep, no en el Excel.** Se acomodan en `/admin/acomodo`
+  y todo movimiento queda en `cambios_salon` (`/admin/cambios`). La importación del Excel está
+  apagada: borraba y reinsertaba `reclutadores` con la columna Mesa del libro y se llevaba el
+  acomodo. No se vuelve a prender sin resolver eso.
 - **Una mesa nunca se mueve con `update` desde el navegador.** `reclutadores_mesa_unica` es un
   índice único parcial y no se puede diferir: dos `update` seguidos truenan o dejan el salón a
   medias. Van por las funciones de la migración 08 —`mover_mesa`, `intercambiar_mesas`,
-  `recorrer_mesas`, `liberar_mesa`, `agregar_mesa`, `cambiar_empresa_de_mesa`—, que hacen el
-  baile completo en una transacción y anotan en la bitácora.
+  `recorrer_mesas`, `liberar_mesa`, `agregar_mesa`, `cambiar_empresa_de_mesa`— y por
+  `reordenar_salon` de la migración 12, que renumera el bloque completo. Hacen el baile completo
+  en una transacción y anotan en la bitácora.
 - **El QR de las mesas es uno solo, y el teléfono recuerda número y empresa.** Si el equipo mueve,
   intercambia o libera la mesa, `/mesa` lo nota porque en su número ya no está su empresa, y
   muestra «Tu mesa cambió» con la mesa nueva. Si se quita la empresa de lo que se guarda en
@@ -53,14 +55,15 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   salón cambia, se corrigen los dos.
 - **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
   `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
-  cuando la base no contesta y lo que sale en la hoja impresa; si se queda atrás, el día del
+  cuando la base no contesta, y la hoja impresa si la base falla; si se queda atrás, el día del
   evento manda gente a mesas equivocadas. `--verificar` avisa, y está en el preflight.
 
 ## Stack
 
 Vite + React 19 + Tailwind 4 + react-router 7 + `@supabase/supabase-js`. SheetJS para leer el
-`.xlsx` en el navegador. Sitio estático en Vercel, sin servidor propio: no hay nada que
-renderizar en servidor y es una cosa menos que pueda fallar el día del evento.
+`.xlsx`. `@dnd-kit` para arrastrar en el acomodo; se carga solo en esa pantalla. Sitio estático
+en Vercel, sin servidor propio: no hay nada que renderizar en servidor y es una cosa menos que
+pueda fallar el día del evento.
 
 ```
 src/
@@ -71,20 +74,21 @@ src/
 ├── lib/
 │   ├── supabase.js      cliente + edicionActiva()
 │   ├── mapaFijo.js      lo que se ve cuando la base no contesta
-│   ├── mesaEquipo.js    editar el salón: las seis funciones y la bitácora
+│   ├── mesaEquipo.js    editar el salón: las funciones de mesa y la bitácora
+│   ├── acomodo.js       fichas por empresa y su numeración, para el acomodo
 │   ├── fila.js          la fila: servicios, estados, consejos y las tres funciones sin sesión
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
-│                        CarrerasPicker, RejillaMesas, Enlace
+│                        CarrerasPicker, RejillaMesas, Enlace, CuadriculaAcomodo
 └── pages/
     ├── Entrar.jsx       login del equipo
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Turno.jsx        pantalla del estudiante que espera, sin login
     ├── Fila.jsx         control de la fila, para el host de lista de espera
     ├── Host.jsx         vista del equipo el día del evento
-    └── admin/           Tablero, Mesas, Empresas, Reclutadores, Cupos, Pendientes,
-                          Cambios, Importar, Qr, Impreso
+    └── admin/           Tablero, Mesas, Acomodo, Empresas, Reclutadores, Cupos,
+                          Pendientes, Cambios, Importar (apagado), Qr, Impreso
 ```
 
 ## Rutas
@@ -182,23 +186,39 @@ sistema de diseño.
 
 ## El Excel
 
-`~/Downloads/WarmUp AD26 - Control de Mesas y Cupos.xlsx`. El importador lee tres hojas:
-`Reclutadores`, `Empresas` y `Catálogo de Empresas`. **Nunca escribe el libro.**
+`~/Downloads/WarmUp AD26 - Control de Mesas y Cupos.xlsx`. Sigue siendo la lista de personas del
+equipo, pero **ya no dice en qué mesa va nadie** y **no se importa** desde el 22-sep. El lector
+(`excel.js`, `importar.js`) queda para comparar; `verificar-importacion.mjs --aplicar` sale con
+error a propósito.
 
 **Trampa conocida:** el campo "cantidad de personas" del Forms no coincide con la lista de
 nombres, casi nunca. Se cuentan filas de la hoja `Reclutadores`, jamás ese campo. Contar el
 número dio un sobrecupo de seis que no existía.
 
+## El acomodo del salón
+
+**Cada bloque se acomoda por su cuenta.** Desde la tarde del 22-sep la base va en orden
+alfabético por bloque: una empresa de todo el día puede tener números distintos en B1 y B2.
+Cada empresa ocupa mesas seguidas. Portafolio se queda en 73–75 y no entra al acomodo.
+
+**En `/admin/acomodo` se arrastra la empresa completa**, como los íconos de un celular. Al soltar
+se ven los números nuevos y lo que tenía antes; nada se guarda hasta «Guardar acomodo», que
+manda el orden completo a `reordenar_salon` y avisa por `salon-<bloque>`. En el celular se deja
+el dedo un momento sobre la ficha para levantarla.
+
+`reordenar_salon` rechaza el acomodo si falta o sobra una empresa, si no cabe antes de
+portafolio, o si cambiaría el número de una mesa en sesión.
+
+**Después de acomodar se hornea el mapa fijo.** `/admin/impreso` ya lee de la base y cae al mapa
+horneado solo si no contesta; pero `/host` y `/mesa` usan el horneado cuando la base falla.
+
 ## Verificación
 
-La prueba dura: después de importar, las cifras de la app tienen que dar **igual que el
-Tablero del Excel**. Al corte del 22-sep-2026, con el mapa compactado y los expertos de
-portafolio: 65 empresas, 73 reclutadores en Bloque 1, 60 en Bloque 2, 73 mesas apartadas de 75,
-798 atenciones, 13 nombres por confirmar.
-
-**El mapa va compactado desde el 22-sep.** Primero las empresas de todo el día (1–22), con el
-mismo número en los dos bloques; luego las de un solo bloque, cada una en mesas seguidas.
-Bloque 1 ocupa 1–70 y Bloque 2 1–57; portafolio sigue en 73–75. Libres: B1 71–72, B2 58–72.
+La prueba dura ya no es contra el Tablero del Excel: la base manda. Se revisa por SQL que no
+haya números repetidos por bloque, que cada empresa esté en mesas seguidas, que portafolio esté
+en 73–75, y `hornear-mapa.mjs --verificar`. Al corte del 22-sep-2026 por la noche, con las bajas
+de Definity y Redwood: 70 lugares en Bloque 1 (1–67 y 73–75) y 60 en Bloque 2 (1–57 y 73–75).
+Libres: B1 68–72, B2 58–72.
 
 ## La fila del día del evento
 
