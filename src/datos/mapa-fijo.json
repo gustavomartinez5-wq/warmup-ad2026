@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-24T18:45:11.483Z",
+  "generado_en": "2026-09-24T21:19:59.381Z",
   "bloques": {
     "b1": [
       {
@@ -840,45 +840,6 @@
       },
       {
         "numero": 28,
-        "empresa": "Growth & Profit Consulting",
-        "giro": "Consultoría",
-        "carreras": [
-          "BGB",
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LDO",
-          "LEC",
-          "LEM",
-          "LIN",
-          "LIT"
-        ]
-      },
-      {
-        "numero": 29,
         "empresa": "Growth & Profit Consulting",
         "giro": "Consultoría",
         "carreras": [

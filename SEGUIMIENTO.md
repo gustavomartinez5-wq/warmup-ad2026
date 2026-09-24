@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con el alta de VERTIV y los nombres de Fastenal.
+Última actualización: **24 de septiembre de 2026**, con Growth & Profit en una sola mesa.
 
 ---
 
@@ -40,6 +40,14 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Growth & Profit en una sola mesa · 24-sep-2026
+
+Las dos personas de Growth & Profit comparten una mesa y se relevan. Se quedan en B1-28 y se
+liberó la 29 con `liberar_mesa`; está en `/admin/cambios`. Los dos nombres quedan en la fila de
+la 28, con la nota del relevo. La 29 se deja libre, sin recorrer el salón.
+
+Quedan B1 74 mesas (libre la 29) y B2 59 (1–56 y 73–75). Sin números repetidos. Mapa horneado.
 
 ### VERTIV entra y Fastenal cambia personas · 24-sep-2026
 
