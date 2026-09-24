@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con Growth & Profit en una sola mesa.
+Última actualización: **24 de septiembre de 2026**, con la baja de Areya.
 
 ---
 
@@ -40,6 +40,16 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Areya cancela · 24-sep-2026
+
+Areya avisó que no viene, ya en firme. Tenía una persona, solo en B2-2: se liberó con
+`liberar_mesa` y está en `/admin/cambios`. La 2 se deja libre, sin recorrer el salón. Su pendiente
+ya estaba resuelto. La empresa sigue en `empresas` sin mesas, como PwC el día de su baja, así que
+el Tablero la cuenta todavía en las 62.
+
+Quedan B1 74 mesas (libre la 29) y B2 58 (libre la 2; ocupadas 1, 3–56 y 73–75). Sin números
+repetidos. Mapa horneado.
 
 ### Growth & Profit en una sola mesa · 24-sep-2026
 

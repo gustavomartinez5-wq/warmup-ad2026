@@ -176,7 +176,7 @@ impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»:
 más 7 expertos, no 69 empresas (al 24-sep, con VERTIV). En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
 Bloque 1 son cuatro, de la 72 a la 75: Arquitectura entró en la 72 el 23-sep.
 
-Las empresas que además revisan portafolio (Definity, Areya, BECK) no llevan mesa extra: la
+Las empresas que además revisan portafolio (Definity y BECK; Areya canceló el 24-sep) no llevan mesa extra: la
 hoja «Expertos Portafolio» del equipo solo dice quién revisa. Mesa aparte solo para expertos.
 
 **Tipografía: Inter, no Neue Haas.** Neue Haas está licenciada y el repo es público. Inter es

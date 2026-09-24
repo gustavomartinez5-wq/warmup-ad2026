@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-24T21:19:59.381Z",
+  "generado_en": "2026-09-24T21:49:33.092Z",
   "bloques": {
     "b1": [
       {
@@ -2148,17 +2148,6 @@
           "LAE",
           "LDE",
           "LIN"
-        ]
-      },
-      {
-        "numero": 2,
-        "empresa": "Areya",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "IC",
-          "LDI",
-          "LUB"
         ]
       },
       {
