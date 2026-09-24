@@ -4,6 +4,10 @@ import { mesasDelBloque } from '../../lib/mesaPublica'
 import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../../lib/cifras'
 import { MESAS_EN_PLANO, nombreCorto, tienePalabraLarga } from '../../lib/plano'
 import PlanoSalon from '../../components/PlanoSalon'
+import { ZONAS, zonaDe } from '../../lib/zonas'
+
+// Sin esto el navegador tira los fondos al imprimir y la hoja sale sin zonas.
+const CON_COLOR = { printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }
 
 /**
  * El salón en papel. Es el último respaldo: si se cae Supabase, Vercel, el wifi
@@ -116,10 +120,14 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
     const carreras = m.carreras ?? []
     const dentro = carreras.slice(0, SIGLAS_EN_LA_MESA)
     const resto = carreras.length - dentro.length
+    // El color de la mesa es el de su zona, como en el Mapa con «Zonas».
+    const z = zonaDe(m.empresa, m.giro)
     return (
-      <div className={`h-full min-h-[108px] rounded border px-[3px] py-1 flex flex-col gap-0.5 min-w-0
-                       ${m.giro === GIRO_PORTAFOLIO
-                         ? 'border-marino border-dashed bg-marino/5' : 'border-marino/70'}`}>
+      <div
+        className={`h-full min-h-[108px] rounded border px-[3px] py-1 flex flex-col gap-0.5 min-w-0
+                    ${m.giro === GIRO_PORTAFOLIO ? 'border-dashed border-2' : ''}`}
+        style={{ ...CON_COLOR, background: z.fondo, borderColor: z.borde, color: z.letra }}
+      >
         <span className="text-[10px] font-extrabold cifra leading-none">{numero}</span>
         {/* En el papel la mesa es más angosta que en pantalla: la palabra larga
             baja a 8 px para no partirse a media palabra. */}
@@ -129,7 +137,7 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
           {nombreCorto(m.empresa)}
         </span>
         {carreras.length > 0 && (
-          <span className="text-[7px] leading-[1.25] text-marino/70 break-words">
+          <span className="text-[7px] leading-[1.25] opacity-75 break-words">
             {dentro.join(' ')}{resto > 0 ? ` +${resto}` : ''}
           </span>
         )}
@@ -160,7 +168,17 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
         celda={celda}
       />
 
-      <p className="text-[10px] text-marino/70 mt-3">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+        {ZONAS.map(z => (
+          <span key={z.clave} className="inline-flex items-center gap-1.5 text-[10px] text-marino">
+            <span className="w-3 h-3 rounded-sm border shrink-0"
+                  style={{ ...CON_COLOR, background: z.fondo, borderColor: z.borde }} />
+            {z.nombre}
+          </span>
+        ))}
+      </div>
+
+      <p className="text-[10px] text-marino/70 mt-2">
         La mesa 1 queda abajo a la derecha, junto al acceso. Debajo del nombre van las carreras que
         busca la empresa.
         {portafolio.length > 0 && (

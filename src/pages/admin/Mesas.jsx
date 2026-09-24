@@ -6,13 +6,17 @@ import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../../lib/plano'
 import Cargando from '../../components/Cargando'
 import FichaEmpresa from '../../components/FichaEmpresa'
 import PlanoSalon from '../../components/PlanoSalon'
+import { SelectorColores, LeyendaZonas } from '../../components/Zonas'
+import { zonaDe } from '../../lib/zonas'
 
 // La librería de arrastre solo viaja cuando alguien entra a editar el acomodo.
 const AcomodoEnMapa = lazy(() => import('../../components/AcomodoEnMapa'))
 
-/** Una mesa del Mapa: número, empresa y el color de su estado. */
-function Mesa({ mesa, angosta = false, onAbrir }) {
-  const { clase } = ESTADO_MESA[mesa.estado]
+/** Una mesa del Mapa: número, empresa y el color de su estado, o de su zona con «Zonas». */
+function Mesa({ mesa, angosta = false, onAbrir, zonas = false }) {
+  const clase = zonas && mesa.reclutador
+    ? zonaDe(mesa.reclutador.empresa, mesa.reclutador.giro).clase
+    : ESTADO_MESA[mesa.estado].clase
   const nombre = nombreCorto(mesa.reclutador?.empresa ?? '')
   const portafolio = mesa.reclutador?.giro === GIRO_PORTAFOLIO
     ? 'outline-2 outline-dashed outline-offset-1 outline-lavanda' : ''
@@ -183,6 +187,7 @@ export default function Mesas() {
   const [guardando, setGuardando] = useState(false)
   const [editando, setEditando] = useState(false)
   const [aviso, setAviso]     = useState(null)
+  const [colores, setColores] = useState('estado')
 
   if (datos.cargando || datos.error) return <Cargando error={datos.error} />
 
@@ -278,6 +283,7 @@ export default function Mesas() {
             Editar acomodo
           </button>
         )}
+        {!editando && <SelectorColores valor={colores} onCambio={setColores} />}
       </div>
 
       {editando ? (
@@ -293,7 +299,7 @@ export default function Mesas() {
           />
         </Suspense>
       ) : (<>
-      <Leyenda mapa={mapa} />
+      {colores === 'zonas' ? <LeyendaZonas /> : <Leyenda mapa={mapa} />}
 
       {mapa.length === 0 && (
         <p className="text-sm text-lavanda/50 py-8 text-center">Sin mesas todavía.</p>
@@ -304,7 +310,7 @@ export default function Mesas() {
           excedentes={mapa.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
           celda={(numero, { angosta }) => {
             const m = mapa.find(x => x.numero === numero) ?? { numero, estado: 'libre', reclutador: null }
-            return <Mesa mesa={m} angosta={angosta} onAbrir={setDetalle} />
+            return <Mesa mesa={m} angosta={angosta} onAbrir={setDetalle} zonas={colores === 'zonas'} />
           }}
         />
       )}

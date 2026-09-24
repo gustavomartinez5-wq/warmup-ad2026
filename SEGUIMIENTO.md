@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con el salón acomodado por zonas.
+Última actualización: **24 de septiembre de 2026**, con el salón por columnas y los colores de zona.
 
 ---
 
@@ -40,6 +40,37 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### El salón por columnas y los colores de zona · 24-sep-2026
+
+Gustavo regresó el acomodo por zonas a orden alfabético a propósito y pidió otras propuestas.
+Aprobó «por columnas» (`Ediciones/WarmUp AD26/WarmUp AD26 - Propuesta por columnas.html`, la arma
+`zonas/proponer-columnas.mjs`):
+
+- Los 11 Big Names que investigó y sí vienen, en la fila de la mampara, en el orden de su lista.
+- Construcción, arquitectura y portafolio en las columnas A y B.
+- Las demás áreas por columnas hacia la O, cada una A–Z. B2 con la fila del fondo vacía.
+
+Se aplicó con `acomodar_mesas`, un llamado por bloque, después de comprobar que la base seguía
+igual al mapa de la propuesta. Revisado empresa por empresa: idéntico. Mapa horneado y publicado.
+
+Los colores del borrador entraron a la app:
+
+| Qué | Cómo quedó |
+|---|---|
+| `src/lib/zonas.js` | La zona de cada empresa y sus colores, con las listas de la propuesta |
+| Mapa de admin y de `/host` | «Estado · Zonas» sobre el Mapa. Abre en Estado. «Zonas» pinta como el borrador y cambia la leyenda |
+| Hoja de papel | Siempre a color por zona, con leyenda y `print-color-adjust: exact`. Portafolio sigue con contorno punteado |
+
+| Prueba (rutas temporales en local, sin sesión, con los datos públicos; se quitaron) | Resultado |
+|---|---|
+| Admin a 390 px, «Zonas» | Colores y leyenda; sin scroll lateral |
+| `/host` a 390 px | Abre en Estado; «Zonas» en su propio renglón; sin scroll lateral |
+| `/host` a 1280 px | Plano horizontal con las zonas; A y B en diseño, fila 1 en Big Names |
+| Hoja de papel | 74 mesas con fondo de zona y ajuste `exact` |
+| `npm run build` | Limpio |
+
+Falta que Gustavo lo vea con su sesión en admin y en `/host`.
 
 ### El salón por zonas · 24-sep-2026
 

@@ -10,6 +10,8 @@ import { catalogoDeCarreras } from '../lib/carreras'
 import { mesasFijas, carrerasFijas, fechaDelMapa } from '../lib/mapaFijo'
 import { plano, contiene } from '../lib/texto'
 import PlanoSalon from '../components/PlanoSalon'
+import { SelectorColores, LeyendaZonas } from '../components/Zonas'
+import { zonaDe } from '../lib/zonas'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
 import EditarMesa from '../components/EditarMesa'
@@ -50,7 +52,7 @@ function Pastilla({ valor, texto, tono }) {
 
 /* ── La mesa dentro del plano ─────────────────────────────────────────────── */
 
-function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco }) {
+function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco, zonas = false }) {
   const apagado = apagada ? 'opacity-25' : ''
 
   if (mesa.libre) {
@@ -68,6 +70,8 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco 
   }
 
   const p = pintar(mesa, ahora)
+  // Con «Zonas» el color es el de la zona; el reloj sigue saliendo si está en sesión.
+  const color = zonas ? zonaDe(mesa.empresa, mesa.giro).clase : p.celda
   const nombre = nombreCorto(mesa.empresa)
   const portafolio = mesa.giro === GIRO_PORTAFOLIO
     ? 'outline-2 outline-dashed outline-offset-1 outline-lavanda' : ''
@@ -78,7 +82,7 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco 
       title={`${mesa.numero} · ${mesa.empresa}`}
       className={`w-full h-full min-h-[58px] rounded-md border ${angosta ? 'px-0.5' : 'px-1'} py-1
                   text-left flex flex-col justify-between min-w-0 transition-transform active:scale-95
-                  ${p.celda} ${portafolio} ${apagado}`}
+                  ${color} ${portafolio} ${apagado}`}
     >
       <span className="flex items-baseline justify-between gap-0.5 min-w-0">
         <span className="text-[11px] font-extrabold cifra">{mesa.numero}</span>
@@ -201,6 +205,7 @@ export default function Host() {
   const desdeFila = params.get('desde') === 'fila'
   const [bloque, setBloque]   = useState(bloquePorReloj)
   const [vista, setVista]     = useState('plano')
+  const [colores, setColores] = useState('estado')   // estado · zonas; abre en estado, el del día
   const [mesas, setMesas]     = useState(() => mesasFijas(bloquePorReloj()))
   const [fuente, setFuente]   = useState('fija')   // fija · viva · vieja
   const [error, setError]     = useState(null)
@@ -525,6 +530,7 @@ export default function Host() {
               </button>
             ))}
           </div>
+          {vista === 'plano' && !acomodando && <SelectorColores valor={colores} onCambio={setColores} />}
           {fuente === 'viva' && !acomodando && (
             <div className="ml-auto flex items-center gap-3">
               {vista === 'plano' && (
@@ -554,6 +560,8 @@ export default function Host() {
           <Pastilla valor={cuenta.no_llego}   texto="no llegaron" tono="gris" />
         </div>
         )}
+
+        {vista === 'plano' && colores === 'zonas' && !acomodando && <LeyendaZonas />}
 
         {fuente !== 'viva' && (
           <p className="text-[11px] leading-snug rounded-lg border border-ambar/50 bg-ambar/10
@@ -668,6 +676,7 @@ export default function Host() {
                 apagada={coinciden ? !coinciden.has(numero) : false}
                 angosta={angosta} ahora={ahora} tocable={fuente === 'viva'}
                 onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
+                zonas={colores === 'zonas'}
               />
             )}
           />
