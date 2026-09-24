@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-24T14:56:03.809Z",
+  "generado_en": "2026-09-24T15:03:42.317Z",
   "bloques": {
     "b1": [
       {
@@ -1665,6 +1665,18 @@
       },
       {
         "numero": 54,
+        "empresa": "PwC",
+        "giro": "Consultoría",
+        "carreras": [
+          "LAE",
+          "LAF",
+          "LCPF",
+          "LEC",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 55,
         "empresa": "Redwood Logistics",
         "giro": "Logística y transporte",
         "carreras": [
@@ -1680,7 +1692,7 @@
         ]
       },
       {
-        "numero": 55,
+        "numero": 56,
         "empresa": "Ruhrpumpen",
         "giro": "Manufactura",
         "carreras": [
@@ -1698,28 +1710,6 @@
           "IQA",
           "IRS",
           "ISD"
-        ]
-      },
-      {
-        "numero": 56,
-        "empresa": "SAP",
-        "giro": "Tecnología y software",
-        "carreras": [
-          "BGB",
-          "IDM",
-          "IFI",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LDO",
-          "LEM",
-          "LIN",
-          "LIT"
         ]
       },
       {
@@ -1746,6 +1736,28 @@
       },
       {
         "numero": 58,
+        "empresa": "SAP",
+        "giro": "Tecnología y software",
+        "carreras": [
+          "BGB",
+          "IDM",
+          "IFI",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAE",
+          "LAF",
+          "LCPF",
+          "LDE",
+          "LDO",
+          "LEM",
+          "LIN",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 59,
         "empresa": "Schneider Electric",
         "giro": "Manufactura",
         "carreras": [
@@ -1761,49 +1773,6 @@
           "IRS",
           "ISD",
           "LIN"
-        ]
-      },
-      {
-        "numero": 59,
-        "empresa": "Steelcase",
-        "giro": "Arquitectura y construcción",
-        "carreras": [
-          "ARQ",
-          "BGB",
-          "BIE",
-          "BME",
-          "IAL",
-          "IBT",
-          "IC",
-          "IDM",
-          "IDS",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMD",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
-          "ITC",
-          "ITD",
-          "LAD",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LDI",
-          "LDO",
-          "LEM",
-          "LIN",
-          "LIT",
-          "LPS",
-          "LUB"
         ]
       },
       {
@@ -1851,6 +1820,49 @@
       },
       {
         "numero": 61,
+        "empresa": "Steelcase",
+        "giro": "Arquitectura y construcción",
+        "carreras": [
+          "ARQ",
+          "BGB",
+          "BIE",
+          "BME",
+          "IAL",
+          "IBT",
+          "IC",
+          "IDM",
+          "IDS",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMD",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "ITD",
+          "LAD",
+          "LAE",
+          "LAF",
+          "LCPF",
+          "LDE",
+          "LDI",
+          "LDO",
+          "LEM",
+          "LIN",
+          "LIT",
+          "LPS",
+          "LUB"
+        ]
+      },
+      {
+        "numero": 62,
         "empresa": "Tecnológico de Monterrey",
         "giro": "Educativo",
         "carreras": [
@@ -1868,7 +1880,7 @@
         ]
       },
       {
-        "numero": 62,
+        "numero": 63,
         "empresa": "The Home Depot México",
         "giro": "Consumo y retail",
         "carreras": [
@@ -1908,23 +1920,6 @@
         ]
       },
       {
-        "numero": 63,
-        "empresa": "Unitivida",
-        "giro": "Seguros",
-        "carreras": [
-          "BGB",
-          "LAE",
-          "LAF",
-          "LCPF",
-          "LDE",
-          "LDO",
-          "LEC",
-          "LEM",
-          "LIN",
-          "LIT"
-        ]
-      },
-      {
         "numero": 64,
         "empresa": "Unitivida",
         "giro": "Seguros",
@@ -1943,27 +1938,16 @@
       },
       {
         "numero": 65,
-        "empresa": "Vitro",
-        "giro": "Manufactura",
+        "empresa": "Unitivida",
+        "giro": "Seguros",
         "carreras": [
           "BGB",
-          "BIE",
-          "BME",
-          "IE",
-          "IFI",
-          "IID",
-          "IIS",
-          "IM",
-          "IMA",
-          "IMT",
-          "INA",
-          "IQ",
-          "IQA",
-          "IRS",
-          "ISD",
           "LAE",
           "LAF",
+          "LCPF",
           "LDE",
+          "LDO",
+          "LEC",
           "LEM",
           "LIN",
           "LIT"
@@ -1999,6 +1983,34 @@
       },
       {
         "numero": 67,
+        "empresa": "Vitro",
+        "giro": "Manufactura",
+        "carreras": [
+          "BGB",
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "LAE",
+          "LAF",
+          "LDE",
+          "LEM",
+          "LIN",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 68,
         "empresa": "ZF",
         "giro": "Automotriz",
         "carreras": [
@@ -2030,7 +2042,7 @@
         ]
       },
       {
-        "numero": 68,
+        "numero": 69,
         "empresa": "ZF",
         "giro": "Automotriz",
         "carreras": [

@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con la baja de PwC y COPARMEX en los dos bloques.
+Última actualización: **24 de septiembre de 2026**, con PwC solo en B1 y COPARMEX en los dos bloques.
 
 ---
 
@@ -41,15 +41,16 @@ dónde quedamos.
 
 ## Fases cerradas
 
-### PwC no viene y COPARMEX a los dos bloques · 24-sep-2026
+### PwC solo en B1 y COPARMEX a los dos bloques · 24-sep-2026
 
 | Empresa | Qué quedó |
 |---|---|
-| PwC | No viene. Se liberaron B1-54 y B2-40. La empresa sigue en `empresas` sin mesas, así que el Tablero la cuenta todavía en las 61 |
+| PwC | Primero avisó que no venía y se liberaron B1-54 y B2-40. Luego confirmó que viene solo a B1, con una persona: regresó a B1-54, con el nombre del representante. B2-40 sigue fuera |
 | COPARMEX | Las mismas dos personas en la mañana y en la tarde: B1-12 y 13, y entran B2-18 y 19, con los nombres de B1 |
 
-B1 se recorrió: 55–69 bajaron uno. B2: 18–39 subieron dos y 41–54 uno, para que COPARMEX quede
-en su lugar alfabético. Quedan B1 72 mesas (1–68 y 72–75, libres 69–71) y B2 58 (1–55 y 73–75).
+B1 queda con los mismos números que tenía antes de la baja. B2: 18–39 subieron dos y 41–54 uno,
+para que COPARMEX quede en su lugar alfabético. Quedan B1 73 mesas (1–69 y 72–75, libres 70 y 71)
+y B2 58 (1–55 y 73–75).
 Mapa horneado; `--verificar` al día y sin números repetidos. El Excel de control no se tocó:
 sigue sin los cambios del 23 y el 24.
 
