@@ -173,8 +173,8 @@ urbanismo saldría mandado a la mesa de animación.
 Las siete llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
 Es lo que saca la zona completa con el filtro de giro de `/host`, lo que hace que la hoja
 impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 62 empresas
-más 7 expertos, no 69 empresas (al 24-sep, con VERTIV). En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
-Bloque 1 son cuatro, de la 72 a la 75: Arquitectura entró en la 72 el 23-sep.
+más 7 expertos, no 69 empresas (al 24-sep, con VERTIV). Desde el 24-sep la zona de
+portafolio va frente al acceso, en las columnas 7 y 8: B1 31, 32, 33 y 36; B2 33, 34 y 39.
 
 Las empresas que además revisan portafolio (Definity y BECK; Areya canceló el 24-sep) no llevan mesa extra: la
 hoja «Expertos Portafolio» del equipo solo dice quién revisa. Mesa aparte solo para expertos.
@@ -195,6 +195,14 @@ nombres, casi nunca. Se cuentan filas de la hoja `Reclutadores`, jamás ese camp
 número dio un sobrecupo de seis que no existía.
 
 ## El acomodo del salón
+
+**Desde el 24-sep el salón va por zonas, no en orden alfabético.** De derecha a izquierda:
+Ingeniería, Tecnología y datos, Arquitectura, diseño y portafolio (frente al acceso), Abiertas a
+varias carreras, y Negocios y finanzas. Dos empresas que compiten no van en la misma columna ni
+en la de espalda. En Bloque 2 la fila del fondo, contra el muro de las puertas de servicio, va
+vacía. La propuesta y sus reglas viven en el vault: `Ediciones/WarmUp AD26/zonas/proponer-zonas.mjs`
+y `WarmUp AD26 - Propuesta de zonas.html`. **«Orden alfabético» en el editor deshace las zonas**:
+regresa el borrador al acomodo del 22-sep, con portafolio al final. No se guarda sin querer eso.
 
 **Cada bloque se acomoda por su cuenta.** El 22-sep la base quedó en orden alfabético por
 bloque: una empresa de todo el día puede tener números distintos en B1 y B2.

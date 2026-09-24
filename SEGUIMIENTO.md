@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con la baja de Areya.
+Última actualización: **24 de septiembre de 2026**, con el salón acomodado por zonas.
 
 ---
 
@@ -40,6 +40,24 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### El salón por zonas · 24-sep-2026
+
+Gustavo aprobó la propuesta de zonas (`Ediciones/WarmUp AD26/WarmUp AD26 - Propuesta de zonas.html`,
+la arma `zonas/proponer-zonas.mjs`) y se aplicó con `acomodar_mesas`, un llamado por bloque; los
+dos quedan en `/admin/cambios`. Admin y host leen la misma base, así que cambió en los dos.
+
+- De derecha a izquierda: Ingeniería · Tecnología y datos · Arquitectura, diseño y portafolio
+  frente al acceso · Abiertas a varias carreras · Negocios y finanzas.
+- Competidores ni en la misma columna ni en la de espalda: bancos, farmacias, seguros,
+  automotriz, eléctrica y automatización (con VERTIV), constructoras.
+- B2: la fila del fondo va vacía y las empresas llenan las otras cuatro filas.
+
+La propuesta se armó antes de dos cambios de la tarde, así que se aplicó igual y quedaron vacías
+las mesas que esas empresas iban a ocupar: B1-46 (la segunda de Growth & Profit) y B2-19 (Areya).
+B2-74 queda libre como estaba previsto. Resultado: B1 74 mesas, libre la 46; B2 58, libres la 19,
+la 74 y la fila del fondo. Revisado contra la propuesta empresa por empresa: idéntico, cero
+competidores cerca, portafolio en las columnas 7 y 8. Mapa horneado.
 
 ### Areya cancela · 24-sep-2026
 
