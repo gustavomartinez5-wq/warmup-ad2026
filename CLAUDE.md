@@ -163,18 +163,18 @@ Paleta CVDP. Teal, ámbar y rojo son semánticos (DEC-019): aquí el color **es*
 
 ## Los expertos de portafolio
 
-Seis personas dan revisión de portafolio creativo, no reclutamiento: cinco de EAAD y una de
-Steelcase, `Portafolio · Diseño (Steelcase)`. Entran como una
+Siete personas dan revisión de portafolio creativo, no reclutamiento: cinco de EAAD, una de
+Steelcase, `Portafolio · Diseño (Steelcase)`, y `Portafolio · Arquitectura`, que se registró el
+23-sep. Entran como una
 empresa cada una —`Portafolio · Diseño`, `Portafolio · Urbanismo`…— porque **las carreras van
 pegadas a la empresa y no a la mesa**: con una sola empresa de cinco mesas, el estudiante de
 urbanismo saldría mandado a la mesa de animación.
 
-Las seis llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
+Las siete llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
 Es lo que saca la zona completa con el filtro de giro de `/host`, lo que hace que la hoja
 impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 61 empresas
-más 6 expertos, no 67 empresas. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
-Bloque 1 también son 73, 74 y 75: la 73, que se había dejado libre el 22-sep, la ocupa la experta
-de Steelcase desde ese mismo día.
+más 7 expertos, no 68 empresas. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
+Bloque 1 son cuatro, de la 72 a la 75: Arquitectura entró en la 72 el 23-sep.
 
 Las empresas que además revisan portafolio (Definity, Areya, BECK) no llevan mesa extra: la
 hoja «Expertos Portafolio» del equipo solo dice quién revisa. Mesa aparte solo para expertos.

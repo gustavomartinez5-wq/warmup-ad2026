@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **22 de septiembre de 2026**, con el acomodo de mesas arrastrando.
+Última actualización: **24 de septiembre de 2026**, con la baja de PwC y COPARMEX en los dos bloques.
 
 ---
 
@@ -41,6 +41,18 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### PwC no viene y COPARMEX a los dos bloques · 24-sep-2026
+
+| Empresa | Qué quedó |
+|---|---|
+| PwC | No viene. Se liberaron B1-54 y B2-40. La empresa sigue en `empresas` sin mesas, así que el Tablero la cuenta todavía en las 61 |
+| COPARMEX | Las mismas dos personas en la mañana y en la tarde: B1-12 y 13, y entran B2-18 y 19, con los nombres de B1 |
+
+B1 se recorrió: 55–69 bajaron uno. B2: 18–39 subieron dos y 41–54 uno, para que COPARMEX quede
+en su lugar alfabético. Quedan B1 72 mesas (1–68 y 72–75, libres 69–71) y B2 58 (1–55 y 73–75).
+Mapa horneado; `--verificar` al día y sin números repetidos. El Excel de control no se tocó:
+sigue sin los cambios del 23 y el 24.
+
 ### Confirmaciones por correo · 23-sep-2026
 
 Gustavo revisó los correos de confirmación. Se aplicó a la base con las funciones de la app.
@@ -53,8 +65,12 @@ Gustavo revisó los correos de confirmación. Se aplicó a la base con las funci
 | Clarios, Benavides, OmniSource, Tec, Areya | Confirmaron; pendiente resuelto |
 
 B1 se recorrió para que cada empresa quede junta y en el mismo orden: 13–35 subieron uno, luego
-29–36. B2 se compactó del 1 al 55 en el mismo orden, y la tercera mesa de Heineken (40) se juntó
-con las otras dos. Quedan B1 72 mesas (libres 54, 71, 72) y B2 58 (libres 56–72). Mapa horneado.
+29–36. Heineken son dos personas por bloque: sale la tercera mesa de B2, agregada esa mañana. B2
+se compactó del 1 al 54 en el mismo orden. Gustavo pasó Heineken de B1 a la 33–34, en su lugar
+alfabético. Entró un séptimo experto, `Portafolio · Arquitectura` (ARQ), en B1-72, pegado a la
+zona de portafolio; se agregó a `carreras-por-empresa.sql` con los otros seis, que no estaban y
+ese script les habría borrado las carreras. Quedan B1 73 mesas (1–69 y 72–75, libres 70 y 71) y
+B2 57 (1–54 y 73–75). Mapa horneado.
 
 Una primera versión de esta entrada llevaba nombres de reclutadores y se subió al repo público.
 Se quitaron aquí; siguen en el historial de git (commit `c1f3ec5`).

@@ -105,7 +105,16 @@ mapa (empresa, siglas) as (
   ('Sustainability Engineering Group', array['IC','ARQ']),
   -- Linde entró el 18-sep y se etiquetó el 22-sep: Química, Industrial, Bioquímicos,
   -- Administración de Empresas, Ciencia de Datos
-  ('Linde',                    array['IQ','IQA','IIS','BIE','IBT','LBC','LAE','LDE','IDM'])
+  ('Linde',                    array['IQ','IQA','IIS','BIE','IBT','LBC','LAE','LDE','IDM']),
+  -- Expertos de portafolio: sin esto, correr el script les borraba las carreras.
+  -- Arquitectura entró el 23-sep-2026.
+  ('Portafolio · Diseño',             array['LDI']),
+  ('Portafolio · Urbanismo',          array['LUB']),
+  ('Portafolio · Diseño y Animación', array['LDI','LAD']),
+  ('Portafolio · Todos los perfiles', array['ARQ','LDI','LAD','LUB']),
+  ('Portafolio · Animación',          array['LAD']),
+  ('Portafolio · Diseño (Steelcase)', array['LDI']),
+  ('Portafolio · Arquitectura',       array['ARQ'])
 
   ) as v(empresa, siglas)
 ),
