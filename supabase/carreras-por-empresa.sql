@@ -103,6 +103,8 @@ mapa (empresa, siglas) as (
   ('GPvivienda',               array['ARQ','IC','LDI']),
   ('EATON',                    array['IIS','BIE','IM','IMA','IMT','BME']),
   ('Sustainability Engineering Group', array['IC','ARQ']),
+  -- Se sumó el 24-sep-2026 (registro 70): Manufactura, Logística, Finanzas
+  ('VERTIV',                   g.manuf || array['LIN','BGB','LAE','LAF','LCPF','LDE']),
   -- Linde entró el 18-sep y se etiquetó el 22-sep: Química, Industrial, Bioquímicos,
   -- Administración de Empresas, Ciencia de Datos
   ('Linde',                    array['IQ','IQA','IIS','BIE','IBT','LBC','LAE','LDE','IDM']),

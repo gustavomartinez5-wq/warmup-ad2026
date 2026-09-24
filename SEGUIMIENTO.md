@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con PwC solo en B1, COPARMEX en los dos bloques y dos mesas tentativas de ZF.
+Última actualización: **24 de septiembre de 2026**, con el alta de VERTIV y los nombres de Fastenal.
 
 ---
 
@@ -40,6 +40,16 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### VERTIV entra y Fastenal cambia personas · 24-sep-2026
+
+| Empresa | Qué quedó |
+|---|---|
+| VERTIV | Registro 70 del Forms: una persona, solo B2. Entra en B2-51, en su lugar alfabético; Viakable, Whirlpool y Management Solutions subieron uno (52–56). Giro Manufactura. 20 carreras con el criterio de Danfoss y Vitro: las de manufactura más LIN, BGB, LAE, LAF, LCPF y LDE. Se agregó a `carreras-por-empresa.sql` y a `carreras-asignadas.md` |
+| Fastenal | Mismas mesas: dos por bloque. Una persona va a los dos bloques y cambia la segunda de cada bloque. Nombres actualizados en la base |
+
+Quedan B1 75 mesas, sin libres, y B2 59 (1–56 y 73–75). El Tablero cuenta 62 empresas: entra
+VERTIV y PwC sigue. Mapa horneado.
 
 ### PwC solo en B1 y COPARMEX a los dos bloques · 24-sep-2026
 

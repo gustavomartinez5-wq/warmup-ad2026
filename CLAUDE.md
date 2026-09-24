@@ -172,8 +172,8 @@ urbanismo saldría mandado a la mesa de animación.
 
 Las siete llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/lib/cifras.js`).
 Es lo que saca la zona completa con el filtro de giro de `/host`, lo que hace que la hoja
-impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 61 empresas
-más 7 expertos, no 68 empresas. En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
+impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 62 empresas
+más 7 expertos, no 69 empresas (al 24-sep, con VERTIV). En Bloque 2 la zona son las tres últimas mesas —73, 74 y 75—; en
 Bloque 1 son cuatro, de la 72 a la 75: Arquitectura entró en la 72 el 23-sep.
 
 Las empresas que además revisan portafolio (Definity, Areya, BECK) no llevan mesa extra: la

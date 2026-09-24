@@ -60,6 +60,7 @@ Para corregir una: ficha de la empresa en la app, o editar
 | **Tecnológico de Monterrey** | Relaciones Internacionales, Gobierno y Transformación Pública, Comunicación, Ingeniería Química, Administración, Ingeniería Industrial | 11 | BIE IIS IQ IQA LAE LC LDE LDO LEI LRI LTP |
 | **The Home Depot México** | Mercadotecnia, Ingenierías, Negocios, Relaciones Internacionales, Legal | 33 | BGB BIE BME IAL IBT IC IDM IDS IE IFI IID IIS IM IMA IMD IMT INA IQ IQA IRS ISD ITC ITD LAE LAF LCPF LDE LDO LED LEM LIN LIT LRI |
 | **Unitivida** | Negocios | 10 | BGB LAE LAF LCPF LDE LDO LEC LEM LIN LIT |
+| **VERTIV** | Manufactura, Logística, Finanzas · se sumó el 24-sep | 20 | BGB BIE BME IE IFI IID IIS IM IMA IMT INA IQ IQA IRS ISD LAE LAF LCPF LDE LIN |
 | **Vitro** | Ingenierías: mecatrónica, mecánica, industrial. Licenciaturas de negocios y logística | 21 | BGB BIE BME IE IFI IID IIS IM IMA IMT INA IQ IQA IRS ISD LAE LAF LDE LEM LIN LIT |
 | **Whirlpool** | Ingenierías | 22 | BIE BME IAL IBT IC IDM IDS IE IFI IID IIS IM IMA IMD IMT INA IQ IQA IRS ISD ITC ITD |
 | **ZF** | LAF, LAE, IIS, ITC, IME, IMT, LDO, Comunicación, Marketing, LNI, Negocios, Administración, Ingeniería | 25 | BGB BIE BME IE IFI IID IIS IM IMA IMT INA IQ IQA IRS ISD ITC LAE LAF LC LCPF LDE LDO LEM LIN LIT |
