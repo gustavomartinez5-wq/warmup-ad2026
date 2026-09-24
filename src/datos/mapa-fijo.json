@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-24T15:03:42.317Z",
+  "generado_en": "2026-09-24T15:23:57.128Z",
   "bloques": {
     "b1": [
       {
@@ -2043,6 +2043,70 @@
       },
       {
         "numero": 69,
+        "empresa": "ZF",
+        "giro": "Automotriz",
+        "carreras": [
+          "BGB",
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "LAE",
+          "LAF",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDO",
+          "LEM",
+          "LIN",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 70,
+        "empresa": "ZF",
+        "giro": "Automotriz",
+        "carreras": [
+          "BGB",
+          "BIE",
+          "BME",
+          "IE",
+          "IFI",
+          "IID",
+          "IIS",
+          "IM",
+          "IMA",
+          "IMT",
+          "INA",
+          "IQ",
+          "IQA",
+          "IRS",
+          "ISD",
+          "ITC",
+          "LAE",
+          "LAF",
+          "LC",
+          "LCPF",
+          "LDE",
+          "LDO",
+          "LEM",
+          "LIN",
+          "LIT"
+        ]
+      },
+      {
+        "numero": 71,
         "empresa": "ZF",
         "giro": "Automotriz",
         "carreras": [

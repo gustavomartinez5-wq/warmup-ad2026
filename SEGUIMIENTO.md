@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con PwC solo en B1 y COPARMEX en los dos bloques.
+Última actualización: **24 de septiembre de 2026**, con PwC solo en B1, COPARMEX en los dos bloques y dos mesas tentativas de ZF.
 
 ---
 
@@ -51,6 +51,11 @@ dónde quedamos.
 B1 queda con los mismos números que tenía antes de la baja. B2: 18–39 subieron dos y 41–54 uno,
 para que COPARMEX quede en su lugar alfabético. Quedan B1 73 mesas (1–69 y 72–75, libres 70 y 71)
 y B2 58 (1–55 y 73–75).
+
+**ZF, dos tentativas.** ZF pidió dos personas más en B1. Gustavo le propuso que fueran dos en la
+mañana y dos en la tarde, y no ha contestado. Entraron en B1-70 y 71, pegadas a sus mesas 68 y 69,
+como `por_confirmar` y «Por definir», con un pendiente abierto en el Tablero. B1 queda lleno: 75
+mesas, ninguna libre. Si ZF acepta repartir, esas dos salen de B1 y entran en B2-56 y 57.
 Mapa horneado; `--verificar` al día y sin números repetidos. El Excel de control no se tocó:
 sigue sin los cambios del 23 y el 24.
 
