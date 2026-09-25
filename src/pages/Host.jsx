@@ -33,6 +33,11 @@ const AcomodoEnMapa = lazy(() => import('../components/AcomodoEnMapa'))
  * rojo fijo y la pastilla de «pasadas de 20» dicen lo mismo sin estrobo. El
  * parpadeo se queda donde hay un solo reloj: la pantalla del reclutador y la
  * hoja de detalle de una mesa.
+ *
+ * Con `scout` es la misma pantalla sin contraseña, para los becarios que recorren
+ * el salón. Solo ve y cambia el estado: usa las dos funciones que ya toca el
+ * reclutador desde `/mesa`, así que no abre nada nuevo en la base. Sin editar
+ * mesas, sin acomodo, sin lista de espera y sin filtro de carreras.
  */
 
 function Pastilla({ valor, texto, tono }) {
@@ -99,7 +104,7 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco,
 
 /* ── Hoja de detalle ──────────────────────────────────────────────────────── */
 
-function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }) {
+function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar, scout }) {
   const p = pintar(mesa, ahora)
   return (
     <div
@@ -148,7 +153,7 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }
             )}
           </div>
 
-          {mesa.carreras?.length > 0 && (
+          {!scout && mesa.carreras?.length > 0 && (
             <div>
               <p className="text-xs text-lavanda/55 mb-1.5">Carreras que busca</p>
               <div className="flex flex-wrap gap-1.5">
@@ -198,7 +203,7 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar }
 
 /* ── La pantalla ──────────────────────────────────────────────────────────── */
 
-export default function Host() {
+export default function Host({ scout = false }) {
   // La lista de espera siempre está a un toque. Si se llegó desde ahí, la liga
   // se lee como regreso; si se entró directo, como ir a verla.
   const [params] = useSearchParams()
@@ -328,13 +333,18 @@ export default function Host() {
   }, [])
 
   // El catálogo sirve para que el buscador entienda «mecatrónica» y no solo «IMT».
-  useEffect(() => { catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo(carrerasFijas())) }, [])
+  useEffect(() => {
+    if (scout) return
+    catalogoDeCarreras().then(setCatalogo).catch(() => setCatalogo(carrerasFijas()))
+  }, [scout])
 
   // Cuántas mesas tiene el salón, para pintar también las libres. Si no
-  // contesta, la rejilla llega hasta la mesa asignada más alta.
+  // contesta, la rejilla llega hasta la mesa asignada más alta. El scout no lo
+  // pide: sin sesión, `ediciones` no deja leer `total_mesas`.
   useEffect(() => {
+    if (scout) return
     edicionCompleta().then(e => setTotalMesas(e?.total_mesas ?? null)).catch(() => {})
-  }, [])
+  }, [scout])
 
   const carreras = useMemo(
     () => [...new Set((mesas ?? []).flatMap(m => m.carreras ?? []))].sort(),
@@ -457,7 +467,8 @@ export default function Host() {
         <Detalle
           mesa={mesaAbierta} bloque={bloque} ahora={ahora} marcando={marcando}
           onCerrar={() => setAbierta(null)} onMarcar={marcar}
-          onEditar={fuente === 'viva' ? () => abrirEdicion(mesaAbierta.numero) : null}
+          onEditar={fuente === 'viva' && !scout ? () => abrirEdicion(mesaAbierta.numero) : null}
+          scout={scout}
         />
       )}
 
@@ -481,11 +492,15 @@ export default function Host() {
                          bg-marino/85 backdrop-blur space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <Link to="/fila"
-              className="inline-block text-xs font-semibold text-cian hover:text-white mb-1.5">
-              {desdeFila ? '← Regresar a la lista de espera' : 'Lista de espera →'}
-            </Link>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">CVDP · Host</p>
+            {!scout && (
+              <Link to="/fila"
+                className="inline-block text-xs font-semibold text-cian hover:text-white mb-1.5">
+                {desdeFila ? '← Regresar a la lista de espera' : 'Lista de espera →'}
+              </Link>
+            )}
+            <p className="text-[10px] uppercase tracking-[0.18em] text-cian font-semibold">
+              {scout ? 'CVDP · Scout' : 'CVDP · Host'}
+            </p>
             <h1 className="text-lg font-extrabold leading-tight">Warm Up AD2026</h1>
           </div>
           <div className="flex items-center gap-3 pt-1 shrink-0">
@@ -501,7 +516,7 @@ export default function Host() {
             >
               Recargar
             </button>
-            <Link to="/admin" className="text-xs text-lavanda/55 hover:text-white">Admin</Link>
+            {!scout && <Link to="/admin" className="text-xs text-lavanda/55 hover:text-white">Admin</Link>}
           </div>
         </div>
 
@@ -531,7 +546,7 @@ export default function Host() {
             ))}
           </div>
           {vista === 'plano' && !acomodando && <SelectorColores valor={colores} onCambio={setColores} />}
-          {fuente === 'viva' && !acomodando && (
+          {fuente === 'viva' && !acomodando && !scout && (
             <div className="ml-auto flex items-center gap-3">
               {vista === 'plano' && (
                 <button
@@ -603,15 +618,17 @@ export default function Host() {
         <div className="space-y-2">
           <input
             value={busca} onChange={e => setBusca(e.target.value)}
-            inputMode="search" placeholder="Empresa, carrera, giro o mesa…"
+            inputMode="search" placeholder={scout ? 'Empresa, giro o mesa…' : 'Empresa, carrera, giro o mesa…'}
             className="w-full rounded-lg bg-marino-alto border border-lavanda/20 px-3 py-2 text-[13px]
                        placeholder-lavanda/30 outline-none focus:border-cian"
           />
-          <div className="grid grid-cols-2 gap-2">
-            <select value={carrera} onChange={e => setCarrera(e.target.value)} className={campoFiltro}>
-              <option value="">Toda carrera</option>
-              {carreras.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+          <div className={`grid gap-2 ${scout ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            {!scout && (
+              <select value={carrera} onChange={e => setCarrera(e.target.value)} className={campoFiltro}>
+                <option value="">Toda carrera</option>
+                {carreras.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
             <select value={giro} onChange={e => setGiro(e.target.value)} className={campoFiltro}>
               <option value="">Todo giro</option>
               {giros.map(g => <option key={g} value={g}>{g}</option>)}
@@ -626,7 +643,7 @@ export default function Host() {
           </p>
         )}
 
-        {carreras.length === 0 && mesas?.length > 0 && (
+        {!scout && carreras.length === 0 && mesas?.length > 0 && (
           <p className="text-[11px] text-ambar/90 leading-snug">
             Ninguna empresa tiene carreras etiquetadas todavía. Se hace en{' '}
             <Link to="/admin/mesas" className="underline">el Mapa de mesas</Link>, tocando la mesa.
@@ -674,7 +691,7 @@ export default function Host() {
               <MesaEnPlano
                 mesa={salonCompleto.find(m => m.numero === numero) ?? { numero, libre: true }}
                 apagada={coinciden ? !coinciden.has(numero) : false}
-                angosta={angosta} ahora={ahora} tocable={fuente === 'viva'}
+                angosta={angosta} ahora={ahora} tocable={fuente === 'viva' && !scout}
                 onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
                 zonas={colores === 'zonas'}
               />

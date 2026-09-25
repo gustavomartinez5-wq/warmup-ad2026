@@ -88,7 +88,7 @@ src/
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Turno.jsx        pantalla del estudiante que espera, sin login
     ├── Fila.jsx         control de la fila, para el host de lista de espera
-    ├── Host.jsx         vista del equipo el día del evento
+    ├── Host.jsx         vista del equipo el día del evento; con `scout`, la de los scouts
     └── admin/           Tablero, Mesas, Reclutadores, Pendientes, Cambios, Qr, Impreso
 ```
 
@@ -99,6 +99,7 @@ src/
 | `/entrar` | equipo CVDP | correo y contraseña |
 | `/admin/*` | equipo CVDP | sesión + estar en `equipo` |
 | `/host` | hosts y becarios | sesión + estar en `equipo` |
+| `/scout` | scouts (becarios) | por liga, sin login |
 | `/mesa` | reclutadores | por el QR, sin login |
 | `/turno` | estudiantes | por el QR de la entrada, sin login |
 | `/fila` | host de lista de espera | sesión + estar en `equipo` |
@@ -139,10 +140,17 @@ Una mesa es excedente cuando su número pasa de `ediciones.total_mesas`.
 - Con sesión y en `equipo`: todo.
 - Con sesión y fuera de `equipo`: nada.
 
-Las cinco son `SECURITY DEFINER` y ejecutables por `anon` **a propósito**: son las dos
+Las cinco son `SECURITY DEFINER` y ejecutables por `anon` **a propósito**: son las
 puertas sin contraseña de la app. El asesor de seguridad de Supabase las marca; es una
 excepción aceptada, no un descuido. `set_estado_mesa` solo escribe `estado` y `ocupado_desde`,
 y rechaza una mesa que no esté asignada en ese bloque.
+
+**`/scout` es `/host` sin nada de edición y sin contraseña** (decidido el 25-sep). El scout
+recorre el salón y corrige estados, y para eso usa las mismas dos funciones que `/mesa`: no abre
+nada nuevo en la base. No tiene editar mesa, acomodo, «+ Agregar mesa», liga a la lista de
+espera ni filtro de carreras. Sin protección, a propósito: la liga solo se comparte con los
+becarios. Con ella se puede cambiar el estado de cualquier mesa, no solo de una; no se pueden
+mover mesas ni ver nombres.
 
 `turnos` no se abre a `anon` ni para leerla. `mi_turno` devuelve **un** renglón y pide el uuid
 completo, así que un teléfono no puede listar la fila ni leer el turno de alguien más.

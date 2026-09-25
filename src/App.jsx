@@ -27,10 +27,13 @@ export default function App() {
     <BrowserRouter>
       <ProveedorSesion>
         <Routes>
-          {/* Sin sesión: el reclutador entra por el QR de su mesa y el
-              estudiante por el QR de la entrada. */}
+          {/* Sin sesión: el reclutador entra por el QR de su mesa, el
+              estudiante por el QR de la entrada y el scout por su liga. */}
           <Route path="/mesa" element={<Mesa />} />
           <Route path="/turno" element={<Turno />} />
+          {/* Los scouts ven el salón y cambian estados sin contraseña: es /host
+              sin nada de edición, con las mismas funciones que /mesa. */}
+          <Route path="/scout" element={<Host scout />} />
           <Route path="/entrar" element={<Entrar />} />
 
           {/* Con la cuenta del equipo. */}

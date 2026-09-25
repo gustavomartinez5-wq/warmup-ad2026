@@ -15,6 +15,7 @@ dónde quedamos.
 |---|---|
 | Administración | https://warmup-ad2026.vercel.app/admin |
 | Vista de host | https://warmup-ad2026.vercel.app/host |
+| Vista de scout, sin contraseña | https://warmup-ad2026.vercel.app/scout |
 | Reclutador, por el QR | https://warmup-ad2026.vercel.app/mesa |
 | QR imprimible | https://warmup-ad2026.vercel.app/admin/qr |
 | Hoja de papel | https://warmup-ad2026.vercel.app/admin/impreso |
