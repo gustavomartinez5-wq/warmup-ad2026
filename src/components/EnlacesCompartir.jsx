@@ -12,6 +12,7 @@ const ENLACES = [
       { ruta: '/turno', texto: 'Sacar turno',          quien: 'Estudiantes, por el QR de la entrada' },
       { ruta: '/mesa',  texto: 'Pantalla de la mesa',  quien: 'Reclutadores, por el QR de su mesa' },
       { ruta: '/host',  texto: 'Vista de host',        quien: 'Hosts y becarios, con cuenta' },
+      { ruta: '/scout', texto: 'Vista de scout',       quien: 'Scouts, sin contraseña' },
       { ruta: '/fila',  texto: 'Lista de espera',      quien: 'Host de lista de espera, con cuenta' },
     ],
   },
