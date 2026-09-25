@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con el salón por columnas y los colores de zona.
+Última actualización: **24 de septiembre de 2026**, con los mapas guardados.
 
 ---
 
@@ -40,6 +40,33 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Mapas guardados · 24-sep-2026
+
+Gustavo pidió guardar acomodos y cargarlos con un botón, «como los saves de un juego». El botón
+«Orden alfabético» se queda. Decidió: tres espacios con nombre, cada uno con los dos bloques, en
+admin y en `/host`, y que empiecen vacíos.
+
+- Migración 14: `acomodos_guardados`, con RLS por `es_equipo()` y sin nada para anon.
+- `src/lib/acomodosGuardados.js`: guardar, listar y `planDesdeGuardado`.
+- En `AcomodoEnMapa`: «Mapa 1 · 2 · 3» y «Guardar como…», con elegir espacio y nombre.
+
+Cargar solo llena el borrador; el salón sigue cambiando únicamente con «Guardar acomodo».
+
+| Prueba | Resultado |
+|---|---|
+| En la base, transacción que se deshizo: anon lee | Rechazado: sin permiso |
+| Con sesión fuera del equipo: guarda · lee | Rechazado por RLS · 0 filas |
+| Equipo: guarda y encima el mismo espacio | Pasa; queda quién guardó |
+| Espacio 4 | Rechazado |
+| `planDesdeGuardado`, 10 casos (misma fila, otra persona, empresa nueva, número ocupado, baja, no cabe, bloque vacío) | Los 10 pasan |
+| Editor en local a 390 px, con la tabla simulada en memoria y las mesas públicas | Cargar marca las 58 mesas; «Deshacer último» regresa; «Guardar como…» guarda y el botón se llena; cargar el mapa de hoy deja el borrador sin cambios; reemplazar pide confirmar y «No» no toca nada; sin scroll lateral |
+| `npm run build` | Limpio |
+
+Falta que Gustavo guarde y cargue uno con su sesión.
+
+Antes de publicar, el mapa horneado iba atrás: en B2 se intercambiaron BECK y Portafolio ·
+Animación (69 ↔ 74). Se horneó de nuevo.
 
 ### El salón por columnas y los colores de zona · 24-sep-2026
 

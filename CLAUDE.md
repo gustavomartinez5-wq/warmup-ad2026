@@ -78,6 +78,7 @@ src/
 │   ├── fila.js          la fila: servicios, estados, consejos y las tres funciones sin sesión
 │   ├── alerta.js        sonido, vibración y pantalla encendida al llamar un turno
 │   ├── zonas.js         la zona de cada empresa y sus colores
+│   ├── acomodosGuardados.js  los tres mapas guardados: guardar, listar y armar el borrador
 │   └── sesion.jsx       contexto de sesión
 ├── components/          Protegida, MarcoAdmin, Cargando, EnObra, EditarMesa,
 │                        CarrerasPicker, Enlace, AcomodoEnMapa, FichaEmpresa,
@@ -123,6 +124,7 @@ la importación sea directa y que Gustavo reconozca lo que ve.
 | `cupos` | Sin pantalla desde el 22-sep: los cupos se llevan en un Excel aparte. La tabla se queda |
 | `equipo` | Qué cuentas tienen acceso. Se maneja por SQL, no desde la app |
 | `cambios_salon` | La bitácora del día: quién movió qué y cuándo. La escriben las funciones |
+| `acomodos_guardados` | Los tres mapas guardados del editor. Solo el equipo; anon no entra |
 | `turnos` | La fila del día del evento. Folio, servicio y estado. Sin datos de persona |
 
 **El mapa de mesas no es una tabla.** Se deriva de `reclutadores.mesa_numero` más el bloque.
@@ -206,7 +208,21 @@ Negocios, Tecnología e Ingeniería, cada una en orden alfabético. En Bloque 2 
 va vacía. Lo armó `Ediciones/WarmUp AD26/zonas/proponer-columnas.mjs`, en el vault, y el
 borrador es `WarmUp AD26 - Propuesta por columnas.html`. Hubo antes una propuesta por zonas con
 competencia; Gustavo la regresó a orden alfabético a propósito y luego se aplicó esta.
-**«Orden alfabético» en el editor deshace el acomodo**: regresa el borrador al del 22-sep.
+**«Orden alfabético» en el editor deshace el acomodo**: regresa el borrador al del 22-sep. Se queda
+a propósito (decidido el 24-sep).
+
+**Mapas guardados: tres espacios, como las partidas de un juego.** En el editor de admin y de
+`/host`: «Mapa 1 · 2 · 3» carga uno al borrador y «Guardar como…» guarda en uno, con nombre.
+Cada espacio guarda los dos bloques: el que se edita, como se ve en el borrador; el otro, como
+está en la base. Así un acomodo se guarda sin aplicarlo. Viven en `acomodos_guardados`
+(migración 14): por mesa, la fila, el nombre de la empresa y el número; ningún nombre de
+reclutador. **Cargar no mueve mesas**: llena el borrador, igual que «Orden alfabético», y lo que
+cambia el salón sigue siendo «Guardar acomodo» → `acomodar_mesas`. Si entre guardar y cargar hubo
+bajas y altas, `planDesdeGuardado` (`src/lib/acomodosGuardados.js`) regresa cada fila a su número;
+si cambió la persona, la empresa toma el número de su mesa; una empresa nueva se queda en su
+número si quedó libre o pasa a la primera libre; lo que ya no existe deja su mesa libre. El
+editor lo dice en cian antes de guardar. Una mesa en sesión no cambia de número, como con el orden
+alfabético. Reemplazar un espacio ocupado pide confirmar.
 
 **El Mapa se puede pintar por zona.** Admin y `/host` tienen «Estado · Zonas» sobre el Mapa y
 abren en Estado, porque el día del evento el color de `/host` es el estado en vivo (DEC-019).

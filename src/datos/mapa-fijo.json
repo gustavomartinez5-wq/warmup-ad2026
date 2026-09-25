@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-09-24T23:49:03.079Z",
+  "generado_en": "2026-09-25T00:18:38.013Z",
   "bloques": {
     "b1": [
       {
@@ -3483,10 +3483,11 @@
       },
       {
         "numero": 69,
-        "empresa": "Portafolio · Animación",
-        "giro": "Revisión de portafolio",
+        "empresa": "BECK",
+        "giro": "Arquitectura y construcción",
         "carreras": [
-          "LAD"
+          "ARQ",
+          "IC"
         ]
       },
       {
@@ -3535,11 +3536,10 @@
       },
       {
         "numero": 74,
-        "empresa": "BECK",
-        "giro": "Arquitectura y construcción",
+        "empresa": "Portafolio · Animación",
+        "giro": "Revisión de portafolio",
         "carreras": [
-          "ARQ",
-          "IC"
+          "LAD"
         ]
       }
     ]

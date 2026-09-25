@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import { mapaDeMesas, ESTADO_MESA, GIRO_PORTAFOLIO } from '../lib/cifras'
 import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../lib/plano'
 import { acomodarMesas } from '../lib/mesaEquipo'
+import { RANURAS, listarGuardados, guardarAcomodo, planDesdeGuardado, cuandoSeGuardo } from '../lib/acomodosGuardados'
 import PlanoSalon from './PlanoSalon'
 
 /**
@@ -31,6 +32,9 @@ import PlanoSalon from './PlanoSalon'
  *                                  se le suelta otra encima (la base también lo exige);
  *   avisar()                     — el aviso por `salon-<bloque>` sale por el canal
  *                                  que `/host` ya tiene abierto, no por uno nuevo.
+ *
+ * Los mapas guardados (Mapa 1, 2 y 3) viven aquí, en las dos pantallas. Cargar uno solo
+ * llena el borrador, igual que «Orden alfabético»; guardar uno no mueve mesas.
  */
 
 /** El borrador: qué número tiene cada fila del bloque. */
@@ -119,6 +123,20 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
   const [guardando, setGuardando] = useState(false)
   const [error, setError]         = useState(null)
   const canal = useRef(null)
+  // Mapas guardados: null mientras llegan.
+  const [guardados, setGuardados] = useState(null)
+  const [avisos, setAvisos]       = useState([])
+  const [forma, setForma]         = useState(null)   // { ranura, nombre } mientras se guarda uno
+  const [guardandoMapa, setGuardandoMapa] = useState(false)
+
+  useEffect(() => {
+    let vigente = true
+    listarGuardados()
+      .then(l => { if (vigente) setGuardados(l) })
+      .catch(e => { if (vigente) { setGuardados([]); setError(`No se pudieron leer los mapas guardados: ${e.message ?? e}`) } })
+    return () => { vigente = false }
+  }, [])
+  const enRanura = r => guardados?.find(g => g.ranura === r) ?? null
 
   // Suscrito para que el aviso salga por el socket, igual que en /host. Si la pantalla
   // ya tiene el canal abierto (/host), avisa por ahí y aquí no se abre otro.
@@ -187,6 +205,41 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
     setBorrador(nuevo)
   }
 
+  function cargar(ranura) {
+    const g = enRanura(ranura)
+    if (!g) return
+    const plan = planDesdeGuardado(g, delBloque, bloque, edicion.total_mesas)
+    if (plan.error) { setError(plan.error); return }
+    // Igual que «Orden alfabético»: una mesa en sesión no cambia de número.
+    const enSesion = delBloque
+      .filter(f => esFija(f) && plan.nuevo.get(f.id) !== borrador.get(f.id))
+      .map(f => original.get(f.id)).sort((a, b) => a - b)
+    if (enSesion.length) {
+      setError(`Hay mesas en sesión que cambiarían de número. Espera a que terminen: ${enSesion.join(', ')}.`)
+      return
+    }
+    setError(null)
+    setAvisos([`Mapa ${ranura} · «${g.nombre}» está en el borrador. Revísalo y dale «Guardar acomodo».`, ...plan.avisos])
+    setHistorial(h => [...h, borrador])
+    setBorrador(plan.nuevo)
+  }
+
+  async function guardarMapa() {
+    const { ranura, nombre } = forma
+    const ocupada = enRanura(ranura)
+    if (ocupada && !window.confirm(`Mapa ${ranura} ya tiene «${ocupada.nombre}». ¿Lo reemplazo?`)) return
+    setGuardandoMapa(true); setError(null)
+    try {
+      await guardarAcomodo({ ranura, nombre, bloque, borrador })
+      setGuardados(await listarGuardados())
+      setForma(null)
+      setAvisos([`Guardado en Mapa ${ranura} · «${nombre.trim()}». Este bloque va como lo ves; el otro, como está en la base.`])
+    } catch (e) {
+      setError(e.message ?? String(e))
+    }
+    setGuardandoMapa(false)
+  }
+
   function deshacerUltimo() {
     if (!historial.length) return
     setBorrador(historial.at(-1))
@@ -245,6 +298,65 @@ export default function AcomodoEnMapa({ edicion, filas, bloque, onGuardado, onSa
           </button>
         </div>
         {error && <p className="text-xs text-rojo">{error}</p>}
+
+        <div className="border-t border-lavanda/15 pt-2.5 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-lavanda/60">Mapas guardados</span>
+            {RANURAS.map(r => {
+              const g = enRanura(r)
+              return (
+                <button key={r} className={suave} onClick={() => cargar(r)}
+                        disabled={guardando || !g}
+                        title={g ? `Guardado el ${cuandoSeGuardo(g.guardado_en)}` : 'Vacío'}>
+                  Mapa {r}{g ? ` · ${g.nombre}` : ' · vacío'}
+                </button>
+              )
+            })}
+            {!forma && (
+              <button className="text-xs font-semibold text-cian hover:text-white transition-colors"
+                      disabled={guardando || guardados === null}
+                      onClick={() => setForma({ ranura: 1, nombre: enRanura(1)?.nombre ?? '' })}>
+                Guardar como…
+              </button>
+            )}
+          </div>
+
+          {forma && (
+            <div className="rounded-lg border border-lavanda/20 bg-marino-alto/50 px-3 py-2.5 space-y-2">
+              <div className="flex flex-wrap items-center gap-3" role="radiogroup" aria-label="Dónde se guarda">
+                {RANURAS.map(r => (
+                  <label key={r} className="inline-flex items-center gap-1.5 text-xs cursor-pointer">
+                    <input type="radio" name="ranura" checked={forma.ranura === r}
+                           onChange={() => setForma({ ranura: r, nombre: enRanura(r)?.nombre ?? forma.nombre })} />
+                    Mapa {r}{enRanura(r) ? ` · ${enRanura(r).nombre}` : ' · vacío'}
+                  </label>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <input value={forma.nombre} maxLength={40} placeholder="Nombre, por ejemplo «Por columnas»"
+                       onChange={e => setForma({ ...forma, nombre: e.target.value })}
+                       className="flex-1 min-w-0 basis-48 rounded-lg bg-marino border border-lavanda/25 px-3 py-2
+                                  text-[13px] placeholder-lavanda/30 outline-none focus:border-cian" />
+                <button className={`${boton} bg-tec text-white hover:bg-tec-claro`}
+                        onClick={guardarMapa} disabled={guardandoMapa || !forma.nombre.trim()}>
+                  {guardandoMapa ? 'Guardando…' : `Guardar en Mapa ${forma.ranura}`}
+                </button>
+                <button className={suave} onClick={() => setForma(null)} disabled={guardandoMapa}>
+                  Cancelar
+                </button>
+              </div>
+              <p className="text-[11px] text-lavanda/60">
+                Se guardan los dos bloques: este, como lo ves; el otro, como está en la base. No mueve mesas.
+              </p>
+            </div>
+          )}
+
+          {avisos.length > 0 && (
+            <ul className="text-[11px] text-cian space-y-0.5">
+              {avisos.map((a, i) => <li key={i}>{a}</li>)}
+            </ul>
+          )}
+        </div>
       </div>
 
       <DndContext
