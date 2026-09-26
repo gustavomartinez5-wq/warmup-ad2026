@@ -163,7 +163,7 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
       </div>
 
       <PlanoSalon
-        orientacion="horizontal" tono="papel"
+        orientacion="horizontal" tono="papel" mediaFila={56}
         excedentes={mesas.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
         celda={celda}
       />
@@ -179,7 +179,7 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
       </div>
 
       <p className="text-[10px] text-marino/70 mt-2">
-        La mesa 1 queda abajo a la derecha, junto al acceso. Debajo del nombre van las carreras que
+        La mesa 1 queda abajo a la derecha y el acceso, frente a las mesas 32 a 43. Debajo del nombre van las carreras que
         busca la empresa.
         {portafolio.length > 0 && (
           <> Revisión de portafolio (EAAD), con contorno punteado:{' '}

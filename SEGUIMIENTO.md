@@ -3,7 +3,7 @@
 Se actualiza al cerrar cada fase. Si el trabajo se corta a media fase, esto es lo que dice
 dónde quedamos.
 
-Última actualización: **24 de septiembre de 2026**, con los mapas guardados.
+Última actualización: **26 de septiembre de 2026**, con el montaje nuevo del salón (19 columnas, 75 mesas).
 
 ---
 
@@ -24,6 +24,10 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
+00. **Publicar el montaje del 26-sep.** El código está listo y sin commitear. Falta commitear,
+    `git push` y revisar el Mapa ya desplegado. `total_mesas` se queda en 75. No hace falta
+    hornear: ningún número cambió de empresa.
+
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
 
@@ -41,6 +45,28 @@ dónde quedamos.
    completo (H1 y Cecilia). Gustavo marcó el reporte el 22-sep y ya se aplicó.
 
 ## Fases cerradas
+
+### Montaje del salón en 19 columnas · 26-sep-2026
+
+Cambió el montaje del salón. Gustavo lo dibujó sobre el croquis de mayo y decidió: 19 columnas de 4
+mesas intercaladas como tablero de ajedrez, la misma numeración en zigzag, y **las empresas
+conservan su número**; solo se redibuja.
+
+- Primero iban 76 mesas; Gustavo corrigió el mismo día: la columna 1 lleva tres, sin la de
+  arriba. Quedan 75, igual que `total_mesas`.
+- `src/lib/plano.js`: `COLUMNAS` 19, `FILAS` 4, `EN_LA_PRIMERA` 3, `COLUMNAS_ACCESO` [9, 11] y `columnaBaja` (las
+  impares van media fila más cerca de la mampara). Salió `pasilloDespuesDe`: ya no hay pares.
+- `PlanoSalon`: el eje corto va en medias filas (9 pistas, cada mesa ocupa dos). En horizontal la
+  media fila es fija, 34 px, y el papel la sube a 56 con `mediaFila`. Horizontal desde 1150 px:
+  abajo de eso las mesas salen de menos de 53 px y los nombres se parten.
+- Hoja de papel: dice dónde queda el acceso, frente a las mesas 32 a 43.
+
+| Prueba | Resultado |
+|---|---|
+| `/scout` a 375 px | Sin scroll lateral, ningún nombre cortado |
+| `/scout` a 1024 y 1200 px | 1024 va vertical; 1200 horizontal, sin desbordes |
+| Hoja del plano en PDF, carta horizontal | Una página, sin mesas encimadas |
+| `npm run build` | Limpio |
 
 ### Mapas guardados · 24-sep-2026
 

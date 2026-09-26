@@ -49,10 +49,13 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   del Tec. Los cambios de forma del salón se avisan por el canal de difusión `salon-<bloque>`, y
   el aviso no lleva datos: el texto que se lee vive en la pantalla, no en el mensaje.
 - **La forma del salón vive en `src/lib/plano.js` y dice lo mismo que el mapa oficial**
-  (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento.html`, en el vault): 15 columnas de 5,
-  zigzag desde la mesa 1 abajo a la derecha, acceso frente a las mesas 31 a 40. Es lo que pinta la
-  vista Mapa de `/host` y de `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
-  salón cambia, se corrigen los dos.
+  (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento final 28 de septiembre.html`, en el vault):
+  desde el 26-sep, 19 columnas intercaladas como tablero de ajedrez: la 1 con tres mesas, sin la de
+  arriba, y las demás con cuatro. Zigzag desde la mesa 1 abajo a la derecha, acceso frente a las
+  columnas 9 a 11 (mesas 32 a 43). Es lo que pinta la
+  vista Mapa de `/host`, `/scout` y `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
+  salón cambia, se corrigen los dos. Al cambiar de 15 × 5 a 19 × 4 las empresas conservaron su
+  número: solo cambió dónde queda cada número en el piso.
 - **Si cambia una mesa o una empresa, se regenera el mapa fijo.**
   `node scripts/hornear-mapa.mjs`, y se commitea. Ese JSON es lo que las pantallas muestran
   cuando la base no contesta, y la hoja impresa si la base falla; si se queda atrás, el día del
@@ -186,7 +189,7 @@ Las siete llevan el giro `Revisión de portafolio` (`GIRO_PORTAFOLIO` en `src/li
 Es lo que saca la zona completa con el filtro de giro de `/host`, lo que hace que la hoja
 impresa las nombre aparte y lo que el Tablero resta de «Empresas registradas»: son 62 empresas
 más 7 expertos, no 69 empresas (al 24-sep, con VERTIV). Desde el acomodo por columnas del
-24-sep, portafolio va con construcción en las columnas A y B: B1 70–73, B2 67–69.
+24-sep, portafolio va con construcción en las columnas A y B: B1 70–73, B2 67, 68 y 74 (según el mapa horneado del 26-sep). En el montaje del 26-sep esas mesas quedan en las columnas 18 y 19, junto al snack.
 
 Las empresas que además revisan portafolio (Definity y BECK; Areya canceló el 24-sep) no llevan mesa extra: la
 hoja «Expertos Portafolio» del equipo solo dice quién revisa. Mesa aparte solo para expertos.
