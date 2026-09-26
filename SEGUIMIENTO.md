@@ -24,9 +24,8 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
-00. **Publicar el montaje del 26-sep.** El código está listo y sin commitear. Falta commitear,
-    `git push` y revisar el Mapa ya desplegado. `total_mesas` se queda en 75. No hace falta
-    hornear: ningún número cambió de empresa.
+00. ~~Publicar el montaje del 26-sep.~~ Publicado el 26-sep (commit 2eced4b) y revisado en
+    `/scout` de producción. `total_mesas` se queda en 75; no hizo falta hornear.
 
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
