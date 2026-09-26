@@ -163,7 +163,7 @@ function HojaPlano({ bloque, ultima, mesas, fecha }) {
       </div>
 
       <PlanoSalon
-        orientacion="horizontal" tono="papel" mediaFila={56}
+        orientacion="horizontal" tono="papel"
         excedentes={mesas.filter(m => m.numero > MESAS_EN_PLANO).map(m => m.numero)}
         celda={celda}
       />

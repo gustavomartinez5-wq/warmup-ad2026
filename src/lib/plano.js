@@ -1,15 +1,13 @@
 /**
- * La forma del salón, tal como la dibuja el mapa oficial:
- * `Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento final 28 de septiembre.html`,
- * en el vault. Si el salón cambia, se corrige aquí y en ese mapa, y los dos tienen
- * que decir lo mismo: el día del evento el host camina con lo que ve en el plano.
+ * La forma del salón en la app: cuántas columnas hay, cuántas mesas lleva cada una
+ * y en qué orden van los números. Sirve para ubicar cada número y acomodar a las
+ * empresas; no es un dibujo a escala.
  *
- * Montaje del 26-sep: 19 columnas intercaladas como tablero de ajedrez, 75 mesas.
- * La columna 1 lleva tres, sin la de arriba; las otras 18 llevan cuatro.
- * Las columnas impares van media fila más cerca de la mampara y las pares media
- * fila más cerca del muro de las puertas, así cada mesa queda frente
- * al hueco de la columna vecina. Todas las columnas van a la misma distancia:
- * ya no hay pares espalda con espalda.
+ * Montaje del 26-sep: 19 columnas, 75 mesas. La columna 1 lleva tres, sin la de
+ * arriba; las otras 18 llevan cuatro. En el piso las columnas van intercaladas,
+ * como en `Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento final 28 de
+ * septiembre.html`, en el vault. Aquí van en filas parejas, a propósito
+ * (decidido el 26-sep): lo que importa en la app son las columnas y los números.
  *
  * La numeración sigue en zigzag desde la mesa 1, abajo a la derecha: la columna
  * impar sube y la par baja. La 1 va de la 1 abajo a la 3; la 2 baja de la 4 a la 7;
@@ -45,8 +43,8 @@ export function posicion(numero) {
   return { columna, fila }
 }
 
-/** La columna va media fila más cerca de la mampara: las impares. */
-export const columnaBaja = columna => columna % 2 === 1
+/** Entre esta columna y la siguiente hay pasillo (true) o solo las sillas del par (false). */
+export const pasilloDespuesDe = columna => columna % 2 === 0
 
 /**
  * En la zona de portafolio el contorno punteado ya dice qué es, y «Portafolio · »

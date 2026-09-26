@@ -50,9 +50,10 @@ La fila del día del evento lleva su propia bitácora aparte: `BITACORA-fila.md`
   el aviso no lleva datos: el texto que se lee vive en la pantalla, no en el mensaje.
 - **La forma del salón vive en `src/lib/plano.js` y dice lo mismo que el mapa oficial**
   (`Ediciones/WarmUp AD26/WarmUp AD26 - Mapa del evento final 28 de septiembre.html`, en el vault):
-  desde el 26-sep, 19 columnas intercaladas como tablero de ajedrez: la 1 con tres mesas, sin la de
-  arriba, y las demás con cuatro. Zigzag desde la mesa 1 abajo a la derecha, acceso frente a las
-  columnas 9 a 11 (mesas 32 a 43). Es lo que pinta la
+  desde el 26-sep, 19 columnas: la 1 con tres mesas, sin la de arriba, y las demás con cuatro.
+  Zigzag desde la mesa 1 abajo a la derecha, acceso frente a las columnas 9 a 11 (mesas 32 a 43).
+  En el piso las columnas van intercaladas; **en la app van en filas parejas, a propósito**: lo que
+  hace falta ahí son las columnas y los números para acomodar a las empresas (Gustavo, 26-sep). Es lo que pinta la
   vista Mapa de `/host`, `/scout` y `/admin/mesas`, y la hoja del plano de `/admin/impreso`. Si el
   salón cambia, se corrigen los dos. Al cambiar de 15 × 5 a 19 × 4 las empresas conservaron su
   número: solo cambió dónde queda cada número en el piso.

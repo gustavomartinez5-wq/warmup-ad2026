@@ -24,8 +24,8 @@ dónde quedamos.
 
 **Lo que falta, en orden:**
 
-00. ~~Publicar el montaje del 26-sep.~~ Publicado el 26-sep (commit 2eced4b) y revisado en
-    `/scout` de producción. `total_mesas` se queda en 75; no hizo falta hornear.
+00. ~~Publicar el montaje del 26-sep.~~ Publicado el 26-sep y revisado en `/scout` de
+    producción. `total_mesas` se queda en 75; no hizo falta hornear.
 
 0. **Regenerar el mapa fijo si cambia una mesa.** `node scripts/hornear-mapa.mjs`, commitear y
    desplegar. `--verificar` dice si ya se quedó atrás; está en el preflight.
@@ -55,9 +55,12 @@ conservan su número**; solo se redibuja.
   arriba. Quedan 75, igual que `total_mesas`.
 - `src/lib/plano.js`: `COLUMNAS` 19, `FILAS` 4, `EN_LA_PRIMERA` 3, `COLUMNAS_ACCESO` [9, 11] y `columnaBaja` (las
   impares van media fila más cerca de la mampara). Salió `pasilloDespuesDe`: ya no hay pares.
-- `PlanoSalon`: el eje corto va en medias filas (9 pistas, cada mesa ocupa dos). En horizontal la
-  media fila es fija, 34 px, y el papel la sube a 56 con `mediaFila`. Horizontal desde 1150 px:
-  abajo de eso las mesas salen de menos de 53 px y los nombres se parten.
+- El mismo día se quitó el intercalado de la app. Gustavo: el Mapa no tiene que verse como el
+  piso; necesita las columnas y los números bien para acomodar los logos. `PlanoSalon` volvió a
+  la rejilla de antes, con pares y pasillos, y solo creció a 19 columnas de 4 filas. El dibujo
+  intercalado se queda en el mapa del vault y en las presentaciones.
+- Horizontal desde 1150 px: abajo de eso las 19 columnas salen de menos de 50 px y los nombres se
+  parten.
 - Hoja de papel: dice dónde queda el acceso, frente a las mesas 32 a 43.
 
 | Prueba | Resultado |
