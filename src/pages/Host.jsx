@@ -60,7 +60,29 @@ function Pastilla({ valor, texto, tono }) {
 const loVivo = f => ({
   estado: f.estado, ocupado_desde: f.ocupado_desde,
   separado_en: f.separado_en ?? null, esperando: f.esperando ?? 0,
+  disponible_desde: f.disponible_desde ?? null,
 })
+
+/**
+ * Desde cuándo está libre cada mesa (migración 16). Solo para hosts con sesión:
+ * no viene en `mesas_publicas`, se lee aparte de `mesas_estado`. Si falla —o la
+ * columna todavía no existe— regresa vacío y la pantalla queda como antes.
+ */
+async function disponiblesDesde(bloque) {
+  const { data, error } = await supabase
+    .from('mesas_estado')
+    .select('numero, disponible_desde, ediciones!inner(activa)')
+    .eq('bloque', bloque)
+    .eq('ediciones.activa', true)
+  if (error) return new Map()
+  return new Map((data ?? []).map(f => [f.numero, f.disponible_desde]))
+}
+
+/** El reloj de una mesa libre, en el mismo mm:ss del de sesión. */
+const libreHace = (mesa, ahora) =>
+  mesa.estado === 'disponible' && mesa.disponible_desde
+    ? comoReloj(segundosDesde(mesa.disponible_desde, ahora))
+    : null
 
 /** «+2»: cuántas personas esperan a esa empresa. Lo ven hosts, scouts y la lista de espera. */
 function PastillaEspera({ n, className = '' }) {
@@ -75,7 +97,8 @@ function PastillaEspera({ n, className = '' }) {
 
 /* ── La mesa dentro del plano ─────────────────────────────────────────────── */
 
-function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco, zonas = false }) {
+function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco, zonas = false,
+                       conLibre = false }) {
   const apagado = apagada ? 'opacity-25' : ''
 
   if (mesa.libre) {
@@ -119,6 +142,9 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco,
         )}
         {mesa.estado !== 'ocupado' && mesa.separado_en && (
           <span className="text-[9px] font-extrabold uppercase text-cian bg-marino/70 rounded px-0.5">Sep.</span>
+        )}
+        {conLibre && !mesa.separado_en && libreHace(mesa, ahora) && (
+          <span className="text-[10px] font-bold cifra">{libreHace(mesa, ahora)}</span>
         )}
       </span>
       <span className={`${letraDelNombre(nombre, angosta)} leading-tight line-clamp-3 break-words font-medium`}>
@@ -167,6 +193,15 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar, 
                 o desde su propio teléfono. Sin esto el host no sabía cómo regresarla. */}
             {mesa.estado === 'no_llego' && (
               <p className="text-xs text-lavanda/60 mt-1.5">Si llega, toca Disponible.</p>
+            )}
+            {!scout && libreHace(mesa, ahora) && (
+              <>
+                <p className="text-5xl font-extrabold cifra mt-1 text-white">{libreHace(mesa, ahora)}</p>
+                <p className="text-xs text-lavanda/45 mt-1">
+                  Libre desde las {new Date(mesa.disponible_desde).toLocaleTimeString('es-MX',
+                    { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </>
             )}
             {mesa.estado === 'ocupado' && (
               <>
@@ -327,13 +362,17 @@ export default function Host({ scout = false }) {
     setError(null)
     try {
       const d = await mesasDelBloque(bloque)
+      if (!scout) {
+        const libres = await disponiblesDesde(bloque).catch(() => new Map())
+        for (const m of d) m.disponible_desde = libres.get(m.numero) ?? null
+      }
       if (!desmontado.current) { setMesas(d); setFuente('viva') }
     } catch {
       // Si ya había datos vivos se quedan, aunque estén viejos: son más ciertos
       // que el mapa fijo. Si nunca los hubo, lo que hay es el mapa fijo.
       if (!desmontado.current) setFuente(f => (f === 'viva' || f === 'vieja') ? 'vieja' : 'fija')
     }
-  }, [bloque])
+  }, [bloque, scout])
 
   /**
    * Las empresas y las filas de reclutadores no se piden al abrir `/host`: son
@@ -792,7 +831,7 @@ export default function Host({ scout = false }) {
                 apagada={coinciden ? !coinciden.has(numero) : false}
                 angosta={angosta} ahora={ahora} tocable={fuente === 'viva' && !scout}
                 onAbrir={setAbierta} onHueco={n => abrirEdicion('nueva', n)}
-                zonas={colores === 'zonas'}
+                zonas={colores === 'zonas'} conLibre={!scout}
               />
             )}
           />
@@ -826,6 +865,11 @@ export default function Host({ scout = false }) {
                       <span className={`cifra text-sm font-bold shrink-0
                                         ${p.alerta ? 'text-rojo' : 'text-lavanda/70'}`}>
                         {comoReloj(p.segundos)}
+                      </span>
+                    )}
+                    {!scout && !m.separado_en && libreHace(m, ahora) && (
+                      <span className="cifra text-sm font-bold shrink-0 text-lavanda/70">
+                        {libreHace(m, ahora)}
                       </span>
                     )}
                   </button>
