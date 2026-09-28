@@ -9,7 +9,7 @@ import Mesa from './pages/Mesa'
 import Turno from './pages/Turno'
 import Host from './pages/Host'
 import Fila from './pages/Fila'
-
+import PantallaFila from './pages/PantallaFila'
 import Tablero from './pages/admin/Tablero'
 import Mesas from './pages/admin/Mesas'
 import Reclutadores from './pages/admin/Reclutadores'
@@ -39,7 +39,8 @@ export default function App() {
           {/* Con la cuenta del equipo. */}
           <Route path="/host" element={<Protegida><Host /></Protegida>} />
           <Route path="/fila" element={<Protegida><Fila /></Protegida>} />
-          <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
+          {/* La pantalla para proyectar los números llamados; se abre desde /fila. */}
+          <Route path="/fila/pantalla" element={<Protegida><PantallaFila /></Protegida>} />          <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
             <Route path="reclutadores" element={<Reclutadores />} />

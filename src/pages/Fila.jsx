@@ -476,6 +476,11 @@ export default function Fila() {
             className="text-xs text-lavanda/50 hover:text-cian underline underline-offset-2">
             Bajar reporte
           </button>
+          {/* Pestaña nueva: se lleva a la pantalla extendida y se proyecta. */}
+          <a href="/fila/pantalla" target="_blank" rel="noopener"
+            className="text-xs text-lavanda/50 hover:text-cian underline underline-offset-2">
+            Abrir pantalla para proyectar
+          </a>
         </div>
       </div>
 

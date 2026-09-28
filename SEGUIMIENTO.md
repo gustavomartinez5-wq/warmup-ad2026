@@ -45,6 +45,12 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### Pantalla de turnos para proyectar · 27-sep-2026
+
+`/fila/pantalla`, con la liga «Abrir pantalla para proyectar» en `/fila`. El último llamado va
+enorme y los demás abajo; solo el número y sin sonido. Se borraron los 18 turnos de prueba y el
+conteo vuelve a empezar en 1. Detalle y pruebas en `BITACORA-fila.md`, fase 14.
+
 ### Acomodo final del Bloque 2 · 27-sep-2026
 
 El Bloque 2 seguía con los números de antes del montaje del 26-sep. Se aplicó la propuesta

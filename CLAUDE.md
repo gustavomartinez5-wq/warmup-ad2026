@@ -92,6 +92,7 @@ src/
     ├── Mesa.jsx         pantalla del reclutador, sin login
     ├── Turno.jsx        pantalla del estudiante que espera, sin login
     ├── Fila.jsx         control de la fila, para el host de lista de espera
+    ├── PantallaFila.jsx los números llamados, para proyectar; se abre desde /fila
     ├── Host.jsx         vista del equipo el día del evento; con `scout`, la de los scouts
     └── admin/           Tablero, Mesas, Reclutadores, Pendientes, Cambios, Qr, Impreso
 ```
@@ -107,6 +108,7 @@ src/
 | `/mesa` | reclutadores | por el QR, sin login |
 | `/turno` | estudiantes | por el QR de la entrada, sin login |
 | `/fila` | host de lista de espera | sesión + estar en `equipo` |
+| `/fila/pantalla` | pantalla proyectada de turnos | sesión + estar en `equipo` |
 
 ## Base de datos
 

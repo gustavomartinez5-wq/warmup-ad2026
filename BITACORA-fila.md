@@ -20,6 +20,7 @@ datos para indicadores los captura Gustavo aparte, en Excel o Forms.
 |---|---|---|
 | `/turno` | estudiantes | por el QR de la entrada, sin login |
 | `/fila` | host de lista de espera (Cecilia) | sesión + estar en `equipo` |
+| `/fila/pantalla` | la pantalla proyectada junto al módulo | sesión + estar en `equipo` |
 
 ---
 
@@ -459,4 +460,28 @@ Complemento, a pedido de Gustavo: `/host` **siempre** muestra la liga, en el mis
 Si se llegó desde la fila dice «← Regresar a la lista de espera»; si se entró directo,
 «Lista de espera →». Verificado en los dos casos; la tira de contadores de `/host` es la
 única que se desliza de lado, como ya estaba.
+
+## Fase 14 — Pantalla para proyectar · 27-sep
+
+`/fila/pantalla` muestra los números llamados para proyectarlos junto al módulo. Se abre desde
+`/fila` con «Abrir pantalla para proyectar», en una pestaña nueva que se lleva a la pantalla
+extendida (Win + Shift + →) y se pone en pantalla completa con su botón.
+
+Lo que decidió Gustavo: el último llamado enorme y los demás llamados más chicos abajo; solo el
+número, sin servicio ni mesa; sin sonido, porque Cecilia canta los números. «Llamar otra vez» sube
+el número al lugar grande, porque reescribe `llamado_en`. Un número sale al marcarlo «Pasó» o
+«No llegó», o al borrarlo. Lee `turnos` como `/fila`, así que pide la sesión del equipo; la pestaña
+nueva la comparte.
+
+Ese mismo día se borraron los 18 turnos de prueba: el próximo turno vuelve a ser el 1.
+
+| Prueba (ruta temporal en local, con turnos de mentira; se quitó) | Resultado |
+|---|---|
+| 1920 × 1080 con 6 llamados | Número grande completo; «También llamados» en una línea |
+| 1280 × 720 con 14 llamados | Se parte en dos líneas sin cortar nada |
+| 1280 × 720 sin llamados | «En un momento llamamos el siguiente número» |
+| 390 px | Sin scroll lateral |
+| `npm run build` | Limpio |
+
+Falta la prueba con sesión: llamar un turno en `/fila` y verlo aparecer en la otra pantalla.
 
