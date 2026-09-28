@@ -14,8 +14,19 @@ export const AMBAR    = 18 * 60
 export const LIMITE   = 20 * 60
 export const PARPADEO = 21 * 60   // después de este minuto el rojo se queda quieto
 
-/** Bloque 1 va de 10 a 13 h y Bloque 2 de 14 a 17 h. El corte es la 13:30. */
+/** El día del evento presencial, en la hora del teléfono o la laptop. */
+export const DIA_DEL_EVENTO = '2026-09-28'
+
+/**
+ * Bloque 1 va de 10 a 13 h y Bloque 2 de 14 a 17 h. El corte es la 13:30, cuando
+ * el host de empresa empieza a recibir al Bloque 2.
+ *
+ * Todo abre en Bloque 1 (Gustavo, 27-sep). Solo el día del evento, de la 13:30 en
+ * adelante, abre en Bloque 2: antes, probar la app de noche la abría en Bloque 2.
+ */
 export function bloquePorReloj(ahora = new Date()) {
+  const dia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
+  if (dia !== DIA_DEL_EVENTO) return 'b1'
   const minutos = ahora.getHours() * 60 + ahora.getMinutes()
   return minutos < 13 * 60 + 30 ? 'b1' : 'b2'
 }

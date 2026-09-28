@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { supabase, edicionCompleta } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
 import { bloquePorReloj, comoReloj } from '../lib/reloj'
+import { useBloqueDelDia } from '../lib/bloqueDelDia'
 import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import { ESTADOS, textoEstado, pintar, ordenarParaLista, contarPorEstado } from '../lib/estadoVivo'
 import { MESAS_EN_PLANO, nombreCorto, letraDelNombre } from '../lib/plano'
@@ -208,7 +209,6 @@ export default function Host({ scout = false }) {
   // se lee como regreso; si se entró directo, como ir a verla.
   const [params] = useSearchParams()
   const desdeFila = params.get('desde') === 'fila'
-  const [bloque, setBloque]   = useState(bloquePorReloj)
   const [vista, setVista]     = useState('plano')
   const [colores, setColores] = useState('estado')   // estado · zonas; abre en estado, el del día
   const [mesas, setMesas]     = useState(() => mesasFijas(bloquePorReloj()))
@@ -230,6 +230,8 @@ export default function Host({ scout = false }) {
   const [intento, setIntento] = useState(0)   // súbelo para re-montar el canal
   const [aviso, setAviso]   = useState(null)  // «otro host movió una mesa»
   const [acomodando, setAcomodando] = useState(false)   // «Editar acomodo» sobre el Mapa
+  // Abre en Bloque 1 y pasa a Bloque 2 a la 13:30 del día del evento, salvo que se elija a mano.
+  const [bloque, setBloque]   = useBloqueDelDia({ pausa: acomodando })
   const [guardadoAcomodo, setGuardadoAcomodo] = useState(null)
   const desmontado = useRef(false)
   const canalSalon = useRef(null)

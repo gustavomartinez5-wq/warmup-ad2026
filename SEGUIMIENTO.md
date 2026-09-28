@@ -45,6 +45,24 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### Todo abre en Bloque 1 · 27-sep-2026
+
+Gustavo pidió que las vistas abran siempre en Bloque 1 y que la app cambie a Bloque 2 por la hora.
+`bloquePorReloj` (`src/lib/reloj.js`) ya cortaba a la 13:30, pero cualquier día: probando de noche
+todo abría en Bloque 2. Ahora solo el 28-sep de la 13:30 en adelante da Bloque 2; cualquier otro
+momento, Bloque 1.
+
+- `useBloqueDelDia` (`src/lib/bloqueDelDia.js`): `/host`, `/scout` y `/fila` pasan solos a Bloque 2
+  a la 13:30 si la pantalla sigue abierta. Si alguien elige bloque a mano, manda lo suyo hasta
+  recargar. Mientras se edita el acomodo o se está llamando un turno, no cambia.
+- `/mesa` abre en el bloque del reloj; un teléfono que ya eligió mesa se queda con su bloque.
+  `/admin/mesas` ya abría en Bloque 1.
+
+| Prueba | Resultado |
+|---|---|
+| `bloquePorReloj` con 27-sep 22:30, 28-sep 8:00, 13:29, 13:30 y 17:45, 29-sep 11:00 y 15:00 | b1, b1, b1, b2, b2, b1, b1 |
+| `npm run build` | Limpio |
+
 ### Pantalla de turnos para proyectar · 27-sep-2026
 
 `/fila/pantalla`, con la liga «Abrir pantalla para proyectar» en `/fila`. El último llamado va

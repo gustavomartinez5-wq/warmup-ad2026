@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase, edicionActiva } from '../lib/supabase'
 import { mesasDelBloque } from '../lib/mesaPublica'
-import { bloquePorReloj, comoReloj, segundosDesde } from '../lib/reloj'
+import { comoReloj, segundosDesde } from '../lib/reloj'
+import { useBloqueDelDia } from '../lib/bloqueDelDia'
 import { textoEstado } from '../lib/estadoVivo'
 import { etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import {
@@ -250,8 +251,8 @@ export default function Fila() {
   const [enlace, setEnlace]   = useState('conectando')
   const [intento, setIntento] = useState(0)
 
-  const [bloque, setBloque]   = useState(() => bloquePorReloj())
   const [llamando, setLlamando] = useState(null)
+  const [bloque, setBloque]   = useBloqueDelDia({ pausa: Boolean(llamando) })
   const [ahora, setAhora]     = useState(Date.now())
   const [verCerrados, setVerCerrados] = useState(false)
 
