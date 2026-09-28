@@ -158,6 +158,16 @@ espera ni filtro de carreras. Sin protección, a propósito: la liga solo se com
 becarios. Con ella se puede cambiar el estado de cualquier mesa, no solo de una; no se pueden
 mover mesas ni ver nombres.
 
+**Separado y personas esperando (migración 15, 27-sep).** Dos hosts mandan estudiantes a la vez.
+En la hoja de una mesa de `/host`, «Separar para mandar a alguien» aparta la mesa y el otro host la
+ve con anillo cian y «Sep.»; separar una mesa ya separada se rechaza con «Otro host ya separó la
+mesa…». Se quita sola al marcar Ocupado (`set_estado_mesa`) o a mano. «Esperando a esta empresa
+− N +» cuenta a mano cuántas personas esperan, sin bajar de 0; si dos hosts suman a la vez, cuenta
+los dos. Viven en `mesas_estado.separado_en` y `esperando`, los escriben `separar_mesa` y
+`ajustar_espera` (solo el equipo, con `exige_equipo`) y `mesas_publicas` los devuelve. Scouts y
+`/fila` solo los ven; `/mesa` no los muestra. `limpia_estado` los borra con el resto del estado al
+mover una mesa.
+
 `turnos` no se abre a `anon` ni para leerla. `mi_turno` devuelve **un** renglón y pide el uuid
 completo, así que un teléfono no puede listar la fila ni leer el turno de alguien más.
 `sacar_turno` solo inserta un turno nuevo en espera. `ceder_turno` solo cierra uno que siga en

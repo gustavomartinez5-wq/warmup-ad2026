@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { Link, useSearchParams } from 'react-router-dom'
 import { supabase, edicionCompleta } from '../lib/supabase'
 import { mesasDelBloque, cambiarEstado } from '../lib/mesaPublica'
-import { bloquePorReloj, comoReloj } from '../lib/reloj'
+import { bloquePorReloj, comoReloj, segundosDesde } from '../lib/reloj'
 import { useBloqueDelDia } from '../lib/bloqueDelDia'
 import { BLOQUES, etiquetaBloque, GIRO_PORTAFOLIO } from '../lib/cifras'
 import { ESTADOS, textoEstado, pintar, ordenarParaLista, contarPorEstado } from '../lib/estadoVivo'
@@ -16,7 +16,7 @@ import { zonaDe } from '../lib/zonas'
 import Cargando from '../components/Cargando'
 import Enlace from '../components/Enlace'
 import EditarMesa from '../components/EditarMesa'
-import { datosDelSalon } from '../lib/mesaEquipo'
+import { datosDelSalon, separarMesa, ajustarEspera } from '../lib/mesaEquipo'
 
 // La librería de arrastre solo viaja cuando alguien entra a «Editar acomodo».
 const AcomodoEnMapa = lazy(() => import('../components/AcomodoEnMapa'))
@@ -56,6 +56,23 @@ function Pastilla({ valor, texto, tono }) {
   )
 }
 
+/** Lo vivo de una fila de `mesas_estado`, para mezclarlo con la mesa que ya se ve. */
+const loVivo = f => ({
+  estado: f.estado, ocupado_desde: f.ocupado_desde,
+  separado_en: f.separado_en ?? null, esperando: f.esperando ?? 0,
+})
+
+/** «+2»: cuántas personas esperan a esa empresa. Lo ven hosts, scouts y la lista de espera. */
+function PastillaEspera({ n, className = '' }) {
+  if (!n) return null
+  return (
+    <span className={`cifra rounded-full bg-white text-marino font-extrabold leading-none ${className}`}
+      title={`${n} ${n === 1 ? 'persona esperando' : 'personas esperando'}`}>
+      +{n}
+    </span>
+  )
+}
+
 /* ── La mesa dentro del plano ─────────────────────────────────────────────── */
 
 function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco, zonas = false }) {
@@ -81,19 +98,27 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco,
   const nombre = nombreCorto(mesa.empresa)
   const portafolio = mesa.giro === GIRO_PORTAFOLIO
     ? 'outline-2 outline-dashed outline-offset-1 outline-lavanda' : ''
+  // Separada: otro host ya mandó a alguien. Anillo cian, sin cambiar el color del estado.
+  const separada = mesa.separado_en ? 'ring-2 ring-cian ring-offset-1 ring-offset-marino' : ''
   return (
     <button
       onClick={() => onAbrir(mesa.numero)}
-      aria-label={`Mesa ${mesa.numero}, ${mesa.empresa}, ${textoEstado(mesa.estado)}`}
+      aria-label={`Mesa ${mesa.numero}, ${mesa.empresa}, ${textoEstado(mesa.estado)}${
+        mesa.separado_en ? ', separada' : ''}${mesa.esperando ? `, ${mesa.esperando} esperando` : ''}`}
       title={`${mesa.numero} · ${mesa.empresa}`}
-      className={`w-full h-full min-h-[58px] rounded-md border ${angosta ? 'px-0.5' : 'px-1'} py-1
+      className={`relative w-full h-full min-h-[58px] rounded-md border ${angosta ? 'px-0.5' : 'px-1'} py-1
                   text-left flex flex-col justify-between min-w-0 transition-transform active:scale-95
-                  ${color} ${portafolio} ${apagado}`}
+                  ${color} ${portafolio} ${separada} ${apagado}`}
     >
+      <PastillaEspera n={mesa.esperando}
+        className="absolute -top-1.5 -right-1.5 text-[10px] px-1.5 py-0.5 shadow ring-1 ring-marino" />
       <span className="flex items-baseline justify-between gap-0.5 min-w-0">
         <span className="text-[11px] font-extrabold cifra">{mesa.numero}</span>
         {mesa.estado === 'ocupado' && (
           <span className="text-[10px] font-bold cifra">{comoReloj(p.segundos)}</span>
+        )}
+        {mesa.estado !== 'ocupado' && mesa.separado_en && (
+          <span className="text-[9px] font-extrabold uppercase text-cian bg-marino/70 rounded px-0.5">Sep.</span>
         )}
       </span>
       <span className={`${letraDelNombre(nombre, angosta)} leading-tight line-clamp-3 break-words font-medium`}>
@@ -105,8 +130,11 @@ function MesaEnPlano({ mesa, apagada, angosta, ahora, tocable, onAbrir, onHueco,
 
 /* ── Hoja de detalle ──────────────────────────────────────────────────────── */
 
-function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar, scout }) {
+function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar, scout,
+                   onSeparar, onEsperar, aviso, ocupado }) {
   const p = pintar(mesa, ahora)
+  const minSeparada = mesa.separado_en ? Math.floor(segundosDesde(mesa.separado_en, ahora) / 60) : null
+  const haceMin = n => (n < 1 ? 'hace menos de 1 min' : `hace ${n} min`)
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 px-0 sm:px-4"
@@ -153,6 +181,57 @@ function Detalle({ mesa, bloque, ahora, onCerrar, onMarcar, marcando, onEditar, 
               </>
             )}
           </div>
+
+          {/* Separado y personas esperando. El host los mueve; el scout solo los ve. */}
+          {scout ? (
+            (mesa.separado_en || mesa.esperando > 0) && (
+              <div className="rounded-xl border border-lavanda/20 bg-marino px-4 py-3 text-sm space-y-1">
+                {mesa.separado_en && (
+                  <p className="text-cian font-semibold">Separada {haceMin(minSeparada)}</p>
+                )}
+                {mesa.esperando > 0 && (
+                  <p className="text-lavanda/80">
+                    <span className="cifra font-bold text-white">{mesa.esperando}</span>{' '}
+                    {mesa.esperando === 1 ? 'persona esperando' : 'personas esperando'}
+                  </p>
+                )}
+              </div>
+            )
+          ) : onSeparar && (
+            <div className="space-y-2">
+              {mesa.separado_en ? (
+                <div className="flex items-center gap-2 rounded-xl border-2 border-cian bg-cian/10 px-4 py-3">
+                  <p className="flex-1 text-sm font-bold text-cian">Separada · {haceMin(minSeparada)}</p>
+                  <button onClick={() => onSeparar(mesa.numero, false)} disabled={ocupado}
+                    className="rounded-lg border border-lavanda/30 px-3 py-1.5 text-xs font-bold text-lavanda/80
+                               hover:text-white disabled:opacity-50">
+                    Quitar
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => onSeparar(mesa.numero, true)} disabled={ocupado}
+                  className="w-full rounded-xl bg-cian text-marino py-3 text-sm font-extrabold
+                             hover:bg-cian/80 disabled:opacity-50 transition-colors">
+                  Separar para mandar a alguien
+                </button>
+              )}
+              <div className="flex items-center gap-3 rounded-xl border border-lavanda/20 bg-marino px-4 py-2.5">
+                <p className="flex-1 text-sm text-lavanda/75">Esperando a esta empresa</p>
+                <button onClick={() => onEsperar(mesa.numero, -1)} disabled={ocupado || !mesa.esperando}
+                  aria-label="Una persona menos esperando"
+                  className="w-9 h-9 rounded-lg border border-lavanda/25 text-lg font-bold disabled:opacity-30">−</button>
+                <span className="cifra text-xl font-extrabold w-6 text-center">{mesa.esperando ?? 0}</span>
+                <button onClick={() => onEsperar(mesa.numero, 1)} disabled={ocupado}
+                  aria-label="Una persona más esperando"
+                  className="w-9 h-9 rounded-lg bg-tec hover:bg-tec-claro text-lg font-bold disabled:opacity-50">+</button>
+              </div>
+              {aviso && (
+                <p className="text-xs font-semibold text-ambar bg-ambar/10 border border-ambar/40 rounded-lg px-3 py-2">
+                  {aviso}
+                </p>
+              )}
+            </div>
+          )}
 
           {!scout && mesa.carreras?.length > 0 && (
             <div>
@@ -233,6 +312,8 @@ export default function Host({ scout = false }) {
   // Abre en Bloque 1 y pasa a Bloque 2 a la 13:30 del día del evento, salvo que se elija a mano.
   const [bloque, setBloque]   = useBloqueDelDia({ pausa: acomodando })
   const [guardadoAcomodo, setGuardadoAcomodo] = useState(null)
+  const [avisoMesa, setAvisoMesa] = useState(null)       // «Otro host ya separó la mesa…»
+  const [moviendoMesa, setMoviendoMesa] = useState(false)
   const desmontado = useRef(false)
   const canalSalon = useRef(null)
   const salonPedido = useRef(false)
@@ -279,9 +360,7 @@ export default function Host({ scout = false }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'mesas_estado' }, carga => {
         const fila = carga.new
         if (!fila || fila.bloque !== bloque) return
-        setMesas(prev => prev?.map(m => m.numero === fila.numero
-          ? { ...m, estado: fila.estado, ocupado_desde: fila.ocupado_desde }
-          : m))
+        setMesas(prev => prev?.map(m => m.numero === fila.numero ? { ...m, ...loVivo(fila) } : m))
       })
       // Sin esto, una caída del websocket deja la pantalla vieja y muda.
       .subscribe(estado => {
@@ -428,13 +507,28 @@ export default function Host({ scout = false }) {
     setMarcando(estado)
     try {
       const fila = await cambiarEstado(numero, bloque, estado)
-      setMesas(prev => prev?.map(m => m.numero === numero
-        ? { ...m, estado: fila.estado, ocupado_desde: fila.ocupado_desde } : m))
+      setMesas(prev => prev?.map(m => m.numero === numero ? { ...m, ...loVivo(fila) } : m))
     } catch (e) {
       setError(e.message ?? String(e))
     }
     setMarcando(null)
   }
+
+  /** Separar y contar: solo el host. Si otro host se adelantó, el aviso sale en la hoja. */
+  async function enMesa(accion) {
+    setAvisoMesa(null)
+    setMoviendoMesa(true)
+    try {
+      const fila = await accion()
+      setMesas(prev => prev?.map(m => m.numero === fila.numero ? { ...m, ...loVivo(fila) } : m))
+    } catch (e) {
+      setAvisoMesa(String(e.message ?? e).replace('hace 0 min', 'hace menos de 1 min'))
+      traer()   // lo que haya hecho el otro host, a la vista
+    }
+    setMoviendoMesa(false)
+  }
+  const separar = (numero, si) => enMesa(() => separarMesa(numero, bloque, si))
+  const esperar = (numero, delta) => enMesa(() => ajustarEspera(numero, bloque, delta))
 
   /**
    * Para «Editar acomodo»: las filas del bloque con su empresa y giro. No se pide
@@ -468,9 +562,12 @@ export default function Host({ scout = false }) {
       {mesaAbierta && (
         <Detalle
           mesa={mesaAbierta} bloque={bloque} ahora={ahora} marcando={marcando}
-          onCerrar={() => setAbierta(null)} onMarcar={marcar}
+          onCerrar={() => { setAbierta(null); setAvisoMesa(null) }} onMarcar={marcar}
           onEditar={fuente === 'viva' && !scout ? () => abrirEdicion(mesaAbierta.numero) : null}
           scout={scout}
+          // Separar y contar escriben en la base: solo con ella viva.
+          onSeparar={fuente === 'viva' && !scout ? separar : null}
+          onEsperar={esperar} aviso={avisoMesa} ocupado={moviendoMesa}
         />
       )}
 
@@ -719,9 +816,12 @@ export default function Host({ scout = false }) {
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold truncate">{m.empresa}</span>
                       <span className="block text-[11px] text-lavanda/50 truncate">
-                        {textoEstado(m.estado)}{m.giro ? ` · ${m.giro}` : ''}
+                        {textoEstado(m.estado)}
+                        {m.separado_en && m.estado !== 'ocupado' && <span className="text-cian font-bold"> · Separada</span>}
+                        {m.giro ? ` · ${m.giro}` : ''}
                       </span>
                     </span>
+                    <PastillaEspera n={m.esperando} className="text-xs px-2 py-1 shrink-0" />
                     {m.estado === 'ocupado' && (
                       <span className={`cifra text-sm font-bold shrink-0
                                         ${p.alerta ? 'text-rojo' : 'text-lavanda/70'}`}>

@@ -40,7 +40,8 @@ export default function App() {
           <Route path="/host" element={<Protegida><Host /></Protegida>} />
           <Route path="/fila" element={<Protegida><Fila /></Protegida>} />
           {/* La pantalla para proyectar los números llamados; se abre desde /fila. */}
-          <Route path="/fila/pantalla" element={<Protegida><PantallaFila /></Protegida>} />          <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
+          <Route path="/fila/pantalla" element={<Protegida><PantallaFila /></Protegida>} />
+          <Route path="/admin" element={<Protegida><MarcoAdmin /></Protegida>}>
             <Route index element={<Tablero />} />
             <Route path="mesas" element={<Mesas />} />
             <Route path="reclutadores" element={<Reclutadores />} />

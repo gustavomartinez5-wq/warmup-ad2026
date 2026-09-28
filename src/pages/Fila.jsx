@@ -45,13 +45,15 @@ function useAvisoFila() {
 function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
   const dePortafolio = poolDe(turno.servicio) === 'portafolio'
   const PESO = { disponible: 0, break: 1, no_llego: 2, ocupado: 3 }
+  const peso = m => (PESO[m.estado] ?? 9) + (m.estado === 'disponible' && m.separado_en ? 0.5 : 0)
 
   // Solo las mesas del pool al que va esta persona: las de portafolio se
   // reconocen por su giro, no por su número, para que sigan siendo ciertas
   // si esas mesas se mueven.
   const opciones = useMemo(() => (mesas ?? [])
     .filter(m => (m.giro === GIRO_PORTAFOLIO) === dePortafolio)
-    .sort((a, b) => (PESO[a.estado] ?? 9) - (PESO[b.estado] ?? 9) || a.numero - b.numero),
+    // Una disponible que un host ya separó baja después de las libres: ya va alguien.
+    .sort((a, b) => peso(a) - peso(b) || a.numero - b.numero),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [mesas, dePortafolio])
 
@@ -110,12 +112,25 @@ function HojaLlamar({ turno, mesas, bloque, onBloque, onElegir, onCerrar }) {
                         <span className="block text-[15px] font-semibold truncate">{m.empresa}</span>
                         {m.giro && <span className="block text-xs text-lavanda/50 truncate">{m.giro}</span>}
                       </span>
-                      <span className={`text-[11px] font-semibold shrink-0 ${
-                        m.estado === 'ocupado' ? 'text-tec-claro'
-                        : m.estado === 'break' ? 'text-ambar'
-                        : m.estado === 'no_llego' ? 'text-lavanda/40'
-                        : 'text-teal'}`}>
-                        {textoEstado(m.estado)}
+                      {/* Separado y personas esperando: lo mueve el host en /host; aquí solo se ve. */}
+                      <span className="shrink-0 flex flex-col items-end gap-0.5">
+                        <span className={`text-[11px] font-semibold ${
+                          m.estado === 'ocupado' ? 'text-tec-claro'
+                          : m.estado === 'break' ? 'text-ambar'
+                          : m.estado === 'no_llego' ? 'text-lavanda/40'
+                          : 'text-teal'}`}>
+                          {textoEstado(m.estado)}
+                        </span>
+                        {(m.separado_en && m.estado !== 'ocupado') || m.esperando > 0 ? (
+                          <span className="flex items-center gap-1 text-[10px] font-bold">
+                            {m.separado_en && m.estado !== 'ocupado' && <span className="text-cian">Separada</span>}
+                            {m.esperando > 0 && (
+                              <span className="cifra rounded-full bg-white text-marino px-1.5 py-0.5 leading-none">
+                                +{m.esperando}
+                              </span>
+                            )}
+                          </span>
+                        ) : null}
                       </span>
                     </button>
                   </li>

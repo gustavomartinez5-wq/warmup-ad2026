@@ -29,6 +29,18 @@ async function llamar(funcion, argumentos) {
 }
 
 /**
+ * Separar una mesa antes de mandarle a alguien, para que el otro host no mande a otro.
+ * Si ya estaba separada, la base lo rechaza con «Otro host ya separó la mesa…».
+ * Se quita sola al marcar Ocupado (migración 15).
+ */
+export const separarMesa = (numero, bloque, separar) =>
+  llamar('separar_mesa', { p_numero: numero, p_bloque: bloque, p_separar: separar })
+
+/** Cuántas personas esperan a esa empresa: +1 o −1. Nunca baja de 0. */
+export const ajustarEspera = (numero, bloque, delta) =>
+  llamar('ajustar_espera', { p_numero: numero, p_bloque: bloque, p_delta: delta })
+
+/**
  * Todo lo que necesita la hoja de edición, en tres consultas. Se llama al abrirla
  * por primera vez, no al abrir `/host`: quien nunca edite no paga nada.
  *

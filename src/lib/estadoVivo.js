@@ -55,11 +55,17 @@ export function pintar(mesa, ahora = Date.now()) {
   return { celda: 'bg-teal/80 border-teal text-white', segundos: 0, parpadea: false, alerta: false }
 }
 
-/** Disponibles arriba; entre iguales, las que llevan más tiempo primero. */
+/**
+ * Peso para ordenar. Una disponible que otro host ya separó baja después de las
+ * disponibles libres: ya va alguien en camino (migración 15).
+ */
+export const pesoDe = m => (PESO[m.estado] ?? 0) + (m.estado === 'disponible' && m.separado_en ? 0.5 : 0)
+
+/** Disponibles libres arriba; entre iguales, las que llevan más tiempo primero. */
 export function ordenarParaLista(mesas, ahora = Date.now()) {
   return [...mesas].sort((a, b) => {
-    const pa = PESO[a.estado] ?? 0
-    const pb = PESO[b.estado] ?? 0
+    const pa = pesoDe(a)
+    const pb = pesoDe(b)
     if (pa !== pb) return pa - pb
     if (a.estado === 'ocupado' && b.estado === 'ocupado') {
       return segundosDesde(b.ocupado_desde, ahora) - segundosDesde(a.ocupado_desde, ahora)

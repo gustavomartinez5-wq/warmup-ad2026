@@ -45,6 +45,23 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### Separado y personas esperando · 27-sep-2026
+
+Dos hosts mandan estudiantes a la vez y podían mandar a dos a la misma mesa. Migración 15 y botones
+en la hoja de cada mesa de `/host`: «Separar para mandar a alguien» y «Esperando a esta empresa
+− N +». Scouts y `/fila` solo lo ven. Decidió Gustavo: el separado se quita solo al marcar Ocupado;
+el contador se mueve a mano.
+
+| Prueba | Resultado |
+|---|---|
+| Migración dentro de una transacción que se deshizo, con la cuenta del equipo | Separar · separar otra vez rechazado · +1 dos veces = 2 · −1 con 0 = 0 · Ocupado quita el separado · quitar a mano · `mesas_publicas` con las columnas nuevas · mesa inexistente rechazada |
+| Como anon | `separar_mesa` y `ajustar_espera` rechazadas; `mesas_publicas` lee las 74 mesas |
+| Después de aplicarla, `/scout` en producción sin sesión | Carga las 75 mesas, en vivo |
+| Ruta temporal a 390 px (se quitó) | «Sep.» y «+N» legibles en la mesa angosta; hoja de host con botones y aviso; hoja de scout solo con texto |
+| `npm run build` | Limpio |
+
+Falta la prueba con dos teléfonos y la cuenta del equipo.
+
 ### Todo abre en Bloque 1 · 27-sep-2026
 
 Gustavo pidió que las vistas abran siempre en Bloque 1 y que la app cambie a Bloque 2 por la hora.
