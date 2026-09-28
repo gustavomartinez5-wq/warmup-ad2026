@@ -45,6 +45,23 @@ dónde quedamos.
 
 ## Fases cerradas
 
+### Acomodo final del Bloque 2 · 27-sep-2026
+
+El Bloque 2 seguía con los números de antes del montaje del 26-sep. Se aplicó la propuesta
+`Ediciones/WarmUp AD26/zonas/proponer-b2-final.mjs`, con un cambio de Gustavo: P&G y Viakable
+intercambian lugares para que queden cerca (Viakable 55-56, P&G 62-63). Se ve en
+`Ediciones/WarmUp AD26/WarmUp AD26 - Propuesta Bloque 2 final.html`.
+
+- Un llamado a `acomodar_mesas('b2', …)`, en `zonas/aplicar-b2-final.sql`; queda en `/admin/cambios`.
+- La fila de atrás va vacía, salvo la 75. Libres: 4, 11, 12, 19, 20, 27, 28, 35, 36, 43, 44, 51, 52, 59, 60, 67 y 68.
+- 8 mesas conservan el logo de la mañana (13, 16, 22, 23, 24, 38, 39, 58).
+
+| Prueba | Resultado |
+|---|---|
+| Base antes de aplicar contra la lectura usada para la propuesta | Idéntica; ninguna mesa ocupada |
+| Base después, mesa por mesa contra la propuesta | Idéntica: 58 mesas |
+| `hornear-mapa.mjs --verificar` | Al día: 74 en B1, 58 en B2 |
+
 ### Montaje del salón en 19 columnas · 26-sep-2026
 
 Cambió el montaje del salón. Gustavo lo dibujó sobre el croquis de mayo y decidió: 19 columnas de 4
